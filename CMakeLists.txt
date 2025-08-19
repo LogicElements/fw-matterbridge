@@ -56,9 +56,9 @@ target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE "Core/Inc")
 target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC "Core/Codegen" "Core/Codegen/zap-generated")
 
 target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE
-		USE_NUCLEO_64
+#		USE_NUCLEO_64
 		USE_HAL_DRIVER
-		USE_STM32WBXX_NUCLEO
+#		USE_STM32WBXX_NUCLEO
 		STM32WB55xx
 		$<$<CONFIG:Debug>:DEBUG>
 		CHIP_DNSSD_DEFAULT_PLATFORM

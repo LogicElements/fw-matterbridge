@@ -24,8 +24,6 @@
 
 #include "AppEvent.h"
 #include "app_entry.h"
-#include "LightingManager.h"
-
 
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/stm32/stm32wb/FactoryDataProvider.h>
@@ -37,29 +35,17 @@ public:
 	    CHIP_ERROR StartAppTask();
 	    CHIP_ERROR Init();
 	    static void AppTaskMain(void * pvParameter);
-	    void PostLightActionRequest(int32_t aActor, LightingManager::Action_t aAction);
 	    void PostEvent(const AppEvent * event);
 	    static void UpdateClusterState();
 	    CHIP_ERROR InitMatter(void);
-	    static void ButtonEventHandler(Push_Button_st *Button);
 
 protected:
 	    TaskHandle_t mAppTask      = NULL;
 
 private:
     friend AppTask & GetAppTask(void);
-       static void ActionInitiated(LightingManager::Action_t aAction);
-       static void ActionCompleted(LightingManager::Action_t aAction);
-       void CancelTimer(void);
        void DispatchEvent(AppEvent * event);
-       static void FunctionHandler(AppEvent * aEvent);
-       static void LightingActionEventHandler(AppEvent * aEvent);
-       static void TimerEventHandler(TimerHandle_t xTimer);
-       static void DelayNvmHandler(void);
        static void MatterEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
-       static void UpdateLCD(void);
-       static void UpdateLEDs(void);
-       static void UpdateNvmEventHandler(AppEvent * aEvent);
 
     enum Function_t
     {

@@ -67,18 +67,12 @@ using chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr;
 AppTask AppTask::sAppTask;
 chip::DeviceLayer::FactoryDataProvider mFactoryDataProvider;
 
-#ifdef USE_STM32WBXX_NUCLEO
-#define APP_FUNCTION_BUTTON1 BUTTON_SW1
-#define APP_FUNCTION_BUTTON2 BUTTON_SW2
-#endif /* USE_STM32WBXX_NUCLEO */
-
 // #define STM32ThreadDataSet "STM32DataSet"
 #define APP_EVENT_QUEUE_SIZE 10
 #define NVM_TIMEOUT 5000 // timer to handle PB to save data in nvm or do a factory reset
 #define STM32_LIGHT_ENDPOINT_ID 1
 
 static QueueHandle_t sAppEventQueue;
-TimerHandle_t sPushButtonTimeoutTimer;
 const osThreadAttr_t AppTask_attr = {.name = APPTASK_NAME, .attr_bits = APP_ATTR_BITS, .cb_mem = APP_CB_MEM, .cb_size = APP_CB_SIZE, .stack_mem = APP_STACK_MEM, .stack_size = APP_STACK_SIZE, .priority = APP_PRIORITY};
 
 static bool sIsThreadProvisioned = false;
@@ -87,8 +81,6 @@ static bool sHaveBLEConnections = false;
 static bool sFabricNeedSaved = false;
 static bool sFailCommissioning = false;
 static bool sHaveFabric = false;
-static uint8_t NvmTimerCpt = 0;
-static uint8_t NvmButtonStateCpt = 0;
 
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
@@ -117,18 +109,6 @@ CHIP_ERROR AppTask::Init()
 	CHIP_ERROR err = CHIP_NO_ERROR;
 	ChipLogProgress(NotSpecified, "Current Software Version: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
 
-	// Setup button handler
-	APP_ENTRY_PBSetReceiveCallback(ButtonEventHandler);
-
-	// Create FreeRTOS sw timer for Push button timeouts.
-	sPushButtonTimeoutTimer = xTimerCreate("PushButtonTimer", // Just a text name, not used by the RTOS kernel
-										   pdMS_TO_TICKS(NVM_TIMEOUT), // == default timer period (mS)
-										   true, // no timer reload (==one-shot)
-										   (void*)this, // init timer id
-										   TimerEventHandler // timer callback handler
-	);
-
-
 	ThreadStackMgr().InitThreadStack();
 
 #if (CHIP_DEVICE_CONFIG_ENABLE_SED == 1)
@@ -138,14 +118,6 @@ CHIP_ERROR AppTask::Init()
 #endif
 
 	PlatformMgr().AddEventHandler(MatterEventHandler, 0);
-
-	err = LightingMgr().Init();
-	if (err != CHIP_NO_ERROR)
-	{
-		APP_DBG("LightingMgr().Init() failed");
-		return err;
-	}
-	LightingMgr().SetCallbacks(ActionInitiated, ActionCompleted);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
 	chip::app::DnssdServer::Instance().SetExtendedDiscoveryTimeoutSecs(extDiscTimeoutSecs);
@@ -233,8 +205,6 @@ void AppTask::AppTaskMain(void* pvParameter)
 
 	APP_DBG("App Task started");
 
-	xTimerStart(sPushButtonTimeoutTimer, 0);
-
 	while (true)
 	{
 
@@ -251,152 +221,6 @@ void AppTask::AppTaskMain(void* pvParameter)
 		mbedtls_memory_buffer_alloc_max_get(&max_used, &max_blocks);
 
 #endif // endif HIGHWATERMARK
-	}
-}
-
-void AppTask::LightingActionEventHandler(AppEvent* aEvent)
-{
-	LightingManager::Action_t action;
-
-	if (aEvent->Type == AppEvent::kEventType_Button)
-	{
-		// Toggle light
-		if (LightingMgr().IsTurnedOn())
-		{
-			action = LightingManager::OFF_ACTION;
-		}
-		else
-		{
-			action = LightingManager::ON_ACTION;
-		}
-
-		sAppTask.mSyncClusterToButtonAction = true;
-		LightingMgr().InitiateAction(action, 0, 0, 0);
-	}
-	if (aEvent->Type == AppEvent::kEventType_Level && aEvent->ButtonEvent.Action != 0)
-	{
-		// Toggle Dimming of light between 2 fixed levels
-		uint8_t val = 0x0;
-		val = LightingMgr().GetLevel() == 0x7f ? 0x1 : 0x7f;
-		action = LightingManager::LEVEL_ACTION;
-
-		sAppTask.mSyncClusterToButtonAction = true;
-		LightingMgr().InitiateAction(action, 0, 1, &val);
-	}
-}
-
-void AppTask::ButtonEventHandler(Push_Button_st* Button)
-{
-	AppEvent button_event = {};
-	button_event.Type = AppEvent::kEventType_Button;
-	button_event.ButtonEvent.ButtonIdx = Button->Pushed_Button;
-	button_event.ButtonEvent.Action = Button->State;
-
-	if (Button->Pushed_Button == APP_FUNCTION_BUTTON1)
-	{
-		// Hand off to Functionality handler - depends on duration of press
-		button_event.Handler = FunctionHandler;
-	}
-	else if (Button->Pushed_Button == APP_FUNCTION_BUTTON2)
-	{
-		// not implemented for this App
-	}
-	else
-	{
-		return;
-	}
-
-	sAppTask.PostEvent(&button_event);
-}
-
-void AppTask::TimerEventHandler(TimerHandle_t xTimer)
-{
-	UpdateClusterState();
-
-	// NvmTimerCpt++;
-	// if (BSP_PB_GetState(APP_FUNCTION_BUTTON1) == 0)
-	// {
-	// 	NvmButtonStateCpt++;
-	// }
-	// if (NvmTimerCpt >= 10)
-	// {
-	// 	xTimerStop(sPushButtonTimeoutTimer, 0);
-	// 	if (NvmButtonStateCpt >= 9)
-	// 	{
-	// 		AppEvent event;
-	// 		event.Type = AppEvent::kEventType_Timer;
-	// 		event.Handler = UpdateNvmEventHandler;
-	// 		sAppTask.mFunction = kFunction_FactoryReset;
-	// 		sAppTask.PostEvent(&event);
-	// 	}
-	// }
-	// else if ((NvmTimerCpt > NvmButtonStateCpt) && (NvmTimerCpt <= 2))
-	// {
-	// 	xTimerStop(sPushButtonTimeoutTimer, 0);
-	// 	if (sHaveFabric == true)
-	// 	{
-	// 		AppEvent event;
-	// 		event.Type = AppEvent::kEventType_Timer;
-	// 		event.Handler = UpdateNvmEventHandler;
-	// 		sAppTask.mFunction = kFunction_SaveNvm;
-	// 		sAppTask.PostEvent(&event);
-	// 	}
-	// }
-}
-
-void AppTask::FunctionHandler(AppEvent* aEvent)
-{
-	if (xTimerIsTimerActive(sPushButtonTimeoutTimer) == 0)
-	{
-		xTimerStart(sPushButtonTimeoutTimer, 0);
-		NvmTimerCpt = 0;
-		NvmButtonStateCpt = 0;
-	}
-}
-
-void AppTask::ActionInitiated(LightingManager::Action_t aAction)
-{
-	// Placeholder for light action
-	if (aAction == LightingManager::ON_ACTION)
-	{
-		APP_DBG("Light goes on");
-
-#ifdef USE_STM32WBXX_NUCLEO
-		APP_ENTRY_LedBlink(LED3, 1);
-#endif /* USE_STM32WBXX_NUCLEO */
-	}
-	else if (aAction == LightingManager::OFF_ACTION)
-	{
-		APP_DBG("Light goes off ");
-
-#ifdef USE_STM32WBXX_NUCLEO
-		APP_ENTRY_LedBlink(LED3, 0);
-#endif /* USE_STM32WBXX_NUCLEO */
-	}
-	else if (aAction == LightingManager::LEVEL_ACTION)
-	{
-		if (LightingMgr().IsTurnedOn())
-		{
-			APP_DBG("Update level control %d", LightingMgr().GetLevel());
-		}
-	}
-}
-
-void AppTask::ActionCompleted(LightingManager::Action_t aAction)
-{
-	// Placeholder for light action completed
-	if (aAction == LightingManager::ON_ACTION)
-	{
-		APP_DBG("Light action on completed");
-	}
-	else if (aAction == LightingManager::OFF_ACTION)
-	{
-		APP_DBG("Light action off completed");
-	}
-	if (sAppTask.mSyncClusterToButtonAction)
-	{
-		sAppTask.UpdateClusterState();
-		sAppTask.mSyncClusterToButtonAction = false;
 	}
 }
 
@@ -457,54 +281,6 @@ void AppTask::UpdateClusterState()
 	}
 }
 
-void AppTask::DelayNvmHandler() {}
-
-#ifdef USE_STM32WBXX_NUCLEO
-void AppTask::UpdateLCD(void) { /* nothing for Nucleo */ }
-void AppTask::UpdateLEDs(void)
-{
-	if (sIsThreadProvisioned && sIsThreadEnabled)
-	{
-		APP_ENTRY_LedBlink(LED2, 1);
-	}
-	else if ((sIsThreadProvisioned == false) || (sIsThreadEnabled == false))
-	{
-		APP_ENTRY_LedBlink(LED2, 0);
-	}
-	if (sHaveBLEConnections)
-	{
-		APP_ENTRY_LedBlink(LED1, 1);
-	}
-	else if (sHaveBLEConnections == false)
-	{
-		APP_ENTRY_LedBlink(LED1, 0);
-	}
-}
-#endif /* USE_STM32WBXX_NUCLEO */
-
-void AppTask::UpdateNvmEventHandler(AppEvent* aEvent)
-{
-	// uint8_t err = 0;
-	//
-	// if (sAppTask.mFunction == kFunction_SaveNvm)
-	// {
-	// 	err = NM_Dump();
-	// 	if (err == 0)
-	// 	{
-	// 		APP_DBG("SAVE NVM");
-	// 	}
-	// 	else
-	// 	{
-	// 		APP_DBG("Failed to SAVE NVM");
-	// 	}
-	// }
-	// else if (sAppTask.mFunction == kFunction_FactoryReset)
-	// {
-	// 	APP_DBG("FACTORY RESET");
-	// 	NM_ResetFactory();
-	// }
-}
-
 void AppTask::MatterEventHandler(const ChipDeviceEvent* event, intptr_t)
 {
 	switch (event->Type)
@@ -512,16 +288,12 @@ void AppTask::MatterEventHandler(const ChipDeviceEvent* event, intptr_t)
 	case DeviceEventType::kServiceProvisioningChange:
 		{
 			sIsThreadProvisioned = event->ServiceProvisioningChange.IsServiceProvisioned;
-			UpdateLCD();
-			UpdateLEDs();
 			break;
 		}
 
 	case DeviceEventType::kThreadConnectivityChange:
 		{
 			sIsThreadEnabled = (event->ThreadConnectivityChange.Result == kConnectivity_Established);
-			UpdateLCD();
-			UpdateLEDs();
 			break;
 		}
 
@@ -529,8 +301,6 @@ void AppTask::MatterEventHandler(const ChipDeviceEvent* event, intptr_t)
 		{
 			sHaveBLEConnections = true;
 			APP_DBG("kCHIPoBLEConnectionEstablished");
-			UpdateLCD();
-			UpdateLEDs();
 			break;
 		}
 
@@ -538,12 +308,9 @@ void AppTask::MatterEventHandler(const ChipDeviceEvent* event, intptr_t)
 		{
 			sHaveBLEConnections = false;
 			APP_DBG("kCHIPoBLEConnectionClosed");
-			UpdateLCD();
-			UpdateLEDs();
 			if (sFabricNeedSaved)
 			{
 				APP_DBG("Start timer to save nvm after commissioning finish");
-				DelayNvmHandler();
 				sFabricNeedSaved = false;
 			}
 			break;
@@ -557,15 +324,12 @@ void AppTask::MatterEventHandler(const ChipDeviceEvent* event, intptr_t)
 			if (sHaveBLEConnections == false)
 			{
 				APP_DBG("Start timer to save nvm after commissioning finish");
-				DelayNvmHandler();
 				sFabricNeedSaved = false; // put to false to avoid save in nvm 2 times
 			}
-			UpdateLCD();
 			break;
 		}
 	case DeviceEventType::kFailSafeTimerExpired:
 		{
-			UpdateLCD();
 			sFailCommissioning = true;
 			break;
 		}

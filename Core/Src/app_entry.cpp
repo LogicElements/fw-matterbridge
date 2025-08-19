@@ -31,17 +31,8 @@
 #include "shci.h"
 #include "shci_tl.h"
 #include "stm32_lpm.h"
-#include "stm_logging.h"
-
-
-#ifdef USE_STM32WB5M_DK
-#if (CFG_LCD_SUPPORTED == 1)
-#include "ssd1315.h"
-#include "stm32_lcd.h"
-#include "stm32wb5mm_dk_lcd.h"
-#endif /* (CFG_LCD_SUPPORTED == 1) */
 #include "stm_ext_flash.h"
-#endif /* USE_STM32WB5M_DK */
+#include "stm_logging.h"
 
 #include "AppTask.h"
 #include "STM32FreeRtosHooks.h"
@@ -132,15 +123,12 @@ static void APPE_SysEvtError(SCHI_SystemErrCode_t ErrorCode);
 static void Init_Debug(void);
 
 static void ShciUserEvtProcess(void* argument);
-static void PushButtonEvtProcess(void* argument);
 
 #if (ENABLE_IWDG_SUPPORT == 1)
 static void IWDSBSFUEvtProcess(void* argument);
 #endif /* (ENABLE_IWDG_SUPPORT == 1) */
 
 /* USER CODE BEGIN PFP */
-static void Led_Init(void);
-static void Button_Init(void);
 #if (CFG_HW_EXTPA_ENABLED == 1)
 static void ExtPA_Init(void);
 #endif
@@ -210,9 +198,7 @@ void APPE_Init(void)
 	Init_Debug();
 
 	/* FLASH init */
-#ifdef USE_STM32WB5M_DK
 	STM_EXT_FLASH_Init();
-#endif /* USE_STM32WB5M_DK */
 
 	NM_Init();
 
@@ -220,13 +206,7 @@ void APPE_Init(void)
 	APP_DBG("**********************************************************");
 	APP_DBG("PRODUCT NAME : " PRODUCT_NAME);
 	APP_DBG("VENDOR NAME : " VENDOR_NAME);
-#if defined(USE_STM32WB5M_DK)
-	APP_DBG("HARDWARE : STM32WB5MM-DK");
-#elif defined(USE_STM32WBXX_NUCLEO)
-	APP_DBG("HARDWARE : STM32WBXX_NUCLEO");
-#else
-	APP_DBG("HARDWARE : UNSPECIFIED");
-#endif
+	APP_DBG("HARDWARE : MatterBridge");
 	APP_DBG("SOFTWARE : X-CUBE-MATTER release revision " X_CUBE_MATTER_VERSION);
 	APP_DBG("Embedded SW components :");
 	APP_DBG("- Matter SDK version : " MATTER_SDK_VERSION);
@@ -241,33 +221,9 @@ void APPE_Init(void)
 	 */
 	UTIL_LPM_SetOffMode(1 << CFG_LPM_APP, UTIL_LPM_DISABLE);
 
-	OsPushButtonProcessId = osThreadNew(PushButtonEvtProcess, NULL, &PushButtonProcess_attr);
 #if (ENABLE_IWDG_SUPPORT == 1)
 	OsIWDSBSFUId = osThreadNew(IWDSBSFUEvtProcess, NULL, &IWDSBSFU_attr);
 #endif /* (ENABLE_IWDG_SUPPORT == 1) */
-
-	Led_Init();
-	Button_Init();
-
-#ifdef USE_STM32WB5M_DK
-#if (CFG_LCD_SUPPORTED == 1)
-	BSP_LCD_Init(0, LCD_ORIENTATION_LANDSCAPE);
-	/* Set LCD Foreground Layer  */
-	UTIL_LCD_SetFuncDriver(&LCD_Driver); /* SetFunc before setting device */
-	UTIL_LCD_SetDevice(0); /* SetDevice after funcDriver is set */
-	BSP_LCD_Clear(0, SSD1315_COLOR_BLACK);
-	BSP_LCD_DisplayOn(0);
-	BSP_LCD_Refresh(0);
-	UTIL_LCD_SetFont(&Font12);
-	/* Set the LCD Text Color */
-	UTIL_LCD_SetTextColor(SSD1315_COLOR_WHITE);
-	UTIL_LCD_SetBackColor(SSD1315_COLOR_BLACK);
-	BSP_LCD_Clear(0, SSD1315_COLOR_BLACK);
-	BSP_LCD_Refresh(0);
-	UTIL_LCD_DisplayStringAt(0, 0, (uint8_t*)PRODUCT_NAME, CENTER_MODE);
-	BSP_LCD_Refresh(0);
-#endif /* (CFG_LCD_SUPPORTED == 1) */
-#endif /* USE_STM32WB5M_DK */
 
 	/* USER CODE END APPE_Init_1 */
 	/* Initialize all transport layers and start CPU2 which will send back a ready event to CPU1 */
@@ -286,20 +242,6 @@ void APPE_Init(void)
 	/* USER CODE END APPE_Init_2 */
 	return;
 }
-
-#ifdef USE_STM32WBXX_NUCLEO
-void APP_ENTRY_LedBlink(Led_TypeDef Led, uint8_t LedStatus)
-{
-	if (LedStatus == 1)
-	{
-		BSP_LED_On(Led);
-	}
-	else
-	{
-		BSP_LED_Off(Led);
-	}
-}
-#endif /* USE_STM32WBXX_NUCLEO */
 
 /*************************************************************
  *
@@ -644,48 +586,6 @@ static void APPE_SysEvtReadyProcessing(void)
 	return;
 }
 
-static void Led_Init(void)
-{
-#if (CFG_LED_SUPPORTED == 1U)
-	/**
-	 * Leds Initialization
-	 */
-
-#ifdef USE_STM32WBXX_NUCLEO
-	BSP_LED_Init(LED_BLUE);
-	BSP_LED_Init(LED_GREEN);
-	BSP_LED_Init(LED_RED);
-#endif /* USE_STM32WBXX_NUCLEO */
-
-#endif
-
-	return;
-}
-
-static void Button_Init(void)
-{
-
-#if (CFG_BUTTON_SUPPORTED == 1U)
-	/**
-	 * Button Initialization
-	 */
-
-#ifdef USE_STM32WBXX_NUCLEO
-	BSP_PB_Init(BUTTON_SW1, BUTTON_MODE_GPIO);
-	BSP_PB_Init(BUTTON_SW2, BUTTON_MODE_GPIO);
-	BSP_PB_Init(BUTTON_SW3, BUTTON_MODE_GPIO);
-#endif /* USE_STM32WBXX_NUCLEO */
-
-#ifdef USE_STM32WB5M_DK
-	BSP_PB_Init(BUTTON_USER1, BUTTON_MODE_EXTI);
-	BSP_PB_Init(BUTTON_USER2, BUTTON_MODE_EXTI);
-#endif /* USE_STM32WB5M_DK */
-
-#endif
-
-	return;
-}
-
 #if (CFG_HW_EXTPA_ENABLED == 1)
 static void ExtPA_Init(void)
 {
@@ -710,54 +610,6 @@ static void ExtPA_Init(void)
 	SHCI_C2_ExtpaConfig((uint32_t)GPIO_EXT_PA_EN_PORT, GPIO_EXT_PA_EN_PIN, EXT_PA_ENABLED_HIGH, EXT_PA_ENABLED);
 }
 #endif /* CFG_HW_EXTPA_ENABLED */
-
-/*************************************************************
- *
- * WRAP FUNCTIONS
- *
- *************************************************************/
-static void PushButtonEvtProcess(void* argument)
-{
-	UNUSED(argument);
-	uint32_t ButtonPressed = 0;
-
-	for (;;)
-	{
-		/* USER CODE BEGIN SHCI_USER_EVT_PROCESS_1 */
-
-		/* USER CODE END SHCI_USER_EVT_PROCESS_1 */
-		ButtonPressed = osThreadFlagsWait(3, osFlagsWaitAny, osWaitForever);
-		Push_Button_st Message;
-#ifdef USE_STM32WBXX_NUCLEO
-		if (1 == ButtonPressed)
-		{
-			Message.Pushed_Button = BUTTON_SW1;
-			Message.State = 1;
-		}
-#endif /* USE_STM32WBXX_NUCLEO */
-
-#ifdef USE_STM32WB5M_DK
-		if (1 == ButtonPressed)
-		{
-			Message.Pushed_Button = BUTTON_USER1;
-			Message.State = 1;
-		}
-		if (2 == ButtonPressed)
-		{
-			Message.Pushed_Button = BUTTON_USER2;
-			Message.State = 2;
-		}
-#endif /* USE_STM32WB5M_DK */
-
-		if (PbCb != NULL)
-		{
-			PbCb(&Message); // call matter callback to handle push button
-		}
-		/* USER CODE BEGIN SHCI_USER_EVT_PROCESS_2 */
-
-		/* USER CODE END SHCI_USER_EVT_PROCESS_2 */
-	}
-}
 
 static void ShciUserEvtProcess(void* argument)
 {
@@ -869,64 +721,6 @@ void DbgOutputTraces(uint8_t* p_data, uint16_t size, void (*cb)(void))
 	return;
 }
 #endif
-
-#ifdef USE_STM32WBXX_NUCLEO
-/**
- * @brief This function manage the Push button action
- * @param  GPIO_Pin : GPIO pin which has been activated
- * @retval None
- */
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
-{
-	switch (GPIO_Pin)
-	{
-	case BUTTON_SW1_PIN:
-		APP_DBG("BUTTON 1 PUSHED !");
-		osThreadFlagsSet(OsPushButtonProcessId, 1);
-		break;
-
-	case BUTTON_SW2_PIN:
-		APP_DBG("BUTTON 2 PUSHED ! Not used");
-		break;
-
-	case BUTTON_SW3_PIN:
-		APP_DBG("BUTTON 3 PUSHED ! Not used");
-		break;
-
-	default:
-		break;
-	}
-
-	return;
-}
-#endif /* USE_STM32WBXX_NUCLEO */
-
-#ifdef USE_STM32WB5M_DK
-/**
- * @brief This function manage the Push button action
- * @param  GPIO_Pin : GPIO pin which has been activated
- * @retval None
- */
-void BSP_PB_Callback(Button_TypeDef Button)
-{
-	switch (Button)
-	{
-	case BUTTON_USER1:
-		APP_DBG("BUTTON 1 PUSHED !");
-		osThreadFlagsSet(OsPushButtonProcessId, 1);
-		break;
-
-	case BUTTON_USER2:
-		APP_DBG("BUTTON 2 PUSHED !");
-		osThreadFlagsSet(OsPushButtonProcessId, 2);
-		break;
-
-	default:
-		break;
-	}
-	return;
-}
-#endif /* USE_STM32WB5M_DK */
 
 #ifdef __cplusplus
 }

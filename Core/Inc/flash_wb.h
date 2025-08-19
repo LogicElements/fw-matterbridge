@@ -30,6 +30,7 @@
 extern "C" {
 #endif
 
+
 typedef enum
 {
 	NVM_OK,
@@ -60,7 +61,7 @@ typedef enum
  * @brief  Copy Flash to RAM NVM
  */
 
-void NM_Init(void);
+NVM_StatusTypeDef NM_Init(void);
 
 
 /**
@@ -69,11 +70,12 @@ void NM_Init(void);
 NVM_StatusTypeDef NM_Dump(void);
 
 /**
- * @brief  check the nvm if it s corrupted or not
- * @retval return NVM_OK if nvm is empty or NVM_FLASH_CORRUPTION if it s not empty
+ * @brief   search KeyName in RAM NVM and return if the key exists
+ *
+ * @param  KeyName:  	  Name of Key needed
+ * @retval return state of function
  */
-NVM_StatusTypeDef NM_Check_Validity(void);
-
+NVM_StatusTypeDef NM_GetKeyExists(const char* KeyName, NVM_Sector sector);
 
 /**
  * @brief   Get KeyName in RAM NVM and return the value of Key in KeyValue
@@ -91,7 +93,6 @@ NVM_StatusTypeDef NM_GetKeyValue(void* KeyValue, const char* KeyName, uint32_t K
  *
  * @param  KeyValue:     Address of the buffer
  * @param  KeyName:  	  Name of Key needed
- * @param  KeyAddr:   	  TODO DELETED this param
  * @param  KeySize:   	  size of KeyValue
  * @param  read_by_size: return size of KeyValue found
  * @retval return state of function
@@ -107,13 +108,6 @@ NVM_StatusTypeDef NM_SetKeyValue(char* KeyValue, char* KeyName, uint32_t KeySize
 
 NVM_StatusTypeDef NM_DeleteKey(const char* Keyname, NVM_Sector sector);
 
-/**
- * @brief   search KeyName in RAM NVM and return if the key exists
- *
- * @param  KeyName:  	  Name of Key needed
- * @retval return state of function
- */
-NVM_StatusTypeDef NM_GetKeyExists(const char* KeyName, NVM_Sector sector);
 
 /**
  * @brief  Get the address of the OT NVM buffer
@@ -126,7 +120,6 @@ NVM_StatusTypeDef NM_GetOtNVMAddr(uint32_t* NVMAddr);
  * @brief  Erase all persistent and reboot program
  */
 void NM_ResetFactory(void);
-void NM_FullErase(void);
 
 #ifdef __cplusplus
 }

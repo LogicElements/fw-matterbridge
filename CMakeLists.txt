@@ -46,6 +46,7 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
 		"Core/Codegen/zap-generated/app/callback-stub.cpp"
 		"Core/Codegen/zap-generated/app/cluster-init-callback.cpp"
 		"Core/Codegen/zap-generated/IMClusterCommandHandler.cpp"
+		"Library/Drivers/BSP/Components/s25fl128s/s25fl128s.c"
 
 		startup_stm32wb55xx_cm4.s
 )

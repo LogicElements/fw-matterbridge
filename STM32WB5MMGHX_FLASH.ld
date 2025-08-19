@@ -45,9 +45,8 @@ _Min_Stack_Size = 0x1000;   /* required amount of stack */
 /* Specify the memory areas */
 MEMORY
 {
-FLASH (rx)                 : ORIGIN = 0x08000000, LENGTH = 520K
-NVM_MATTER				   : ORIGIN = 0x08082000, LENGTH = 0x3000
-RAM1 (xrw)                 : ORIGIN = 0x20000008, LENGTH = 0x26EC4 /*0x23bfc */
+FLASH (rx)                 : ORIGIN = 0x08000000, LENGTH = 592K
+RAM1 (xrw)                 : ORIGIN = 0x20000008, LENGTH = 0x2B7E8
 RAM_SHARED (xrw)           : ORIGIN = 0x20030000, LENGTH = 10K
 }
 
@@ -99,20 +98,6 @@ SECTIONS
     *(.ARM.exidx*)
     __exidx_end = .;
   } >FLASH
-
-_nvm_matter_init_base = LOADADDR(.nvm_matter);
-_nvm_matter_init_length = SIZEOF(.nvm_matter);
-
- .nvm_matter :
-  {
-    . = ALIGN(4);
-    _nvm_matter_start = .;        /* create a global symbol at nvm_matter start */
-    *(.nvm_matter)         /* .nvm_matter sections */
-    *(.nvm_matter*)        /* .nvm_matter* sections */
-    . = ALIGN(4);
-    _nvm_matter_end = .;         /* define a global symbols at end of nvm_matter */
-
-  } >NVM_MATTER
 
   .preinit_array (READONLY) : /* The READONLY keyword is only supported in GCC11 and later, remove it if using GCC10 or earlier. */
   {

@@ -134,11 +134,6 @@ static void ExtPA_Init(void);
 #endif
 /* USER CODE END PFP */
 
-// Callback function to handle pushbutton to apptask
-PushButtonCallback PbCb = NULL;
-
-void APP_ENTRY_PBSetReceiveCallback(PushButtonCallback aCallback) { PbCb = aCallback; }
-
 /* Functions Definition ------------------------------------------------------*/
 void APPE_Config(void)
 {
@@ -554,11 +549,11 @@ static void APPE_SysEvtReadyProcessing(void)
 	APP_THREAD_CheckWirelessFirmwareInfo();
 
 	/* Set the address that will be used by OT stack for NVM data management */
-	// if (NM_GetOtNVMAddr(&Ot_NVMAddr) == NVM_OK)
-	// {
-	// 	config_param.ThreadNvmRamAddress = Ot_NVMAddr;
-	// 	(void)SHCI_C2_Config(&config_param);
-	// }
+	if (NM_GetOtNVMAddr(&Ot_NVMAddr) == NVM_OK)
+	{
+		config_param.ThreadNvmRamAddress = Ot_NVMAddr;
+		(void)SHCI_C2_Config(&config_param);
+	}
 
 	APP_DBG("1- Initialisation of BLE Stack...");
 	APP_BLE_Init_Dyn_1();

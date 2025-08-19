@@ -8,8 +8,6 @@
 using namespace chip;
 using namespace chip::app::Clusters;
 
-// good reference: https://github.com/SiliconLabs/matter/blob/release_2.3.1-1.3/examples/thermostat/silabs/src/TemperatureManager.cpp
-
 void MatterPostAttributeChangeCallback(const app::ConcreteAttributePath& attributePath, uint8_t type, uint16_t size, uint8_t* value)
 {
 	ClusterId clusterId = attributePath.mClusterId;

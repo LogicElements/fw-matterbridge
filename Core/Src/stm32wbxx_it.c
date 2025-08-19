@@ -258,8 +258,6 @@ void FLASH_IRQHandler(void)
 
 void EXTI15_10_IRQHandler(void)
 {
-	// BSP_PB_IRQHandler(BUTTON_USER1);
-	// BSP_PB_IRQHandler(BUTTON_USER2);
 }
 
 /* USER CODE END 1 */

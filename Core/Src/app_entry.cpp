@@ -854,10 +854,6 @@ void TL_TRACES_EvtReceived(TL_EvtPacket_t* hcievt)
 #if (CFG_DEBUG_TRACE != 0)
 void DbgOutputInit(void)
 {
-#if (CFG_HW_USART1_ENABLED == 1)
-
-	MX_USART1_UART_Init();
-#endif
 	return;
 }
 
@@ -870,8 +866,6 @@ void DbgOutputInit(void)
  */
 void DbgOutputTraces(uint8_t* p_data, uint16_t size, void (*cb)(void))
 {
-	HW_UART_Transmit_DMA(CFG_DEBUG_TRACE_UART, p_data, size, cb);
-
 	return;
 }
 #endif

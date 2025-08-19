@@ -313,12 +313,6 @@ extern "C" {
 #define TL_BLE_EVENT_FRAME_SIZE ( TL_EVT_HDR_SIZE + CFG_TLBLE_MOST_EVENT_PAYLOAD_SIZE )
 
 /******************************************************************************
- * UART interfaces
- ******************************************************************************/
-#define CFG_DEBUG_TRACE_UART      hw_uart1
-#define CFG_CLI_UART              hw_lpuart1
-
-/******************************************************************************
  * IPCC interface
  ******************************************************************************/
 
@@ -524,11 +518,6 @@ typedef enum
 #define CFG_DEBUG_TRACE_FULL      0
 #define CFG_DEBUG_TRACE_LIGHT     0
 #endif
-
-/**
- * When not set, the traces is looping on sending the trace over UART
- */
-#define DBG_TRACE_USE_CIRCULAR_QUEUE 1
 
 /**
  * max buffer Size to queue data traces and max data trace allowed.

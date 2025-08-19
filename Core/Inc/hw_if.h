@@ -26,7 +26,7 @@
 extern "C" {
 #endif
 
-  /* Includes ------------------------------------------------------------------*/
+/* Includes ------------------------------------------------------------------*/
 #include "stm32wbxx.h"
 #include "stm32wbxx_ll_exti.h"
 #include "stm32wbxx_ll_system.h"
@@ -58,48 +58,48 @@ extern "C" {
 
 /* USER CODE END Includes */
 
-  /******************************************************************************
+/******************************************************************************
    * HW TimerServer
    ******************************************************************************/
-  /* Exported types ------------------------------------------------------------*/
-  /**
+/* Exported types ------------------------------------------------------------*/
+/**
    * This setting is used when standby mode is supported.
    * hw_ts_InitMode_Limited should be used when the device restarts from Standby Mode. In that case, the Timer Server does
    * not re-initialized its context. Only the Hardware register which content has been lost is reconfigured
    * Otherwise, hw_ts_InitMode_Full should be requested (Start from Power ON) and everything is re-initialized.
    */
-  typedef enum
-  {
-    hw_ts_InitMode_Full,
-    hw_ts_InitMode_Limited,
-  } HW_TS_InitMode_t;
+typedef enum
+{
+	hw_ts_InitMode_Full,
+	hw_ts_InitMode_Limited,
+} HW_TS_InitMode_t;
 
-  /**
+/**
    * When a Timer is created as a SingleShot timer, it is not automatically restarted when the timeout occurs. However,
    * the timer is kept reserved in the list and could be restarted at anytime with HW_TS_Start()
    *
    * When a Timer is created as a Repeated timer, it is automatically restarted when the timeout occurs.
    */
-  typedef enum
-  {
-    hw_ts_SingleShot,
-    hw_ts_Repeated
-  } HW_TS_Mode_t;
+typedef enum
+{
+	hw_ts_SingleShot,
+	hw_ts_Repeated
+} HW_TS_Mode_t;
 
-  /**
+/**
    * hw_ts_Successful is returned when a Timer has been successfully created with HW_TS_Create(). Otherwise, hw_ts_Failed
    * is returned. When hw_ts_Failed is returned, that means there are not enough free slots in the list to create a
    * Timer. In that case, CFG_HW_TS_MAX_NBR_CONCURRENT_TIMER should be increased
    */
-  typedef enum
-  {
-    hw_ts_Successful,
-    hw_ts_Failed,
-  }HW_TS_ReturnStatus_t;
+typedef enum
+{
+	hw_ts_Successful,
+	hw_ts_Failed,
+} HW_TS_ReturnStatus_t;
 
-  typedef void (*HW_TS_pTimerCb_t)(void);
+typedef void (*HW_TS_pTimerCb_t)(void);
 
-  /**
+/**
    * @brief  Initialize the timer server
    *         This API shall be called by the application before any timer is requested to the timer server. It
    *         configures the RTC module to be connected to the LSI input clock.
@@ -109,9 +109,9 @@ extern "C" {
    * @param  hrtc: RTC Handle
    * @retval None
    */
-  void HW_TS_Init(HW_TS_InitMode_t TimerInitMode, RTC_HandleTypeDef *hrtc);
+void HW_TS_Init(HW_TS_InitMode_t TimerInitMode, RTC_HandleTypeDef* hrtc);
 
-  /**
+/**
    * @brief  Interface to create a virtual timer
    *         The user shall call this API to create a timer. Once created, the timer is reserved to the module until it
    *         has been deleted. When creating a timer, the user shall specify the mode (single shot or repeated), the
@@ -125,9 +125,9 @@ extern "C" {
    * @param  pTimerCallBack: Callback when the virtual timer expires
    * @retval HW_TS_ReturnStatus_t: Return whether the creation is successful or not
    */
-  HW_TS_ReturnStatus_t HW_TS_Create(uint32_t TimerProcessID, uint8_t *pTimerId, HW_TS_Mode_t TimerMode, HW_TS_pTimerCb_t pTimerCallBack);
+HW_TS_ReturnStatus_t HW_TS_Create(uint32_t TimerProcessID, uint8_t* pTimerId, HW_TS_Mode_t TimerMode, HW_TS_pTimerCb_t pTimerCallBack);
 
-  /**
+/**
    * @brief  Stop a virtual timer
    *         This API may be used to stop a running timer. A timer which is stopped is move to the pending state.
    *         A pending timer may be restarted at any time with a different timeout value but the mode cannot be changed.
@@ -136,9 +136,9 @@ extern "C" {
    * @param  TimerID:  Id of the timer to stop
    * @retval None
    */
-  void HW_TS_Stop(uint8_t TimerID);
+void HW_TS_Stop(uint8_t TimerID);
 
-  /**
+/**
    * @brief  Start a virtual timer
    *         This API shall be used to start a timer. The timeout value is specified and may be different each time.
    *         When the timer is in the single shot mode, it will move to the pending state when it expires. The user may
@@ -150,9 +150,9 @@ extern "C" {
    * @param  timeout_ticks: Number of ticks of the virtual timer (Maximum value is (0xFFFFFFFF-0xFFFF = 0xFFFF0000)
    * @retval None
    */
-  void HW_TS_Start(uint8_t TimerID, uint32_t timeout_ticks);
+void HW_TS_Start(uint8_t TimerID, uint32_t timeout_ticks);
 
-  /**
+/**
    * @brief  Delete a virtual timer from the list
    *         This API should be used when a timer is not needed anymore by the user. A deleted timer is removed from
    *         the timer list managed by the timer server. It cannot be restarted again. The user has to go with the
@@ -161,9 +161,9 @@ extern "C" {
    * @param  TimerID:  The ID of the timer to remove from the list
    * @retval None
    */
-  void HW_TS_Delete(uint8_t TimerID);
+void HW_TS_Delete(uint8_t TimerID);
 
-  /**
+/**
    * @brief  Schedule the timer list on the timer interrupt handler
    *         This interrupt handler shall be called by the application in the RTC interrupt handler. This handler takes
    *         care of clearing all status flag required in the RTC and EXTI peripherals
@@ -171,9 +171,9 @@ extern "C" {
    * @param  None
    * @retval None
    */
-  void HW_TS_RTC_Wakeup_Handler(void);
+void HW_TS_RTC_Wakeup_Handler(void);
 
-  /**
+/**
    * @brief  Return the number of ticks to count before the interrupt
    *         This API returns the number of ticks left to be counted before an interrupt is generated by the
    *         Timer Server. This API may be used by the application for power management optimization. When the system
@@ -186,9 +186,9 @@ extern "C" {
    * @param  None
    * @retval The number of ticks left to count
    */
-  uint16_t HW_TS_RTC_ReadLeftTicksToCount(void);
+uint16_t HW_TS_RTC_ReadLeftTicksToCount(void);
 
-  /**
+/**
    * @brief  Notify the application that a registered timer has expired
    *         This API shall be implemented by the user application.
    *         This API notifies the application that a timer expires. This API is running in the RTC Wakeup interrupt
@@ -201,9 +201,9 @@ extern "C" {
    * @param  pTimerCallBack: The Callback associated with the timer when it has been created
    * @retval None
    */
-  void HW_TS_RTC_Int_AppNot(uint32_t TimerProcessID, uint8_t TimerID, HW_TS_pTimerCb_t pTimerCallBack);
+void HW_TS_RTC_Int_AppNot(uint32_t TimerProcessID, uint8_t TimerID, HW_TS_pTimerCb_t pTimerCallBack);
 
-  /**
+/**
    * @brief  Notify the application that the wakeupcounter has been updated
    *         This API should be implemented by the user application
    *         This API notifies the application that the counter has been updated. This is expected to be used along
@@ -215,7 +215,7 @@ extern "C" {
    * @param  None
    * @retval None
    */
-  void HW_TS_RTC_CountUpdated_AppNot(void);
+void HW_TS_RTC_CountUpdated_AppNot(void);
 
 #ifdef __cplusplus
 }

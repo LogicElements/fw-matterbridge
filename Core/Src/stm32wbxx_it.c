@@ -48,7 +48,7 @@
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN PFP */
 #if (USE_CUSTOM_IPCC_HANDLER == 1)
-extern void HW_IPCC_Rx_Handler(void); 
+extern void HW_IPCC_Rx_Handler(void);
 extern void HW_IPCC_Tx_Handler(void);
 #endif //(USE_CUSTOM_IPCC_HANDLER) 
 /* USER CODE END PFP */
@@ -77,14 +77,14 @@ extern TIM_HandleTypeDef htim17;
   */
 void NMI_Handler(void)
 {
-  /* USER CODE BEGIN NonMaskableInt_IRQn 0 */
+	/* USER CODE BEGIN NonMaskableInt_IRQn 0 */
 
-  /* USER CODE END NonMaskableInt_IRQn 0 */
-  /* USER CODE BEGIN NonMaskableInt_IRQn 1 */
-  while (1)
-  {
-  }
-  /* USER CODE END NonMaskableInt_IRQn 1 */
+	/* USER CODE END NonMaskableInt_IRQn 0 */
+	/* USER CODE BEGIN NonMaskableInt_IRQn 1 */
+	while (1)
+	{
+	}
+	/* USER CODE END NonMaskableInt_IRQn 1 */
 }
 
 /**
@@ -92,14 +92,14 @@ void NMI_Handler(void)
   */
 void HardFault_Handler(void)
 {
-  /* USER CODE BEGIN HardFault_IRQn 0 */
+	/* USER CODE BEGIN HardFault_IRQn 0 */
 
-  /* USER CODE END HardFault_IRQn 0 */
-  while (1)
-  {
-    /* USER CODE BEGIN W1_HardFault_IRQn 0 */
-    /* USER CODE END W1_HardFault_IRQn 0 */
-  }
+	/* USER CODE END HardFault_IRQn 0 */
+	while (1)
+	{
+		/* USER CODE BEGIN W1_HardFault_IRQn 0 */
+		/* USER CODE END W1_HardFault_IRQn 0 */
+	}
 }
 
 /**
@@ -107,14 +107,14 @@ void HardFault_Handler(void)
   */
 void MemManage_Handler(void)
 {
-  /* USER CODE BEGIN MemoryManagement_IRQn 0 */
+	/* USER CODE BEGIN MemoryManagement_IRQn 0 */
 
-  /* USER CODE END MemoryManagement_IRQn 0 */
-  while (1)
-  {
-    /* USER CODE BEGIN W1_MemoryManagement_IRQn 0 */
-    /* USER CODE END W1_MemoryManagement_IRQn 0 */
-  }
+	/* USER CODE END MemoryManagement_IRQn 0 */
+	while (1)
+	{
+		/* USER CODE BEGIN W1_MemoryManagement_IRQn 0 */
+		/* USER CODE END W1_MemoryManagement_IRQn 0 */
+	}
 }
 
 /**
@@ -122,14 +122,14 @@ void MemManage_Handler(void)
   */
 void BusFault_Handler(void)
 {
-  /* USER CODE BEGIN BusFault_IRQn 0 */
+	/* USER CODE BEGIN BusFault_IRQn 0 */
 
-  /* USER CODE END BusFault_IRQn 0 */
-  while (1)
-  {
-    /* USER CODE BEGIN W1_BusFault_IRQn 0 */
-    /* USER CODE END W1_BusFault_IRQn 0 */
-  }
+	/* USER CODE END BusFault_IRQn 0 */
+	while (1)
+	{
+		/* USER CODE BEGIN W1_BusFault_IRQn 0 */
+		/* USER CODE END W1_BusFault_IRQn 0 */
+	}
 }
 
 /**
@@ -137,14 +137,14 @@ void BusFault_Handler(void)
   */
 void UsageFault_Handler(void)
 {
-  /* USER CODE BEGIN UsageFault_IRQn 0 */
+	/* USER CODE BEGIN UsageFault_IRQn 0 */
 
-  /* USER CODE END UsageFault_IRQn 0 */
-  while (1)
-  {
-    /* USER CODE BEGIN W1_UsageFault_IRQn 0 */
-    /* USER CODE END W1_UsageFault_IRQn 0 */
-  }
+	/* USER CODE END UsageFault_IRQn 0 */
+	while (1)
+	{
+		/* USER CODE BEGIN W1_UsageFault_IRQn 0 */
+		/* USER CODE END W1_UsageFault_IRQn 0 */
+	}
 }
 
 /**
@@ -152,12 +152,12 @@ void UsageFault_Handler(void)
   */
 void DebugMon_Handler(void)
 {
-  /* USER CODE BEGIN DebugMonitor_IRQn 0 */
+	/* USER CODE BEGIN DebugMonitor_IRQn 0 */
 
-  /* USER CODE END DebugMonitor_IRQn 0 */
-  /* USER CODE BEGIN DebugMonitor_IRQn 1 */
+	/* USER CODE END DebugMonitor_IRQn 0 */
+	/* USER CODE BEGIN DebugMonitor_IRQn 1 */
 
-  /* USER CODE END DebugMonitor_IRQn 1 */
+	/* USER CODE END DebugMonitor_IRQn 1 */
 }
 
 /******************************************************************************/
@@ -172,13 +172,13 @@ void DebugMon_Handler(void)
   */
 void RTC_WKUP_IRQHandler(void)
 {
-  /* USER CODE BEGIN RTC_WKUP_IRQn 0 */
+	/* USER CODE BEGIN RTC_WKUP_IRQn 0 */
 
-  /* USER CODE END RTC_WKUP_IRQn 0 */
-  HAL_RTCEx_WakeUpTimerIRQHandler(&hrtc);
-  /* USER CODE BEGIN RTC_WKUP_IRQn 1 */
+	/* USER CODE END RTC_WKUP_IRQn 0 */
+	HAL_RTCEx_WakeUpTimerIRQHandler(&hrtc);
+	/* USER CODE BEGIN RTC_WKUP_IRQn 1 */
 
-  /* USER CODE END RTC_WKUP_IRQn 1 */
+	/* USER CODE END RTC_WKUP_IRQn 1 */
 }
 
 /**
@@ -186,13 +186,13 @@ void RTC_WKUP_IRQHandler(void)
   */
 void TIM1_TRG_COM_TIM17_IRQHandler(void)
 {
-  /* USER CODE BEGIN TIM1_TRG_COM_TIM17_IRQn 0 */
+	/* USER CODE BEGIN TIM1_TRG_COM_TIM17_IRQn 0 */
 
-  /* USER CODE END TIM1_TRG_COM_TIM17_IRQn 0 */
-  HAL_TIM_IRQHandler(&htim17);
-  /* USER CODE BEGIN TIM1_TRG_COM_TIM17_IRQn 1 */
+	/* USER CODE END TIM1_TRG_COM_TIM17_IRQn 0 */
+	HAL_TIM_IRQHandler(&htim17);
+	/* USER CODE BEGIN TIM1_TRG_COM_TIM17_IRQn 1 */
 
-  /* USER CODE END TIM1_TRG_COM_TIM17_IRQn 1 */
+	/* USER CODE END TIM1_TRG_COM_TIM17_IRQn 1 */
 }
 
 /**
@@ -200,15 +200,15 @@ void TIM1_TRG_COM_TIM17_IRQHandler(void)
   */
 void IPCC_C1_RX_IRQHandler(void)
 {
-  /* USER CODE BEGIN IPCC_C1_RX_IRQn 0 */
-#if (USE_CUSTOM_IPCC_HANDLER == 1) 
-  HW_IPCC_Rx_Handler(); 	
-#else	
-  /* USER CODE END IPCC_C1_RX_IRQn 0 */
-  HAL_IPCC_RX_IRQHandler(&hipcc);
-  /* USER CODE BEGIN IPCC_C1_RX_IRQn 1 */
+	/* USER CODE BEGIN IPCC_C1_RX_IRQn 0 */
+#if (USE_CUSTOM_IPCC_HANDLER == 1)
+	HW_IPCC_Rx_Handler();
+#else
+	/* USER CODE END IPCC_C1_RX_IRQn 0 */
+	HAL_IPCC_RX_IRQHandler(&hipcc);
+	/* USER CODE BEGIN IPCC_C1_RX_IRQn 1 */
 #endif //(USE_CUSTOM_IPCC_HANDLER)    
-  /* USER CODE END IPCC_C1_RX_IRQn 1 */
+	/* USER CODE END IPCC_C1_RX_IRQn 1 */
 }
 
 /**
@@ -216,15 +216,15 @@ void IPCC_C1_RX_IRQHandler(void)
   */
 void IPCC_C1_TX_IRQHandler(void)
 {
-  /* USER CODE BEGIN IPCC_C1_TX_IRQn 0 */
-#if (USE_CUSTOM_IPCC_HANDLER == 1) 
-  HW_IPCC_Tx_Handler();	
-#else	 
-  /* USER CODE END IPCC_C1_TX_IRQn 0 */
-  HAL_IPCC_TX_IRQHandler(&hipcc);
-  /* USER CODE BEGIN IPCC_C1_TX_IRQn 1 */
+	/* USER CODE BEGIN IPCC_C1_TX_IRQn 0 */
+#if (USE_CUSTOM_IPCC_HANDLER == 1)
+	HW_IPCC_Tx_Handler();
+#else
+	/* USER CODE END IPCC_C1_TX_IRQn 0 */
+	HAL_IPCC_TX_IRQHandler(&hipcc);
+	/* USER CODE BEGIN IPCC_C1_TX_IRQn 1 */
 #endif //(USE_CUSTOM_IPCC_HANDLER)     
-  /* USER CODE END IPCC_C1_TX_IRQn 1 */
+	/* USER CODE END IPCC_C1_TX_IRQn 1 */
 }
 
 /**
@@ -232,13 +232,13 @@ void IPCC_C1_TX_IRQHandler(void)
   */
 void HSEM_IRQHandler(void)
 {
-  /* USER CODE BEGIN HSEM_IRQn 0 */
+	/* USER CODE BEGIN HSEM_IRQn 0 */
 
-  /* USER CODE END HSEM_IRQn 0 */
-  // HAL_HSEM_IRQHandler();
-  /* USER CODE BEGIN HSEM_IRQn 1 */
+	/* USER CODE END HSEM_IRQn 0 */
+	// HAL_HSEM_IRQHandler();
+	/* USER CODE BEGIN HSEM_IRQn 1 */
 
-  /* USER CODE END HSEM_IRQn 1 */
+	/* USER CODE END HSEM_IRQn 1 */
 }
 
 /* USER CODE BEGIN 1 */
@@ -247,18 +247,19 @@ void HSEM_IRQHandler(void)
   */
 void FLASH_IRQHandler(void)
 {
-  /* USER CODE BEGIN FLASH_IRQn 0 */
+	/* USER CODE BEGIN FLASH_IRQn 0 */
 
-  /* USER CODE END FLASH_IRQn 0 */
-  HAL_FLASH_IRQHandler();
-  /* USER CODE BEGIN FLASH_IRQn 1 */
+	/* USER CODE END FLASH_IRQn 0 */
+	HAL_FLASH_IRQHandler();
+	/* USER CODE BEGIN FLASH_IRQn 1 */
 
-  /* USER CODE END FLASH_IRQn 1 */
+	/* USER CODE END FLASH_IRQn 1 */
 }
 
 void EXTI15_10_IRQHandler(void)
 {
-  // BSP_PB_IRQHandler(BUTTON_USER1);
-  // BSP_PB_IRQHandler(BUTTON_USER2);
+	// BSP_PB_IRQHandler(BUTTON_USER1);
+	// BSP_PB_IRQHandler(BUTTON_USER2);
 }
+
 /* USER CODE END 1 */

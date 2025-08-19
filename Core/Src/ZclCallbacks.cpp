@@ -22,4 +22,6 @@ void MatterPostAttributeChangeCallback(const app::ConcreteAttributePath& attribu
 }
 
 
-void emberAfOnOffClusterInitCallback(EndpointId endpoint) {}
+void emberAfOnOffClusterInitCallback(EndpointId endpoint)
+{
+}

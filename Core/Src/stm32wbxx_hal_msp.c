@@ -1,4 +1,3 @@
-
 /* USER CODE BEGIN Header */
 /**
  ******************************************************************************
@@ -64,7 +63,6 @@ extern DMA_HandleTypeDef hdma_usart1_tx;
  */
 void HAL_MspInit(void)
 {
-
 	/* USER CODE BEGIN MspInit 0 */
 
 	/* USER CODE END MspInit 0 */

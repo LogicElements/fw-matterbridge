@@ -162,7 +162,6 @@ void APPE_Config(void)
 
 void APPE_Init(void)
 {
-
 #if (ENABLE_IWDG_SUPPORT == 1)
 	/* Reconfigure IWDG for user application usage.
 	 * The SecureBoot (if used) configured the IWDG for its own purpose.
@@ -450,7 +449,6 @@ static void SystemPower_Config(void)
 
 static void appe_Tl_Init(void)
 {
-
 	/**< Reference table initialization */
 	TL_Init();
 
@@ -681,7 +679,6 @@ void shci_cmd_resp_release(uint32_t flag)
 
 void shci_cmd_resp_wait(uint32_t timeout)
 {
-
 	osSemaphoreAcquire(SemShciId, pdMS_TO_TICKS(timeout));
 	return;
 }
@@ -698,6 +695,7 @@ void TL_TRACES_EvtReceived(TL_EvtPacket_t* hcievt)
 	/* Release buffer */
 	TL_MM_EvtDone(hcievt);
 }
+
 /**
  * @brief  Initialization of the trace mechanism
  * @param  None

@@ -32,8 +32,10 @@
 
 
 /* Variables */
-extern int __io_putchar(int ch) __attribute__((weak));
-extern int __io_getchar(void) __attribute__((weak));
+extern int __io_putchar(int ch) __attribute__
+((weak));
+extern int __io_getchar(void) __attribute__
+((weak));
 
 
 char* __env[1] = {0};
@@ -41,7 +43,9 @@ char** environ = __env;
 
 
 /* Functions */
-void initialise_monitor_handles() {}
+void initialise_monitor_handles()
+{
+}
 
 int _getpid(void) { return 1; }
 
@@ -61,7 +65,9 @@ void _exit(int status)
 	} /* Make sure we hang here */
 }
 
-__attribute__((weak)) int _read(int file, char* ptr, int len)
+__attribute__ ((weak))
+
+int _read(int file, char* ptr, int len)
 {
 	(void)file;
 	int DataIdx;
@@ -74,7 +80,9 @@ __attribute__((weak)) int _read(int file, char* ptr, int len)
 	return len;
 }
 
-__attribute__((weak)) int _write(int file, char* ptr, int len)
+__attribute__ ((weak))
+
+int _write(int file, char* ptr, int len)
 {
 	(void)file;
 	int DataIdx;
@@ -149,7 +157,7 @@ int _stat(char* file, struct stat* st)
 	return 0;
 }
 
-int _link(char* old, char* new)
+int _link(char* old, char*new)
 {
 	(void)old;
 	(void)new;

@@ -35,22 +35,26 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-typedef struct {
+typedef struct
+{
 	uint8_t Device_Led_Selection;
 	uint8_t Led1;
 } P2P_LedCharValue_t;
 
-typedef struct {
+typedef struct
+{
 	uint8_t Device_Button_Selection;
 	uint8_t ButtonStatus;
 } P2P_ButtonCharValue_t;
 
-typedef struct {
+typedef struct
+{
 	uint8_t Notification_Status; /* used to check if P2P Server is enabled to Notify */
 	P2P_LedCharValue_t LedControl;
 	P2P_ButtonCharValue_t ButtonControl;
 	uint16_t ConnectionHandle;
 } P2P_Server_App_Context_t;
+
 /* USER CODE END PTD */
 
 /* Private defines ------------------------------------------------------------*/
@@ -69,7 +73,12 @@ typedef struct {
  * START of Section BLE_APP_CONTEXT
  */
 
-PLACE_IN_SECTION("BLE_APP_CONTEXT") static P2P_Server_App_Context_t P2P_Server_App_Context;
+PLACE_IN_SECTION (
+
+
+"BLE_APP_CONTEXT"
+)
+static P2P_Server_App_Context_t P2P_Server_App_Context;
 
 BLEReceiveCallback BLEReceiveCb = NULL;
 BLETXCharCCCDWriteCallback BLETXCharCCCDWriteCb = NULL;
@@ -86,42 +95,49 @@ BLEDAckCallback BLEAckCb = NULL;
 /* USER CODE BEGIN PFP */
 /* USER CODE END PFP */
 
-void APP_MATTER_BLE_Set_Receive_Callback(BLEReceiveCallback aCallback) {
+void APP_MATTER_BLE_Set_Receive_Callback(BLEReceiveCallback aCallback)
+{
 	BLEReceiveCb = aCallback;
 }
 
-void APP_MATTER_BLE_Set_TXCharCCCDWrite_Callback(BLETXCharCCCDWriteCallback aCallback) {
+void APP_MATTER_BLE_Set_TXCharCCCDWrite_Callback(BLETXCharCCCDWriteCallback aCallback)
+{
 	BLETXCharCCCDWriteCb = aCallback;
 }
 
-void APP_MATTER_BLE_Set_Connection_Callback(BLEConnectionCallback aCallback) {
+void APP_MATTER_BLE_Set_Connection_Callback(BLEConnectionCallback aCallback)
+{
 	BLEConnectionCb = aCallback;
 }
 
-void APP_MATTER_BLE_Set_Disconnection_Callback(BLEDisconnectionCallback aCallback) {
+void APP_MATTER_BLE_Set_Disconnection_Callback(BLEDisconnectionCallback aCallback)
+{
 	BLEDisconnectionCb = aCallback;
 }
 
-void APP_MATTER_BLE_Set_Ack_After_Indicate_Callback(BLEDAckCallback aCallback) {
+void APP_MATTER_BLE_Set_Ack_After_Indicate_Callback(BLEDAckCallback aCallback)
+{
 	BLEAckCb = aCallback;
 }
 
 /* Functions Definition ------------------------------------------------------*/
-void APP_MATTER_Notification(MATTER_App_Notification_evt_t *pNotification) {
+void APP_MATTER_Notification(MATTER_App_Notification_evt_t* pNotification)
+{
 	/* USER CODE BEGIN APP_MATTER_Notification */
 	BLE_Matter_TXCharCCCD message;
 	/* USER CODE END APP_MATTER_Notification */
-	switch (pNotification->P2P_Evt_Opcode) {
+	switch (pNotification->Evt_Opcode)
+	{
 	/* USER CODE BEGIN APP_MATTER_Notification */
 	/* USER CODE END APP_MATTER_Notification */
 
-	case MATTER_STM_PEER_CONN_HANDLE_EVT:
+	case MATTER_STM_CONN_HANDLE_EVT:
 		/* USER CODE BEGIN PEER_CONN_HANDLE_EVT */
 		BLEConnectionCb();
 		/* USER CODE END PEER_CONN_HANDLE_EVT */
 		break;
 
-	case MATTER_STM_PEER_DISCON_HANDLE_EVT:
+	case MATTER_STM_DISCON_HANDLE_EVT:
 		/* USER CODE BEGIN PEER_DISCON_HANDLE_EVT */
 		BLEDisconnectionCb(&pNotification->ConnectionHandle);
 		/* USER CODE END PEER_DISCON_HANDLE_EVT */
@@ -162,7 +178,7 @@ void APP_MATTER_Notification(MATTER_App_Notification_evt_t *pNotification) {
 		Message.Payload = pNotification->DataTransfered.pPayload;
 		Message.connid = pNotification->ConnectionHandle;
 		BLEReceiveCb(&Message); //call matter callback
-	   /* USER CODE BEGIN MATTER_STM_WRITE_EVT */
+		/* USER CODE BEGIN MATTER_STM_WRITE_EVT */
 
 		/* USER CODE END MATTER_STM_WRITE_EVT */
 		break;
@@ -179,7 +195,8 @@ void APP_MATTER_Notification(MATTER_App_Notification_evt_t *pNotification) {
 	return;
 }
 
-void APP_MATTER_Init(void) {
+void APP_MATTER_Init(void)
+{
 	/* USER CODE BEGIN APP_MATTER_Init */
 
 	/**
@@ -200,17 +217,23 @@ void APP_MATTER_Init(void) {
  *************************************************************/
 
 /* USER CODE BEGIN FD_LOCAL_FUNCTIONS*/
-void APP_MATTER_Send_Notification(uint16_t datalength, uint8_t *data) {
-
-	if (P2P_Server_App_Context.ButtonControl.ButtonStatus == 0x00) {
+void APP_MATTER_Send_Notification(uint16_t datalength, uint8_t* data)
+{
+	if (P2P_Server_App_Context.ButtonControl.ButtonStatus == 0x00)
+	{
 		P2P_Server_App_Context.ButtonControl.ButtonStatus = 0x01;
-	} else {
+	}
+	else
+	{
 		P2P_Server_App_Context.ButtonControl.ButtonStatus = 0x00;
 	}
 
-	if (P2P_Server_App_Context.Notification_Status) {
-		CUSTOM_STM_App_Update_Char(P2P_NOTIFY_CHAR_UUID, (uint8_t*) data, datalength);
-	} else {
+	if (P2P_Server_App_Context.Notification_Status)
+	{
+		CUSTOM_STM_App_Update_Char(P2P_NOTIFY_CHAR_UUID, (uint8_t*)data, datalength);
+	}
+	else
+	{
 		APP_DBG_MSG("-- Matter APPLICATION SERVER : CAN'T INFORM CLIENT -  NOTIFICATION DISABLED\n ");
 	}
 

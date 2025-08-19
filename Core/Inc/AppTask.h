@@ -30,45 +30,44 @@
 
 class AppTask
 {
-
 public:
-	    CHIP_ERROR StartAppTask();
-	    CHIP_ERROR Init();
-	    static void AppTaskMain(void * pvParameter);
-	    void PostEvent(const AppEvent * event);
-	    static void UpdateClusterState();
-	    CHIP_ERROR InitMatter(void);
+	CHIP_ERROR StartAppTask();
+	CHIP_ERROR Init();
+	static void AppTaskMain(void* pvParameter);
+	void PostEvent(const AppEvent* event);
+	static void UpdateClusterState();
+	CHIP_ERROR InitMatter(void);
 
 protected:
-	    TaskHandle_t mAppTask      = NULL;
+	TaskHandle_t mAppTask = NULL;
 
 private:
-    friend AppTask & GetAppTask(void);
-       void DispatchEvent(AppEvent * event);
-       static void MatterEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
+	friend AppTask& GetAppTask(void);
+	void DispatchEvent(AppEvent* event);
+	static void MatterEventHandler(const chip::DeviceLayer::ChipDeviceEvent* event, intptr_t arg);
 
-    enum Function_t
-    {
-        kFunction_NoneSelected   = 0,
-        kFunction_SoftwareUpdate = 0,
-        kFunction_Joiner         = 1,
-        kFunction_SaveNvm        = 2,
-        kFunction_FactoryReset   = 3,
+	enum Function_t
+	{
+		kFunction_NoneSelected = 0,
+		kFunction_SoftwareUpdate = 0,
+		kFunction_Joiner = 1,
+		kFunction_SaveNvm = 2,
+		kFunction_FactoryReset = 3,
 
-        kFunction_Invalid
-    } Function;
+		kFunction_Invalid
+	} Function;
 
-    Function_t mFunction;
-    bool mFunctionTimerActive;
-    bool mSyncClusterToButtonAction;
-    //chip::Ble::BLEEndPoint * mBLEEndPoint;
+	Function_t mFunction;
+	bool mFunctionTimerActive;
+	bool mSyncClusterToButtonAction;
+	//chip::Ble::BLEEndPoint * mBLEEndPoint;
 
-    static AppTask sAppTask;
+	static AppTask sAppTask;
 };
 
-inline AppTask & GetAppTask(void)
+inline AppTask& GetAppTask(void)
 {
-    return AppTask::sAppTask;
+	return AppTask::sAppTask;
 }
 
 

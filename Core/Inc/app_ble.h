@@ -24,6 +24,7 @@
 
 #ifdef __cplusplus
 extern "C" {
+
 #endif
 
 /* Includes ------------------------------------------------------------------*/
@@ -36,20 +37,20 @@ extern "C" {
 
 /* Exported types ------------------------------------------------------------*/
 
-    typedef enum
-    {
-      APP_BLE_IDLE,
-      APP_BLE_FAST_ADV,
-      APP_BLE_LP_ADV,
-      APP_BLE_SCAN,
-      APP_BLE_LP_CONNECTING,
-      APP_BLE_CONNECTED_SERVER,
-      APP_BLE_CONNECTED_CLIENT
-    } APP_BLE_ConnStatus_t;
-    
+typedef enum
+{
+	APP_BLE_IDLE,
+	APP_BLE_FAST_ADV,
+	APP_BLE_LP_ADV,
+	APP_BLE_SCAN,
+	APP_BLE_LP_CONNECTING,
+	APP_BLE_CONNECTED_SERVER,
+	APP_BLE_CONNECTED_CLIENT
+} APP_BLE_ConnStatus_t;
+
 /* USER CODE BEGIN ET */
 
-/* USER CODE END ET */  
+/* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
 /* USER CODE BEGIN EC */
@@ -67,16 +68,16 @@ extern "C" {
 /* USER CODE END EM */
 
 /* Exported functions ---------------------------------------------*/
-  void APP_BLE_Init_Dyn_1( void );
-  APP_BLE_ConnStatus_t APP_BLE_Get_Server_Connection_Status(void);
+void APP_BLE_Init_Dyn_1(void);
+APP_BLE_ConnStatus_t APP_BLE_Get_Server_Connection_Status(void);
 
 /* USER CODE BEGIN EF */
 void APP_BLE_Key_Button1_Action(void);
 void APP_BLE_Key_Button2_Action(void);
 void APP_BLE_Key_Button3_Action(void);
 void APP_BLE_Stop(void);
-void APP_BLE_Adv_Request( APP_BLE_ConnStatus_t New_Status );
-void APP_BLE_Adv_Cancel( void );
+void APP_BLE_Adv_Request(APP_BLE_ConnStatus_t New_Status);
+void APP_BLE_Adv_Cancel(void);
 /* USER CODE END EF */
 
 #ifdef __cplusplus

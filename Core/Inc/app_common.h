@@ -22,8 +22,7 @@
 #define __APP_COMMON_H
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 
 #include <stdint.h>
@@ -53,9 +52,7 @@ extern "C"
 #define section_text __attribute__((section(".extendtext"), noinline))
 
 
-
-
-  /* -------------------------------- *
+/* -------------------------------- *
    *  Critical Section definition     *
    * -------------------------------- */
 #define BACKUP_PRIMASK()    uint32_t primask_bit= __get_PRIMASK()
@@ -109,7 +106,7 @@ extern "C"
 
 #define BITNSET( w, n, b )   M_BEGIN (w)[(n)/32] |= ((U32)(b))<<((n)%32); M_END
 
-  /* -------------------------------- *
+/* -------------------------------- *
    *  Compiler                         *
    * -------------------------------- */
 #define PLACE_IN_SECTION( __x__ )  __attribute__((section (__x__)))

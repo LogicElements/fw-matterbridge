@@ -56,7 +56,6 @@ typedef struct
 	NVM_Sector id_sector;
 	uint8_t* ram_ptr;
 	size_t sector_size;
-
 } NVM_Sector_Struct;
 
 /* Private macros ------------------------------------------------------------*/
@@ -110,7 +109,6 @@ NVM_StatusTypeDef NM_Dump(void)
 
 NVM_StatusTypeDef NM_GetKeyExists(const char* KeyName, NVM_Sector sector)
 {
-
 	NVM_StatusTypeDef err = NVM_KEY_NOT_FOUND;
 
 	if (KeyName == NULL)
@@ -142,7 +140,6 @@ NVM_StatusTypeDef NM_GetKeyExists(const char* KeyName, NVM_Sector sector)
 
 NVM_StatusTypeDef NM_GetKeyValue(void* KeyValue, const char* KeyName, uint32_t KeySize, size_t* read_by_size, NVM_Sector sector)
 {
-
 	if (KeyValue == NULL)
 	{
 		return NVM_PARAM_ERROR;
@@ -183,7 +180,6 @@ NVM_StatusTypeDef NM_GetOtNVMAddr(uint32_t* NVMAddr)
 
 NVM_StatusTypeDef NM_SetKeyValue(char* KeyValue, char* KeyName, uint32_t KeySize, NVM_Sector sector)
 {
-
 	if ((KeyValue == NULL) || (KeyName == NULL))
 	{
 		return NVM_PARAM_ERROR;
@@ -228,7 +224,6 @@ NVM_StatusTypeDef NM_SetKeyValue(char* KeyValue, char* KeyName, uint32_t KeySize
 
 NVM_StatusTypeDef NM_DeleteKey(const char* Keyname, NVM_Sector sector)
 {
-
 	if (Keyname == NULL)
 	{
 		return NVM_PARAM_ERROR;
@@ -272,7 +267,6 @@ void NM_ResetFactory(void)
 
 static uint8_t* SearchKey(uint8_t* PtPage, uint8_t* KeyName, size_t nvm_size)
 {
-
 	uint8_t* i = PtPage;
 	size_t read_by_size = 0;
 
@@ -325,7 +319,6 @@ static uint8_t flash_get(uint8_t* KeyValue, uint8_t* KeyAddr, size_t KeySize, si
 
 static NVM_StatusTypeDef flash_update(const NVM_Sector_Struct select_sector, uint8_t* KeyName, uint8_t* KeyValue, size_t KeySize)
 {
-
 	uint8_t* i = select_sector.ram_ptr;
 	size_t read_by_size = 0;
 	while (i < (select_sector.ram_ptr + select_sector.sector_size))
@@ -346,7 +339,6 @@ static NVM_StatusTypeDef flash_update(const NVM_Sector_Struct select_sector, uin
 
 static NVM_StatusTypeDef flash_replace(const NVM_Sector_Struct select_sector, uint8_t* PtKeyfind, uint8_t* KeyName, uint8_t* KeyValue, size_t KeySize)
 {
-
 	NVM_StatusTypeDef err = NVM_OK;
 	if ((PtKeyfind != NULL) && (KeyName != NULL) && (KeyValue != NULL))
 	{
@@ -388,10 +380,8 @@ static NVM_StatusTypeDef delete_key(const NVM_Sector_Struct select_sector, uint8
 
 static NVM_StatusTypeDef flash_write(uint8_t* PtKeyFree, uint8_t* key, uint8_t* value, size_t value_size)
 {
-
 	if ((PtKeyFree != NULL) && (key != NULL) && (value != NULL))
 	{
-
 		memset(PtKeyFree, DEFAULT_VALUE, value_size);
 		memset(PtKeyFree, 0x00, MATTER_KEY_NAME_MAX_LENGTH);
 		memcpy(PtKeyFree, key, strlen((char*)key));

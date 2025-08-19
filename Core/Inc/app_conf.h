@@ -21,6 +21,7 @@
 
 #ifdef __cplusplus
 extern "C" {
+
 #endif
 
 #include "hw.h"
@@ -37,7 +38,7 @@ extern "C" {
 /**
  *
  * Define Tx Power
- */   
+ */
 #define CFG_TX_POWER                      (0x18) /**< 0dbm */
 
 /**
@@ -127,8 +128,8 @@ extern "C" {
 #define CFG_DEV_ID_P2P_SERVER2                  (0x84)
 #define CFG_DEV_ID_P2P_SERVER3                  (0x87)
 #define CFG_DEV_ID_P2P_SERVER4                  (0x88)
-#define CFG_DEV_ID_P2P_SERVER5                  (0x89)   
-#define CFG_DEV_ID_P2P_SERVER6                  (0x8A)   
+#define CFG_DEV_ID_P2P_SERVER5                  (0x89)
+#define CFG_DEV_ID_P2P_SERVER6                  (0x8A)
 #define CFG_DEV_ID_P2P_ROUTER                   (0x85)
 
 
@@ -136,7 +137,7 @@ extern "C" {
 
 /**
 * AD Element - Group B Feature
-*/ 
+*/
 /* LSB - First Byte */
 #define CFG_FEATURE_THREAD_SWITCH               (0x40)
 
@@ -146,7 +147,7 @@ extern "C" {
 #define CONN_L(x) ((int)((x)/0.625f))
 #define CONN_P(x) ((int)((x)/1.25f))
 
-  /*  L2CAP Connection Update request parameters used for test only with smart Phone */
+/*  L2CAP Connection Update request parameters used for test only with smart Phone */
 #define L2CAP_REQUEST_NEW_CONN_PARAM             1
 
 #define L2CAP_INTERVAL_MIN              CONN_P(1000) /* 1s */
@@ -432,11 +433,10 @@ extern "C" {
 
 typedef enum
 {
-  CFG_TIM_PROC_ID_ISR,
-  /* USER CODE BEGIN CFG_TimProcID_t */
+	CFG_TIM_PROC_ID_ISR,
+	/* USER CODE BEGIN CFG_TimProcID_t */
 
-  /* USER CODE END CFG_TimProcID_t */
-  
+	/* USER CODE END CFG_TimProcID_t */
 } CFG_TimProcID_t;
 
 /******************************************************************************
@@ -470,10 +470,10 @@ typedef enum
  * Note : Refer to utilities_conf.h file in order to details
  *        the level of traces : CFG_DEBUG_TRACE_FULL or CFG_DEBUG_TRACE_LIGHT
  *****************************************************************************/
- 
- /**
- * When set to 1, the traces are enabled in the BLE services
- */
+
+/**
+* When set to 1, the traces are enabled in the BLE services
+*/
 #define CFG_DEBUG_BLE_TRACE     1
 
 /**
@@ -667,12 +667,12 @@ typedef enum
  */
 typedef enum
 {
-    CFG_LPM_APP,
-	  CFG_LPM_APP_BLE,
-	  CFG_LPM_APP_THREAD
-    /* USER CODE BEGIN CFG_LPM_Id_t */
+	CFG_LPM_APP,
+	CFG_LPM_APP_BLE,
+	CFG_LPM_APP_THREAD
+	/* USER CODE BEGIN CFG_LPM_Id_t */
 
-    /* USER CODE END CFG_LPM_Id_t */
+	/* USER CODE END CFG_LPM_Id_t */
 } CFG_LPM_Id_t;
 
 /******************************************************************************
@@ -706,11 +706,11 @@ typedef enum
  * LCD support
  ******************************************************************************/
 #if defined(USE_STM32WB5M_DK)
-    #define CFG_LCD_SUPPORTED 1
+#define CFG_LCD_SUPPORTED 1
 #elif defined(USE_STM32WBXX_NUCLEO)
- 	#define CFG_LCD_SUPPORTED 0
+#define CFG_LCD_SUPPORTED 0
 #else
- 	#define CFG_LCD_SUPPORTED 0
+#define CFG_LCD_SUPPORTED 0
 #endif
 
 #if ((OTA_SUPPORT == 1) || (CFG_FULL_LOW_POWER == 1))
@@ -731,8 +731,8 @@ typedef enum
  * versions
  ******************************************************************************/
 #define X_CUBE_MATTER_VERSION "1.4.2"
-#define PRODUCT_NAME "Dimmable Light" 
-#define VENDOR_NAME "STMicroelectronics"
+#define PRODUCT_NAME "MatterBridge"
+#define VENDOR_NAME "Jablotron"
 #define MATTER_SDK_VERSION "1.4.1"
 
 /******************************************************************************
@@ -740,11 +740,6 @@ typedef enum
  ******************************************************************************/
 #define CONFIG_STM32_FACTORY_DATA_ENABLE 0
 #define USE_STM32WBXX_DAC_CRYPTO 0
-
-typedef enum
-{
-    BUTTON_1 = 0x1,
-} button_type_t;
 
 #ifdef __cplusplus
 } /* extern "C" */

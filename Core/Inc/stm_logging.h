@@ -22,8 +22,7 @@
 #define STM_LOGGING_H_
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 
 #define LOG_LEVEL_NONE  0  /* None     */
@@ -55,21 +54,24 @@ extern "C"
  * This enumeration represents log regions.
  *
  */
-typedef enum 
+typedef enum
 {
-  APPLI_LOG_REGION_GENERAL                    = 1U,  /* General                 */
-  APPLI_LOG_REGION_OPENTHREAD_API             = 2U,  /* OpenThread API          */
-  APPLI_LOG_REGION_OT_API_LINK                = 3U,  /* OpenThread Link API     */
-  APPLI_LOG_REGION_OT_API_INSTANCE            = 4U,  /* OpenThread Instance API */
-  APPLI_LOG_REGION_OT_API_MESSAGE             = 5U   /* OpenThread Message API  */
+	APPLI_LOG_REGION_GENERAL = 1U,
+	/* General                 */
+	APPLI_LOG_REGION_OPENTHREAD_API = 2U,
+	/* OpenThread API          */
+	APPLI_LOG_REGION_OT_API_LINK = 3U,
+	/* OpenThread Link API     */
+	APPLI_LOG_REGION_OT_API_INSTANCE = 4U,
+	/* OpenThread Instance API */
+	APPLI_LOG_REGION_OT_API_MESSAGE = 5U /* OpenThread Message API  */
 } appliLogRegion_t;
 
 typedef uint8_t appliLogLevel_t;
 
-void logApplication(appliLogLevel_t aLogLevel, appliLogRegion_t aLogRegion, const char *aFormat, ...);
+void logApplication(appliLogLevel_t aLogLevel, appliLogRegion_t aLogRegion, const char* aFormat, ...);
 
 #ifdef __cplusplus
 }
 #endif
 #endif  /* STM_LOGGING_H_ */
-

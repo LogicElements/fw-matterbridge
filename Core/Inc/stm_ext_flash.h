@@ -32,14 +32,15 @@ extern "C" {
 #define EXTERNAL_FLASH_ADDRESS  0x90000000U
 #define OTA_MAX_SIZE 0x100000  // 1 Mbytes
 
-typedef enum {
-    STM_EXT_FLASH_OK,
-    STM_EXT_FLASH_INIT_FAILED,
-    STM_EXT_FLASH_WRITE_FAILED,
-    STM_EXT_FLASH_READ_FAILED,
-    STM_EXT_FLASH_DELETE_FAILED,
-    STM_EXT_FLASH_INVALID_PARAM,
-    STM_EXT_FLASH_SIZE_FULL
+typedef enum
+{
+	STM_EXT_FLASH_OK,
+	STM_EXT_FLASH_INIT_FAILED,
+	STM_EXT_FLASH_WRITE_FAILED,
+	STM_EXT_FLASH_READ_FAILED,
+	STM_EXT_FLASH_DELETE_FAILED,
+	STM_EXT_FLASH_INVALID_PARAM,
+	STM_EXT_FLASH_SIZE_FULL
 } STM_OTA_StatusTypeDef;
 
 /* Exported variables ------------------------------------------------------- */
@@ -48,7 +49,7 @@ typedef enum {
 /**
  * @brief  init ota fw
  */
-STM_OTA_StatusTypeDef STM_EXT_FLASH_Init( void );
+STM_OTA_StatusTypeDef STM_EXT_FLASH_Init(void);
 
 /**
  * @brief  Delete old image in external flash
@@ -58,12 +59,12 @@ STM_OTA_StatusTypeDef STM_EXT_FLASH_Delete_Image(uint32_t Address, uint32_t Leng
 /**
  * @brief  Write chunk of data in external flash
  */
-STM_OTA_StatusTypeDef STM_EXT_FLASH_WriteChunk(uint32_t DestAddress, uint8_t * pSrcBuffer, uint32_t Length);
+STM_OTA_StatusTypeDef STM_EXT_FLASH_WriteChunk(uint32_t DestAddress, uint8_t* pSrcBuffer, uint32_t Length);
 
 /**
  * @brief  Read chunk of data in external flash
  */
-STM_OTA_StatusTypeDef STM_EXT_FLASH_ReadChunk(uint32_t DestAddress, uint8_t * pSrcBuffer, uint32_t Length);
+STM_OTA_StatusTypeDef STM_EXT_FLASH_ReadChunk(uint32_t DestAddress, uint8_t* pSrcBuffer, uint32_t Length);
 
 #ifdef __cplusplus
 }

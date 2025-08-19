@@ -66,34 +66,34 @@
  *
  * @returns  String with a log level color value.
  */
-static inline uint16_t logRegion(char *aLogString, uint16_t aMaxSize,
-        appliLogRegion_t aLogRegion)
+static inline uint16_t logRegion(char* aLogString, uint16_t aMaxSize,
+                                 appliLogRegion_t aLogRegion)
 {
-  char logRegionString[30U];
+	char logRegionString[30U];
 
-  switch (aLogRegion)
-  {
-    case APPLI_LOG_REGION_GENERAL:
-      strcpy(logRegionString, "[M4 APPLICATION]");
-      break;
-    case APPLI_LOG_REGION_OPENTHREAD_API:
-      strcpy(logRegionString, "[M4 OPENTHREAD API]");
-      break;
-    case APPLI_LOG_REGION_OT_API_LINK:
-      strcpy(logRegionString, "[M4 LINK API]");
-      break;
-    case APPLI_LOG_REGION_OT_API_INSTANCE:
-      strcpy(logRegionString, "[M4 INSTANCE API]");
-      break;
-    case APPLI_LOG_REGION_OT_API_MESSAGE:
-      strcpy(logRegionString, "[M4 MESSAGE API]");
-      break;
-    default:
-      strcpy(logRegionString, "[M4]");
-      break;
-  }
+	switch (aLogRegion)
+	{
+	case APPLI_LOG_REGION_GENERAL:
+		strcpy(logRegionString, "[M4 APPLICATION]");
+		break;
+	case APPLI_LOG_REGION_OPENTHREAD_API:
+		strcpy(logRegionString, "[M4 OPENTHREAD API]");
+		break;
+	case APPLI_LOG_REGION_OT_API_LINK:
+		strcpy(logRegionString, "[M4 LINK API]");
+		break;
+	case APPLI_LOG_REGION_OT_API_INSTANCE:
+		strcpy(logRegionString, "[M4 INSTANCE API]");
+		break;
+	case APPLI_LOG_REGION_OT_API_MESSAGE:
+		strcpy(logRegionString, "[M4 MESSAGE API]");
+		break;
+	default:
+		strcpy(logRegionString, "[M4]");
+		break;
+	}
 
-  return snprintf(aLogString, aMaxSize, "%s ", logRegionString);
+	return snprintf(aLogString, aMaxSize, "%s ", logRegionString);
 }
 #endif /* CFG_DEBUG_TRACE */
 
@@ -106,23 +106,23 @@ static inline uint16_t logRegion(char *aLogString, uint16_t aMaxSize,
  *
  * @returns  String with a log level color value.
  */
-static inline const char *levelToString(appliLogLevel_t aLogLevel)
+static inline const char* levelToString(appliLogLevel_t aLogLevel)
 {
-  switch (aLogLevel)
-  {
-  case LOG_LEVEL_CRIT:
-    return RTT_COLOR_CODE_RED;
+	switch (aLogLevel)
+	{
+	case LOG_LEVEL_CRIT:
+		return RTT_COLOR_CODE_RED;
 
-  case LOG_LEVEL_WARN:
-    return RTT_COLOR_CODE_YELLOW;
+	case LOG_LEVEL_WARN:
+		return RTT_COLOR_CODE_YELLOW;
 
-  case LOG_LEVEL_INFO:
-    return RTT_COLOR_CODE_GREEN;
+	case LOG_LEVEL_INFO:
+		return RTT_COLOR_CODE_GREEN;
 
-  case LOG_LEVEL_DEBG:
-  default:
-    return RTT_COLOR_CODE_DEFAULT;
-  }
+	case LOG_LEVEL_DEBG:
+	default:
+		return RTT_COLOR_CODE_DEFAULT;
+	}
 }
 #endif /* CFG_DEBUG_TRACE */
 
@@ -136,10 +136,10 @@ static inline const char *levelToString(appliLogLevel_t aLogLevel)
  *
  * @returns  Number of bytes successfully written to the log buffer.
  */
-static inline uint16_t logLevel(char *aLogString, uint16_t aMaxSize,
+static inline uint16_t logLevel(char* aLogString, uint16_t aMaxSize,
                                 appliLogLevel_t aLogLevel)
 {
-  return snprintf(aLogString, aMaxSize, "%s", levelToString(aLogLevel));
+	return snprintf(aLogString, aMaxSize, "%s", levelToString(aLogLevel));
 }
 #endif /* CFG_DEBUG_TRACE */
 #endif /* LOG_RTT_COLOR_ENABLE */
@@ -153,10 +153,10 @@ static inline uint16_t logLevel(char *aLogString, uint16_t aMaxSize,
  *
  * @returns  Number of bytes successfully written to the log buffer.
  */
-static inline uint16_t logTimestamp(char *aLogString, uint16_t aMaxSize)
+static inline uint16_t logTimestamp(char* aLogString, uint16_t aMaxSize)
 {
-  return snprintf(aLogString, aMaxSize, "%s[%010ld]", RTT_COLOR_CODE_DEFAULT,
-                  otPlatAlarmMilliGetNow());
+	return snprintf(aLogString, aMaxSize, "%s[%010ld]", RTT_COLOR_CODE_DEFAULT,
+	                otPlatAlarmMilliGetNow());
 }
 #endif /* LOG_TIMESTAMP_ENABLE */
 
@@ -169,44 +169,45 @@ static inline uint16_t logTimestamp(char *aLogString, uint16_t aMaxSize)
  *
  * @returns  Number of bytes successfully written to the log buffer.
  */
-void logApplication(appliLogLevel_t aLogLevel, appliLogRegion_t aLogRegion, const char *aFormat, ...)
+void logApplication(appliLogLevel_t aLogLevel, appliLogRegion_t aLogRegion, const char* aFormat, ...)
 {
 #if (CFG_DEBUG_TRACE != 0) /* Since the traces are disabled, there is nothing to print */
-  uint16_t length = 0;
-  char logString[LOG_PARSE_BUFFER_SIZE + 1U];
+	uint16_t length = 0;
+	char logString[LOG_PARSE_BUFFER_SIZE + 1U];
 
 #if (LOG_TIMESTAMP_ENABLE == 1U)
-  length += logTimestamp(logString, LOG_PARSE_BUFFER_SIZE);
+	length += logTimestamp(logString, LOG_PARSE_BUFFER_SIZE);
 #endif
 
 #if (LOG_RTT_COLOR_ENABLE == 1U)
-  /* Add level information */
-  length += logLevel(&logString[length], (LOG_PARSE_BUFFER_SIZE - length),
-      aLogLevel);
+	/* Add level information */
+	length += logLevel(&logString[length], (LOG_PARSE_BUFFER_SIZE - length),
+	                   aLogLevel);
 #endif
 
 #if (LOG_REGION_ENABLE == 1U)
-  /* Add Region information */
-  length += logRegion(&logString[length], (LOG_PARSE_BUFFER_SIZE - length),
-      aLogRegion);
+	/* Add Region information */
+	length += logRegion(&logString[length], (LOG_PARSE_BUFFER_SIZE - length),
+	                    aLogRegion);
 #endif
 
-  /* Parse user string */
-  va_list paramList;
-  va_start(paramList, aFormat);
-  length += vsnprintf(&logString[length], (LOG_PARSE_BUFFER_SIZE - length),
-      aFormat, paramList);
-  logString[length++] = '\r';
-  logString[length++] = '\n';
-  logString[length++] = 0;
-  va_end(paramList);
+	/* Parse user string */
+	va_list paramList;
+	va_start(paramList, aFormat);
+	length += vsnprintf(&logString[length], (LOG_PARSE_BUFFER_SIZE - length),
+	                    aFormat, paramList);
+	logString[length++] = '\r';
+	logString[length++] = '\n';
+	logString[length++] = 0;
+	va_end(paramList);
 
-  if (aLogLevel <= APPLI_CONFIG_LOG_LEVEL)
-  {
-    printf("%s", logString);
-  }else
-  {
-    /* Print nothing */
-  }
+	if (aLogLevel <= APPLI_CONFIG_LOG_LEVEL)
+	{
+		printf("%s", logString);
+	}
+	else
+	{
+		/* Print nothing */
+	}
 #endif /* CFG_DEBUG_TRACE */
 }

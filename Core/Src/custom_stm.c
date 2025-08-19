@@ -21,11 +21,12 @@
 #include "app_matter.h"
 
 /* Private typedef -----------------------------------------------------------*/
-typedef struct {
-	uint16_t PeerToPeerSvcHdle; /**< Service handle */
-	uint16_t P2PWriteClientToServerCharHdle; /**< Characteristic handle */
-	uint16_t P2PNotifyServerToClientCharHdle; /**< Characteristic handle */
-} PeerToPeerContext_t;
+typedef struct
+{
+	uint16_t CustomSvcHdle; /**< Service handle */
+	uint16_t WriteClientToServerCharHdle; /**< Characteristic handle */
+	uint16_t NotifyServerToClientCharHdle; /**< Characteristic handle */
+} CustomContext_t;
 
 /* Private defines -----------------------------------------------------------*/
 #define UUID_128_SUPPORTED  1
@@ -47,13 +48,17 @@ MATTER_App_Notification_evt_t Notification;
 /**
  * START of Section BLE_DRIVER_CONTEXT
  */
-PLACE_IN_SECTION("BLE_DRIVER_CONTEXT") static PeerToPeerContext_t aPeerToPeerContext;
+PLACE_IN_SECTION(
+
+	"BLE_DRIVER_CONTEXT"
+)
+static CustomContext_t aCustomContext;
 
 /**
  * END of Section BLE_DRIVER_CONTEXT
  */
 /* Private function prototypes -----------------------------------------------*/
-static SVCCTL_EvtAckStatus_t Matter_Event_Handler(void *Event);
+static SVCCTL_EvtAckStatus_t Matter_Event_Handler(void* Event);
 
 /* Functions Definition ------------------------------------------------------*/
 /* Private functions ----------------------------------------------------------*/
@@ -79,8 +84,8 @@ do {\
  * @param  None
  * @retval None
  */
-void SVCCTL_InitCustomSvc(void) {
-
+void SVCCTL_InitCustomSvc(void)
+{
 	Char_UUID_t uuid16;
 
 	/**
@@ -89,47 +94,41 @@ void SVCCTL_InitCustomSvc(void) {
 	SVCCTL_RegisterSvcHandler(Matter_Event_Handler);
 
 	/**
-	 *  Peer To Peer Service
+	 *  Matter Service for ble commissioning
 	 *
 	 * Max_Attribute_Records = 2*no_of_char + 1
-	 * service_max_attribute_record = 1 for Peer To Peer service +
-	 *                                2 for P2P Write characteristic +
-	 *                                2 for P2P Notify characteristic +
-	 *                                1 for client char configuration descriptor +
-	 *
 	 */
 
 	uint16_t uuid = MATTER_SERVICE_UUID;
 
-	aci_gatt_add_service(UUID_TYPE_16, (Service_UUID_t*) &uuid,
-	PRIMARY_SERVICE, 8, &(aPeerToPeerContext.PeerToPeerSvcHdle));
+	aci_gatt_add_service(UUID_TYPE_16, (Service_UUID_t*)&uuid,
+	                     PRIMARY_SERVICE, 8, &(aCustomContext.CustomSvcHdle));
 
 	/**
 	 *  Add RX Characteristic
 	 */
 	COPY_CHAR_RX_UUID(uuid16.Char_UUID_128);
-	aci_gatt_add_char(aPeerToPeerContext.PeerToPeerSvcHdle,
-	UUID_TYPE_128, &uuid16, 247,
-	CHAR_PROP_WRITE,
-	ATTR_PERMISSION_NONE,
-	GATT_NOTIFY_ATTRIBUTE_WRITE | GATT_NOTIFY_WRITE_REQ_AND_WAIT_FOR_APPL_RESP, /* gattEvtMask */
-	10, /* encryKeySize */
-	1, /* isVariable */
-	&(aPeerToPeerContext.P2PWriteClientToServerCharHdle));
+	aci_gatt_add_char(aCustomContext.CustomSvcHdle,
+	                  UUID_TYPE_128, &uuid16, 247,
+	                  CHAR_PROP_WRITE,
+	                  ATTR_PERMISSION_NONE,
+	                  GATT_NOTIFY_ATTRIBUTE_WRITE | GATT_NOTIFY_WRITE_REQ_AND_WAIT_FOR_APPL_RESP, /* gattEvtMask */
+	                  10, /* encryKeySize */
+	                  1, /* isVariable */
+	                  &(aCustomContext.WriteClientToServerCharHdle));
 
 	/**
 	 *   Add notification Characteristic
 	 */
-
 	COPY_CHAR_TX_UUID(uuid16.Char_UUID_128);
-	aci_gatt_add_char(aPeerToPeerContext.PeerToPeerSvcHdle,
-	UUID_TYPE_128, &uuid16, 247,
-	CHAR_PROP_INDICATE,
-	ATTR_PERMISSION_NONE,
-	GATT_NOTIFY_ATTRIBUTE_WRITE, /* gattEvtMask */
-	10, /* encryKeySize */
-	1, /* isVariable: 1 */
-	&(aPeerToPeerContext.P2PNotifyServerToClientCharHdle));
+	aci_gatt_add_char(aCustomContext.CustomSvcHdle,
+	                  UUID_TYPE_128, &uuid16, 247,
+	                  CHAR_PROP_INDICATE,
+	                  ATTR_PERMISSION_NONE,
+	                  GATT_NOTIFY_ATTRIBUTE_WRITE, /* gattEvtMask */
+	                  10, /* encryKeySize */
+	                  1, /* isVariable: 1 */
+	                  &(aCustomContext.NotifyServerToClientCharHdle));
 
 	return;
 }
@@ -140,14 +139,16 @@ void SVCCTL_InitCustomSvc(void) {
  * @param  Service_Instance: Instance of the service to which the characteristic belongs
  *
  */
-tBleStatus CUSTOM_STM_App_Update_Char(uint16_t UUID, uint8_t *pPayload, uint16_t Length) {
+tBleStatus CUSTOM_STM_App_Update_Char(uint16_t UUID, uint8_t* pPayload, uint16_t Length)
+{
 	tBleStatus result = BLE_STATUS_INVALID_PARAMS;
-	switch (UUID) {
+	switch (UUID)
+	{
 	case P2P_NOTIFY_CHAR_UUID:
 
-		result = aci_gatt_update_char_value(aPeerToPeerContext.PeerToPeerSvcHdle, aPeerToPeerContext.P2PNotifyServerToClientCharHdle, 0, /* charValOffset */
-		Length, /* charValueLen */
-		(uint8_t*) pPayload);
+		result = aci_gatt_update_char_value(aCustomContext.CustomSvcHdle, aCustomContext.NotifyServerToClientCharHdle, 0, /* charValOffset */
+		                                    Length, /* charValueLen */
+		                                    (uint8_t*)pPayload);
 
 		break;
 
@@ -165,72 +166,85 @@ tBleStatus CUSTOM_STM_App_Update_Char(uint16_t UUID, uint8_t *pPayload, uint16_t
  * @param  Event: Address of the buffer holding the Event
  * @retval Ack: Return whether the Event has been managed or not
  */
-static SVCCTL_EvtAckStatus_t Matter_Event_Handler(void *Event) {
+static SVCCTL_EvtAckStatus_t Matter_Event_Handler(void* Event)
+{
 	SVCCTL_EvtAckStatus_t return_value;
-	hci_event_pckt *event_pckt;
-	evt_blecore_aci *blecore_evt;
-	aci_gatt_attribute_modified_event_rp0 *attribute_modified;
+	hci_event_pckt* event_pckt;
+	evt_blecore_aci* blecore_evt;
+	aci_gatt_attribute_modified_event_rp0* attribute_modified;
 
 	return_value = SVCCTL_EvtNotAck;
-	event_pckt = (hci_event_pckt*) (((hci_uart_pckt*) Event)->data);
+	event_pckt = (hci_event_pckt*)(((hci_uart_pckt*)Event)->data);
 
-	switch (event_pckt->evt) {
-	case HCI_VENDOR_SPECIFIC_DEBUG_EVT_CODE: {
-		blecore_evt = (evt_blecore_aci*) event_pckt->data;
-		switch (blecore_evt->ecode) {
-		case ACI_GATT_SERVER_CONFIRMATION_VSEVT_CODE: {
-			attribute_modified = (aci_gatt_attribute_modified_event_rp0*) blecore_evt->data;
-			Notification.P2P_Evt_Opcode = MATTER_STM_ACK_INDICATE_EVT;
-			Notification.ConnectionHandle = attribute_modified->Connection_Handle;
-			APP_MATTER_Notification(&Notification);
-		}
-		case ACI_GATT_ATTRIBUTE_MODIFIED_VSEVT_CODE: {
-			attribute_modified = (aci_gatt_attribute_modified_event_rp0*) blecore_evt->data;
-			if (attribute_modified->Attr_Handle == (aPeerToPeerContext.P2PNotifyServerToClientCharHdle + 2)) {
-				/**
-				 * Descriptor handle
-				 */
-				return_value = SVCCTL_EvtAckFlowEnable;
-				APP_DBG_MSG("Subscribe for c2 notification\n");
-				/**
-				 * Indicate to application
-				 */
-				if (attribute_modified->Attr_Data[0] & COMSVC_Indication) {
-					Notification.P2P_Evt_Opcode = MATTER_STM_INDICATE_ENABLED_EVT;
-					Notification.ConnectionHandle = attribute_modified->Connection_Handle;
-					APP_MATTER_Notification(&Notification);
-				} else {
-					Notification.P2P_Evt_Opcode = MATTER_STM_INDICATE_DISABLED_EVT;
+	switch (event_pckt->evt)
+	{
+	case HCI_VENDOR_SPECIFIC_DEBUG_EVT_CODE:
+		{
+			blecore_evt = (evt_blecore_aci*)event_pckt->data;
+			switch (blecore_evt->ecode)
+			{
+			case ACI_GATT_SERVER_CONFIRMATION_VSEVT_CODE:
+				{
+					attribute_modified = (aci_gatt_attribute_modified_event_rp0*)blecore_evt->data;
+					Notification.Evt_Opcode = MATTER_STM_ACK_INDICATE_EVT;
 					Notification.ConnectionHandle = attribute_modified->Connection_Handle;
 					APP_MATTER_Notification(&Notification);
 				}
-			}
+			case ACI_GATT_ATTRIBUTE_MODIFIED_VSEVT_CODE:
+				{
+					attribute_modified = (aci_gatt_attribute_modified_event_rp0*)blecore_evt->data;
+					if (attribute_modified->Attr_Handle == (aCustomContext.NotifyServerToClientCharHdle + 2))
+					{
+						/**
+				 * Descriptor handle
+				 */
+						return_value = SVCCTL_EvtAckFlowEnable;
+						APP_DBG_MSG("Subscribe for c2 notification\n");
+						/**
+				 * Indicate to application
+				 */
+						if (attribute_modified->Attr_Data[0] & COMSVC_Indication)
+						{
+							Notification.Evt_Opcode = MATTER_STM_INDICATE_ENABLED_EVT;
+							Notification.ConnectionHandle = attribute_modified->Connection_Handle;
+							APP_MATTER_Notification(&Notification);
+						}
+						else
+						{
+							Notification.Evt_Opcode = MATTER_STM_INDICATE_DISABLED_EVT;
+							Notification.ConnectionHandle = attribute_modified->Connection_Handle;
+							APP_MATTER_Notification(&Notification);
+						}
+					}
 
-			else if (attribute_modified->Attr_Handle == (aPeerToPeerContext.P2PWriteClientToServerCharHdle + 1)) {
-				Notification.P2P_Evt_Opcode = MATTER_STM_WRITE_EVT;
-				Notification.DataTransfered.Length = attribute_modified->Attr_Data_Length;
-				Notification.DataTransfered.pPayload = attribute_modified->Attr_Data;
-				Notification.ConnectionHandle = attribute_modified->Connection_Handle;
-	            if(Notification.DataTransfered.Length == 0){
-	                    /* Exit the function because of bad packet  */
-	                    break;
-	             }
-				APP_MATTER_Notification(&Notification);
+					else if (attribute_modified->Attr_Handle == (aCustomContext.WriteClientToServerCharHdle + 1))
+					{
+						Notification.Evt_Opcode = MATTER_STM_WRITE_EVT;
+						Notification.DataTransfered.Length = attribute_modified->Attr_Data_Length;
+						Notification.DataTransfered.pPayload = attribute_modified->Attr_Data;
+						Notification.ConnectionHandle = attribute_modified->Connection_Handle;
+						if (Notification.DataTransfered.Length == 0)
+						{
+							/* Exit the function because of bad packet  */
+							break;
+						}
+						APP_MATTER_Notification(&Notification);
+					}
+				}
+				break;
+			case ACI_GATT_WRITE_PERMIT_REQ_VSEVT_CODE:
+				{
+					aci_gatt_write_permit_req_event_rp0* write_perm_req;
+					write_perm_req = (aci_gatt_write_permit_req_event_rp0*)blecore_evt->data;
+					aci_gatt_write_resp(write_perm_req->Connection_Handle, write_perm_req->Attribute_Handle, 0x00, /* write_status = 0 (no error))*/
+					                    0x00, /* err_code */
+					                    write_perm_req->Data_Length, (uint8_t*)&(write_perm_req->Data[0]));
+				}
+				break;
+			default:
+				break;
 			}
 		}
-			break;
-		case ACI_GATT_WRITE_PERMIT_REQ_VSEVT_CODE: {
-			aci_gatt_write_permit_req_event_rp0 *write_perm_req;
-			write_perm_req = (aci_gatt_write_permit_req_event_rp0*) blecore_evt->data;
-			aci_gatt_write_resp(write_perm_req->Connection_Handle, write_perm_req->Attribute_Handle, 0x00, /* write_status = 0 (no error))*/
-			0x00, /* err_code */
-			write_perm_req->Data_Length, (uint8_t*) &(write_perm_req->Data[0]));
-		}
-			break;
-		default:
-			break;
-		}
-	}
 		break; /* HCI_HCI_VENDOR_SPECIFIC_DEBUG_EVT_CODE_SPECIFIC */
 
 	default:
@@ -239,4 +253,3 @@ static SVCCTL_EvtAckStatus_t Matter_Event_Handler(void *Event) {
 
 	return (return_value);
 }/* end SVCCTL_EvtAckStatus_t */
-

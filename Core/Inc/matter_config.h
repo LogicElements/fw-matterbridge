@@ -144,7 +144,7 @@ extern "C" {
 //#include "mbedtls/check_config.h" /*not needed according to migration guide*/
 //#include "mbedtls/config_psa.h"   /*not needed according to migration guide*/
 
-int mbedtls_ssl_safer_memcmp( const void *a, const void *b, size_t n );
+int mbedtls_ssl_safer_memcmp(const void* a, const void* b, size_t n);
 #ifdef __cplusplus
 }
 #endif

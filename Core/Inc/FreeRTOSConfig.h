@@ -49,8 +49,8 @@
 
 /* Ensure definitions are only used by the compiler, and not by the assembler. */
 #if defined(__ICCARM__) || defined(__CC_ARM) || defined(__GNUC__)
-  #include <stdint.h>
-  extern uint32_t SystemCoreClock;
+#include <stdint.h>
+extern uint32_t SystemCoreClock;
 #endif
 #ifndef CMSIS_device_header
 #define CMSIS_device_header "stm32wbxx.h"
@@ -126,10 +126,10 @@ to exclude the API function. */
 
 /* Cortex-M specific definitions. */
 #ifdef __NVIC_PRIO_BITS
- /* __BVIC_PRIO_BITS will be specified when CMSIS is being used. */
- #define configPRIO_BITS         __NVIC_PRIO_BITS
+/* __BVIC_PRIO_BITS will be specified when CMSIS is being used. */
+#define configPRIO_BITS         __NVIC_PRIO_BITS
 #else
- #define configPRIO_BITS         4
+#define configPRIO_BITS         4
 #endif
 
 /* The lowest interrupt priority that can be used in a call to a "set priority"
@@ -171,13 +171,13 @@ standard names. */
 
 #if( configGENERATE_RUN_TIME_STATS == 1 )
 
-  extern void RTOS_AppConfigureTimerForRuntimeStats();
+extern void RTOS_AppConfigureTimerForRuntimeStats();
 
-  extern uint32_t RTOS_AppGetRuntimeCounterValueFromISR();
+extern uint32_t RTOS_AppGetRuntimeCounterValueFromISR();
 
-  #define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS()    RTOS_AppConfigureTimerForRuntimeStats()
+#define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS()    RTOS_AppConfigureTimerForRuntimeStats()
 
-  #define portGET_RUN_TIME_COUNTER_VALUE()            RTOS_AppGetRuntimeCounterValueFromISR()
+#define portGET_RUN_TIME_COUNTER_VALUE()            RTOS_AppGetRuntimeCounterValueFromISR()
 
 #endif
 

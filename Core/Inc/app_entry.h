@@ -1,4 +1,3 @@
-
 /**
   ******************************************************************************
   * @file    app_entry.h
@@ -40,26 +39,26 @@
 extern "C" {
 #endif
 
-  /* Includes ------------------------------------------------------------------*/
-  /* Exported types ------------------------------------------------------------*/
-  /* Exported constants --------------------------------------------------------*/
-  /* External variables --------------------------------------------------------*/
-	typedef struct
-	{
-	  uint8_t Pushed_Button;
-	  uint8_t State; //1 pushed
-	}Push_Button_st;
+/* Includes ------------------------------------------------------------------*/
+/* Exported types ------------------------------------------------------------*/
+/* Exported constants --------------------------------------------------------*/
+/* External variables --------------------------------------------------------*/
+typedef struct
+{
+	uint8_t Pushed_Button;
+	uint8_t State; //1 pushed
+} Push_Button_st;
 
-  typedef void (*PushButtonCallback)(Push_Button_st *aMessage);
+typedef void (*PushButtonCallback)(Push_Button_st* aMessage);
 
-  /* Exported macros -----------------------------------------------------------*/
-  /* Exported functions ------------------------------------------------------- */
-  void APPE_Config(void);
-  void APPE_Init(void);
-  void APP_ENTRY_PBSetReceiveCallback(PushButtonCallback aCallback);
+/* Exported macros -----------------------------------------------------------*/
+/* Exported functions ------------------------------------------------------- */
+void APPE_Config(void);
+void APPE_Init(void);
+void APP_ENTRY_PBSetReceiveCallback(PushButtonCallback aCallback);
 
 #ifdef  USE_STM32WBXX_NUCLEO
-  void APP_ENTRY_LedBlink(Led_TypeDef Led, uint8_t LedStatus);
+void APP_ENTRY_LedBlink(Led_TypeDef Led, uint8_t LedStatus);
 #endif /* USE_STM32WBXX_NUCLEO */
 
 #ifdef __cplusplus

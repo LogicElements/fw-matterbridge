@@ -51,8 +51,10 @@ extern "C" {
 
 typedef enum
 {
-	QSPI_ACCESS_NONE = 0, /*!<  Instance not initialized,             */
-	QSPI_ACCESS_INDIRECT, /*!<  Instance use indirect mode access     */
+	QSPI_ACCESS_NONE = 0,
+	/*!<  Instance not initialized,             */
+	QSPI_ACCESS_INDIRECT,
+	/*!<  Instance use indirect mode access     */
 	QSPI_ACCESS_MMP /*!<  Instance use Memory Mapped Mode read  */
 } BSP_QSPI_Access_t;
 
@@ -187,7 +189,7 @@ int32_t BSP_QSPI_ReadID(uint32_t Instance, uint8_t* Id);
 
 /* These functions can be modified in case the current settings
    need to be changed for specific application needs */
-HAL_StatusTypeDef MX_QSPI_Init(QSPI_HandleTypeDef* hQspi, MX_QSPI_Init_t* Config);
+HAL_StatusTypeDef MX_QSPI_Init(QSPI_HandleTypeDef * hQspi, MX_QSPI_Init_t * Config);
 
 /**
  * @}

@@ -22,7 +22,7 @@
 #define __STM32WBxx_IT_H
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /* Private includes ----------------------------------------------------------*/
@@ -62,7 +62,7 @@ void DMA2_Channel4_IRQHandler(void);
 /* USER CODE BEGIN EFP */
 void FLASH_IRQHandler(void);
 void EXTI15_10_IRQHandler(void);
-void CFG_HW_USART1_DMA_TX_IRQHandler( void );
+void CFG_HW_USART1_DMA_TX_IRQHandler(void);
 /* void SysTick_Handler(void); */
 
 /* USER CODE END EFP */

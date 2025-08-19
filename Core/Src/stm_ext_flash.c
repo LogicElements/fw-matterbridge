@@ -207,7 +207,6 @@ static STM_OTA_StatusTypeDef check_addr(uint32_t Address, uint32_t Length)
 #if CFG_FULL_LOW_POWER == 1
 static void QSPI_Pin_WakeUP(void)
 {
-
 	GPIO_InitTypeDef gpio_init_structure;
 
 	/*##-1- Configure peripheral GPIO ##########################################*/

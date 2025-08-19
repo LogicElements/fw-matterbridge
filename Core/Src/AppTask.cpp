@@ -36,7 +36,6 @@
 
 /*Matter includes*/
 #include <DeviceInfoProviderImpl.h>
-#include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/server/Dnssd.h>
 #include <app/server/OnboardingCodesUtil.h>
@@ -62,15 +61,14 @@ using namespace chip::DeviceLayer;
 using namespace ::chip::Platform;
 using namespace ::chip::Credentials;
 using namespace ::chip::app::Clusters;
-using chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr;
+using DeviceLayer::PersistedStorage::KeyValueStoreMgr;
 
 AppTask AppTask::sAppTask;
-chip::DeviceLayer::FactoryDataProvider mFactoryDataProvider;
+FactoryDataProvider mFactoryDataProvider;
 
 // #define STM32ThreadDataSet "STM32DataSet"
 #define APP_EVENT_QUEUE_SIZE 10
-#define NVM_TIMEOUT 5000 // timer to handle PB to save data in nvm or do a factory reset
-#define STM32_LIGHT_ENDPOINT_ID 1
+#define NVM_TIMEOUT 1000 // timer to handle PB to save data in nvm or do a factory reset
 
 static QueueHandle_t sAppEventQueue;
 const osThreadAttr_t AppTask_attr = {.name = APPTASK_NAME, .attr_bits = APP_ATTR_BITS, .cb_mem = APP_CB_MEM, .cb_size = APP_CB_SIZE, .stack_mem = APP_STACK_MEM, .stack_size = APP_STACK_SIZE, .priority = APP_PRIORITY};
@@ -82,7 +80,7 @@ static bool sFabricNeedSaved = false;
 static bool sFailCommissioning = false;
 static bool sHaveFabric = false;
 
-chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
+DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
 CHIP_ERROR AppTask::StartAppTask()
 {
@@ -99,13 +97,12 @@ CHIP_ERROR AppTask::StartAppTask()
 	return CHIP_NO_ERROR;
 }
 
-void LockOpenThreadTask(void) { chip::DeviceLayer::ThreadStackMgr().LockThreadStack(); }
+void LockOpenThreadTask(void) { ThreadStackMgr().LockThreadStack(); }
 
-void UnlockOpenThreadTask(void) { chip::DeviceLayer::ThreadStackMgr().UnlockThreadStack(); }
+void UnlockOpenThreadTask(void) { ThreadStackMgr().UnlockThreadStack(); }
 
 CHIP_ERROR AppTask::Init()
 {
-
 	CHIP_ERROR err = CHIP_NO_ERROR;
 	ChipLogProgress(NotSpecified, "Current Software Version: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
 
@@ -124,35 +121,36 @@ CHIP_ERROR AppTask::Init()
 #endif
 
 	// Init ZCL Data Model
-	static chip::CommonCaseDeviceServerInitParams initParams;
+	static CommonCaseDeviceServerInitParams initParams;
 	(void)initParams.InitializeStaticResourcesBeforeServerInit();
 	ReturnErrorOnFailure(mFactoryDataProvider.Init());
 	SetDeviceInstanceInfoProvider(&mFactoryDataProvider);
 	SetCommissionableDataProvider(&mFactoryDataProvider);
 	SetDeviceAttestationCredentialsProvider(&mFactoryDataProvider);
 
-	chip::Inet::EndPointStateOpenThread::OpenThreadEndpointInitParam nativeParams;
+	Inet::EndPointStateOpenThread::OpenThreadEndpointInitParam nativeParams;
 	nativeParams.lockCb = LockOpenThreadTask;
 	nativeParams.unlockCb = UnlockOpenThreadTask;
-	nativeParams.openThreadInstancePtr = chip::DeviceLayer::ThreadStackMgrImpl().OTInstance();
+	nativeParams.openThreadInstancePtr = ThreadStackMgrImpl().OTInstance();
 	initParams.endpointNativeParams = static_cast<void*>(&nativeParams);
-	chip::Server::GetInstance().Init(initParams);
+	Server::GetInstance().Init(initParams);
 
 	gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
-	chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
+	SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
 	ConfigurationMgr().LogDeviceConfig();
 
 	// Open commissioning after boot if no fabric was available
-	if (chip::Server::GetInstance().GetFabricTable().FabricCount() == 0)
+	if (Server::GetInstance().GetFabricTable().FabricCount() == 0)
 	{
-		PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
+		PrintOnboardingCodes(RendezvousInformationFlags(RendezvousInformationFlag::kBLE));
 		// Enable BLE advertisements
-		chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
+		Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
 		APP_DBG("BLE advertising started. Waiting for Pairing.");
 	}
 	else
-	{ // try to attach to the thread network
+	{
+		// try to attach to the thread network
 		sHaveFabric = true;
 	}
 
@@ -170,7 +168,7 @@ CHIP_ERROR AppTask::InitMatter()
 {
 	CHIP_ERROR err = CHIP_NO_ERROR;
 
-	err = chip::Platform::MemoryInit();
+	err = MemoryInit();
 	if (err != CHIP_NO_ERROR)
 	{
 		APP_DBG("Platform::MemoryInit() failed");
@@ -207,7 +205,6 @@ void AppTask::AppTaskMain(void* pvParameter)
 
 	while (true)
 	{
-
 		BaseType_t eventReceived = xQueueReceive(sAppEventQueue, &event, portMAX_DELAY);
 		while (eventReceived == pdTRUE)
 		{

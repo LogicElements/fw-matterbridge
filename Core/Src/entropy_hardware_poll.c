@@ -1,4 +1,3 @@
-
 /* USER CODE BEGIN Header */
 /**
  ******************************************************************************
@@ -26,9 +25,10 @@
 
 extern RNG_HandleTypeDef hrng;
 
-int mbedtls_hardware_poll(void *data, unsigned char *output, size_t len, size_t *olen);
+int mbedtls_hardware_poll(void* data, unsigned char* output, size_t len, size_t* olen);
 
-int mbedtls_hardware_poll(void *data, unsigned char *output, size_t len, size_t *olen) {
+int mbedtls_hardware_poll(void* data, unsigned char* output, size_t len, size_t* olen)
+{
 	HAL_StatusTypeDef status = HAL_OK;
 	uint32_t random_number = 0;
 	/**
@@ -38,8 +38,7 @@ int mbedtls_hardware_poll(void *data, unsigned char *output, size_t len, size_t 
 	 * The RNG may be used to provide a random number on each power on
 	 */
 	/* Get RNG semaphore */
-	while (LL_HSEM_1StepLock(HSEM, 0))
-		;
+	while (LL_HSEM_1StepLock(HSEM, 0));
 
 	/* Enable RNG */
 	__HAL_RNG_ENABLE(&hrng);
@@ -47,10 +46,10 @@ int mbedtls_hardware_poll(void *data, unsigned char *output, size_t len, size_t 
 	/* Enable HSI48 oscillator */
 	LL_RCC_HSI48_Enable();
 	/* Wait until HSI48 is ready */
-	while (!LL_RCC_HSI48_IsReady())
-		;
+	while (!LL_RCC_HSI48_IsReady());
 
-	if (HAL_RNG_GenerateRandomNumber(&hrng, &random_number) != HAL_OK) {
+	if (HAL_RNG_GenerateRandomNumber(&hrng, &random_number) != HAL_OK)
+	{
 	}
 
 	/* Disable HSI48 oscillator */
@@ -61,10 +60,11 @@ int mbedtls_hardware_poll(void *data, unsigned char *output, size_t len, size_t 
 
 	/* Release RNG semaphore */
 	LL_HSEM_ReleaseLock(HSEM, 0, 0);
-	((void) data);
+	((void)data);
 	*olen = 0;
 
-	if ((len < sizeof(uint32_t)) || (HAL_OK != status)) {
+	if ((len < sizeof(uint32_t)) || (HAL_OK != status))
+	{
 		return 0;
 	}
 
@@ -73,4 +73,3 @@ int mbedtls_hardware_poll(void *data, unsigned char *output, size_t len, size_t 
 
 	return 0;
 }
-

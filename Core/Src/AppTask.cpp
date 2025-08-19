@@ -23,8 +23,7 @@
 #include "app_thread.h"
 #include "cmsis_os.h"
 #include "dbg_trace.h"
-#include "flash_wb.h"
-#include "stm32_lpm.h"
+#include "LED.h"
 
 #if (OTA_SUPPORT == 1)
 #include "ota.h"
@@ -79,6 +78,8 @@ static bool sHaveBLEConnections = false;
 static bool sFabricNeedSaved = false;
 static bool sFailCommissioning = false;
 static bool sHaveFabric = false;
+
+extern TIM_HandleTypeDef htim1;
 
 DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
@@ -211,6 +212,9 @@ void AppTask::AppTaskMain(void* pvParameter)
 			sAppTask.DispatchEvent(&event);
 			eventReceived = xQueueReceive(sAppEventQueue, &event, 0);
 		}
+
+		LED_SetColorRGB(0, 255, 0, 0);
+		LED_Send(&htim1);
 
 #if HIGHWATERMARK
 		uxHighWaterMark = uxTaskGetStackHighWaterMark(NULL);

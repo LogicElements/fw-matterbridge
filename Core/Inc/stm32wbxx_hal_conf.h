@@ -24,6 +24,9 @@
 
 #ifdef __cplusplus
 extern "C" {
+
+
+
 #endif
 
 /* Exported types ------------------------------------------------------------*/
@@ -42,7 +45,7 @@ extern "C" {
 /*#define HAL_I2C_MODULE_ENABLED   */
 #define HAL_IPCC_MODULE_ENABLED
 /*#define HAL_IRDA_MODULE_ENABLED   */
-/*#define HAL_IWDG_MODULE_ENABLED   */
+#define HAL_IWDG_MODULE_ENABLED
 /*#define HAL_LCD_MODULE_ENABLED   */
 /*#define HAL_LPTIM_MODULE_ENABLED   */
 /*#define HAL_PCD_MODULE_ENABLED   */

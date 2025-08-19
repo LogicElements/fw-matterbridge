@@ -1,0 +1,39 @@
+#include <memory.h>
+#include "LED.h"
+
+#define NUM_LEDS 5
+#define BLANK_INTERVAL 100
+#define LOW_DUTY 22 // should be between 200-400 ns
+#define HIGH_DUTY 44 // should be between 580-1000 ns
+
+#define DATA_LENGTH (BLANK_INTERVAL + 24 * NUM_LEDS + BLANK_INTERVAL)
+
+uint32_t data[DATA_LENGTH];
+
+void LED_Init(void)
+{
+	memset(data, 0, sizeof data);
+}
+
+void LED_Send(TIM_HandleTypeDef* tim)
+{
+	HAL_TIM_PWM_Start_DMA(tim, TIM_CHANNEL_3, data, DATA_LENGTH);
+}
+
+void LED_SetColorRGB(const uint8_t led, const uint8_t r, const uint8_t g, const uint8_t b)
+{
+	const uint32_t color = (uint32_t)g << 16 | (uint32_t)r << 8 | (uint32_t)b;
+
+	for (int i = 23; i >= 0; i--)
+	{
+		if (color & 1 << i)
+			data[BLANK_INTERVAL + 24 * led + 23 - i] = HIGH_DUTY;
+		else
+			data[BLANK_INTERVAL + 24 * led + 23 - i] = LOW_DUTY;
+	}
+}
+
+void LED_SetColor(const uint8_t led, const Color color)
+{
+	LED_SetColorRGB(led, color.r, color.g, color.b);
+}

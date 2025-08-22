@@ -65,11 +65,26 @@ typedef struct
  * START of Section TIMERSERVER_CONTEXT
  */
 
-PLACE_IN_SECTION("TIMERSERVER_CONTEXT") static volatile TimerContext_t aTimerContext[CFG_HW_TS_MAX_NBR_CONCURRENT_TIMER];
-PLACE_IN_SECTION("TIMERSERVER_CONTEXT") static volatile uint8_t CurrentRunningTimerID;
-PLACE_IN_SECTION("TIMERSERVER_CONTEXT") static volatile uint8_t PreviousRunningTimerID;
-PLACE_IN_SECTION("TIMERSERVER_CONTEXT") static volatile uint32_t SSRValueOnLastSetup;
-PLACE_IN_SECTION("TIMERSERVER_CONTEXT") static volatile WakeupTimerLimitation_Status_t WakeupTimerLimitation;
+PLACE_IN_SECTION (
+"TIMERSERVER_CONTEXT"
+)
+static volatile TimerContext_t aTimerContext[CFG_HW_TS_MAX_NBR_CONCURRENT_TIMER];
+PLACE_IN_SECTION (
+"TIMERSERVER_CONTEXT"
+)
+static volatile uint8_t CurrentRunningTimerID;
+PLACE_IN_SECTION (
+"TIMERSERVER_CONTEXT"
+)
+static volatile uint8_t PreviousRunningTimerID;
+PLACE_IN_SECTION (
+"TIMERSERVER_CONTEXT"
+)
+static volatile uint32_t SSRValueOnLastSetup;
+PLACE_IN_SECTION (
+"TIMERSERVER_CONTEXT"
+)
+static volatile WakeupTimerLimitation_Status_t WakeupTimerLimitation;
 
 /**
  * END of Section TIMERSERVER_CONTEXT
@@ -357,8 +372,7 @@ static void RestartWakeupCounter(uint16_t Value)
 			Value -= 1;
 		}
 
-		while (__HAL_RTC_WAKEUPTIMER_GET_FLAG(&hrtc, RTC_FLAG_WUTWF) == RESET)
-			;
+		while (__HAL_RTC_WAKEUPTIMER_GET_FLAG(&hrtc, RTC_FLAG_WUTWF) == RESET);
 
 		/**
 		 * make sure to clear the flags after checking the WUTWF.
@@ -409,8 +423,7 @@ static void RescheduleTimerList(void)
 		/**
 		 * Wait for the flag to be back to 0 when the wakeup timer is enabled
 		 */
-		while (__HAL_RTC_WAKEUPTIMER_GET_FLAG(&hrtc, RTC_FLAG_WUTWF) == SET)
-			;
+		while (__HAL_RTC_WAKEUPTIMER_GET_FLAG(&hrtc, RTC_FLAG_WUTWF) == SET);
 	}
 	__HAL_RTC_WAKEUPTIMER_DISABLE(&hrtc); /**<  Disable the Wakeup Timer */
 
@@ -564,8 +577,7 @@ void HW_TS_RTC_Wakeup_Handler(void)
 		 * However, if due to any bug in the timer server this is the case, the mistake may not impact the user.
 		 * We could just clean the interrupt flag and get out from this unexpected interrupt
 		 */
-		while (__HAL_RTC_WAKEUPTIMER_GET_FLAG(&hrtc, RTC_FLAG_WUTWF) == RESET)
-			;
+		while (__HAL_RTC_WAKEUPTIMER_GET_FLAG(&hrtc, RTC_FLAG_WUTWF) == RESET);
 
 		/**
 		 * make sure to clear the flags after checking the WUTWF.
@@ -760,13 +772,11 @@ void HW_TS_Stop(uint8_t timer_id)
 				/**
 				 * Wait for the flag to be back to 0 when the wakeup timer is enabled
 				 */
-				while (__HAL_RTC_WAKEUPTIMER_GET_FLAG(&hrtc, RTC_FLAG_WUTWF) == SET)
-					;
+				while (__HAL_RTC_WAKEUPTIMER_GET_FLAG(&hrtc, RTC_FLAG_WUTWF) == SET);
 			}
 			__HAL_RTC_WAKEUPTIMER_DISABLE(&hrtc); /**<  Disable the Wakeup Timer */
 
-			while (__HAL_RTC_WAKEUPTIMER_GET_FLAG(&hrtc, RTC_FLAG_WUTWF) == RESET)
-				;
+			while (__HAL_RTC_WAKEUPTIMER_GET_FLAG(&hrtc, RTC_FLAG_WUTWF) == RESET);
 
 			/**
 			 * make sure to clear the flags after checking the WUTWF.

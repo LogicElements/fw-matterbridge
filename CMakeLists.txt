@@ -82,6 +82,7 @@ target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
 		"Application/inc"
 		"Core/inc"
 		"Library/Drivers/BSP/STM32WB5MM-DK"
+#		Library/Drivers/BSP/STM32WB5MM-DK/stm32wb5mm_dk_qspi.h
 )
 
 target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC

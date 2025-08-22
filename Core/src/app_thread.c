@@ -83,11 +83,41 @@ static void APP_THREAD_FreeRTOSProcessMsgM0ToM4Task(void* argument);
 /* Private variables ---------------------------------------------------------*/
 static TL_CmdPacket_t* p_thread_otcmdbuffer;
 static TL_EvtPacket_t* p_thread_notif_M0_to_M4;
-PLACE_IN_SECTION("MB_MEM1") ALIGN(4) static TL_TH_Config_t ThreadConfigBuffer;
-PLACE_IN_SECTION("MB_MEM2") ALIGN(4) static TL_CmdPacket_t ThreadOtCmdBuffer;
-PLACE_IN_SECTION("MB_MEM2") ALIGN(4) static uint8_t ThreadNotifRspEvtBuffer[sizeof(TL_PacketHeader_t) + TL_EVT_HDR_SIZE + 255U];
-PLACE_IN_SECTION("MB_MEM2") ALIGN(4) static TL_CmdPacket_t ThreadCliCmdBuffer;
-PLACE_IN_SECTION("MB_MEM2") ALIGN(4) static TL_CmdPacket_t ThreadCliNotBuffer;
+PLACE_IN_SECTION (
+"MB_MEM1"
+)
+ALIGN (
+4
+)
+static TL_TH_Config_t ThreadConfigBuffer;
+PLACE_IN_SECTION (
+"MB_MEM2"
+)
+ALIGN (
+4
+)
+static TL_CmdPacket_t ThreadOtCmdBuffer;
+PLACE_IN_SECTION (
+"MB_MEM2"
+)
+ALIGN (
+4
+)
+static uint8_t ThreadNotifRspEvtBuffer[sizeof(TL_PacketHeader_t) + TL_EVT_HDR_SIZE + 255U];
+PLACE_IN_SECTION (
+"MB_MEM2"
+)
+ALIGN (
+4
+)
+static TL_CmdPacket_t ThreadCliCmdBuffer;
+PLACE_IN_SECTION (
+"MB_MEM2"
+)
+ALIGN (
+4
+)
+static TL_CmdPacket_t ThreadCliNotBuffer;
 extern uint8_t g_ot_notification_allowed;
 
 static QueueHandle_t MoNotifQueue;

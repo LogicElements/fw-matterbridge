@@ -56,10 +56,14 @@ extern "C" {
  */
 typedef enum
 {
-	APPLI_LOG_REGION_GENERAL = 1U, /* General                 */
-	APPLI_LOG_REGION_OPENTHREAD_API = 2U, /* OpenThread API          */
-	APPLI_LOG_REGION_OT_API_LINK = 3U, /* OpenThread Link API     */
-	APPLI_LOG_REGION_OT_API_INSTANCE = 4U, /* OpenThread Instance API */
+	APPLI_LOG_REGION_GENERAL = 1U,
+	/* General                 */
+	APPLI_LOG_REGION_OPENTHREAD_API = 2U,
+	/* OpenThread API          */
+	APPLI_LOG_REGION_OT_API_LINK = 3U,
+	/* OpenThread Link API     */
+	APPLI_LOG_REGION_OT_API_INSTANCE = 4U,
+	/* OpenThread Instance API */
 	APPLI_LOG_REGION_OT_API_MESSAGE = 5U /* OpenThread Message API  */
 } appliLogRegion_t;
 

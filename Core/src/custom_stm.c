@@ -48,7 +48,10 @@ MATTER_App_Notification_evt_t Notification;
 /**
  * START of Section BLE_DRIVER_CONTEXT
  */
-PLACE_IN_SECTION("BLE_DRIVER_CONTEXT") static CustomContext_t aCustomContext;
+PLACE_IN_SECTION (
+"BLE_DRIVER_CONTEXT"
+)
+static CustomContext_t aCustomContext;
 
 /**
  * END of Section BLE_DRIVER_CONTEXT

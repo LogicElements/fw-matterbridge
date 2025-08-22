@@ -570,7 +570,9 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN 4 */
 
-void RTOS_AppConfigureTimerForRuntimeStats() {}
+void RTOS_AppConfigureTimerForRuntimeStats()
+{
+}
 
 uint32_t RTOS_AppGetRuntimeCounterValueFromISR() { return HAL_GetTick(); }
 

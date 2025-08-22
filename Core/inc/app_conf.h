@@ -21,6 +21,7 @@
 
 #ifdef __cplusplus
 extern "C" {
+
 #endif
 
 #include "hw.h"
@@ -108,13 +109,6 @@ extern "C" {
 #define CFG_USE_SMPS 1
 
 /* USER CODE END Generic_Parameters */
-
-/**< specific parameters */
-/*****************************************************/
-// #define PUSH_BUTTON_SW1_EXTI_IRQHandler     EXTI4_IRQHandler
-// #define PUSH_BUTTON_SW2_EXTI_IRQHandler     EXTI0_IRQHandler
-// #define PUSH_BUTTON_SW3_EXTI_IRQHandler     EXTI1_IRQHandler
-
 
 #define P2P_SERVER1 1 /*1 = Device is Peripherique*/
 #define P2P_SERVER2 0
@@ -312,12 +306,6 @@ extern "C" {
 
 #define TL_BLE_EVENT_FRAME_SIZE (TL_EVT_HDR_SIZE + CFG_TLBLE_MOST_EVENT_PAYLOAD_SIZE)
 
-// /******************************************************************************
-//  * UART interfaces
-//  ******************************************************************************/
-// #define CFG_DEBUG_TRACE_UART hw_uart1
-// #define CFG_CLI_UART hw_lpuart1
-
 /******************************************************************************
  * IPCC interface
  ******************************************************************************/
@@ -442,7 +430,6 @@ typedef enum
 	/* USER CODE BEGIN CFG_TimProcID_t */
 
 	/* USER CODE END CFG_TimProcID_t */
-
 } CFG_TimProcID_t;
 
 /******************************************************************************
@@ -542,21 +529,6 @@ typedef enum
  ******************************************************************************/
 #define APPLI_CONFIG_LOG_LEVEL LOG_LEVEL_INFO
 #define APPLI_PRINT_FILE_FUNC_LINE 0
-
-/* USER CODE BEGIN Defines */
-/******************************************************************************
- * User interaction
- * When CFG_LED_SUPPORTED is set, LEDS are activated if requested
- * When CFG_BUTTON_SUPPORTED is set, the push button are activated if requested
- ******************************************************************************/
-#if (CFG_FULL_LOW_POWER == 1)
-#define CFG_LED_SUPPORTED 0
-#define CFG_BUTTON_SUPPORTED 0
-#else
-#define CFG_LED_SUPPORTED 1
-#define CFG_BUTTON_SUPPORTED 1
-#endif /* CFG_FULL_LOW_POWER */
-/* USER CODE END Defines */
 
 /******************************************************************************
  * FreeRTOS
@@ -712,36 +684,6 @@ typedef enum
 
 /* Define the timer used by task that will refresh (in sec) the watchdog started be the SBSFU */
 #define IWD_RELOAD 5000
-
-// /******************************************************************************
-//  * LCD support
-//  ******************************************************************************/
-// #if defined(USE_STM32WB5M_DK)
-// #define CFG_LCD_SUPPORTED 1
-// #elif defined(USE_STM32WBXX_NUCLEO)
-// #define CFG_LCD_SUPPORTED 0
-// #else
-// #define CFG_LCD_SUPPORTED 0
-// #endif
-
-// #if ((OTA_SUPPORT == 1) || (CFG_FULL_LOW_POWER == 1))
-// /******************************************************************************
-//  * LCD support override
-//  ******************************************************************************/
-// #undef CFG_LCD_SUPPORTED
-// #define CFG_LCD_SUPPORTED 0
-// #endif /* ((OTA_SUPPORT == 1) || (CFG_FULL_LOW_POWER == 1)) */
-//
-// #define CFG_RGB_LED_DEMO 1
-// #define CFG_IDENTIFY_LED_DEMO 1
-// #define CFG_IDENTIFY_LED_R 0
-// #define CFG_IDENTIFY_LED_G 0
-// #define CFG_IDENTIFY_LED_B 50
-//
-// #if (CFG_RGB_LED_DEMO == 1U || CFG_IDENTIFY_LED_DEMO == 1U)
-// #define CFG_RGB_LED_SUPPORTED 0
-// #endif
-
 
 /*******************************************************************************
  * SDK BOOT REASON support

@@ -186,7 +186,13 @@ typedef struct
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
-PLACE_IN_SECTION("MB_MEM1") ALIGN(4) static TL_CmdPacket_t BleCmdBuffer;
+PLACE_IN_SECTION (
+"MB_MEM1"
+)
+ALIGN (
+4
+)
+static TL_CmdPacket_t BleCmdBuffer;
 
 static const uint8_t M_bd_addr[BD_ADDR_SIZE_LOCAL] = {(uint8_t)((CFG_ADV_BD_ADDRESS & 0x0000000000FF)), (uint8_t)((CFG_ADV_BD_ADDRESS & 0x00000000FF00) >> 8), (uint8_t)((CFG_ADV_BD_ADDRESS & 0x000000FF0000) >> 16), (uint8_t)((CFG_ADV_BD_ADDRESS & 0x0000FF000000) >> 24), (uint8_t)((CFG_ADV_BD_ADDRESS & 0x00FF00000000) >> 32), (uint8_t)((CFG_ADV_BD_ADDRESS & 0xFF0000000000) >> 40)};
 static uint8_t bd_addr_udn[BD_ADDR_SIZE_LOCAL];

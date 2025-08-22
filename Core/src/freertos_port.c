@@ -270,10 +270,11 @@ static void LpEnter(void)
 {
 
 
+
 #if (CFG_LPM_SUPPORTED == 1)
-	UTIL_LPM_EnterLowPower();
+UTIL_LPM_EnterLowPower();
 #endif
-	return;
+return;
 }
 #endif
 

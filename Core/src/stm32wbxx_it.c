@@ -61,8 +61,6 @@ extern void HW_IPCC_Tx_Handler(void);
 /* External variables --------------------------------------------------------*/
 extern IPCC_HandleTypeDef hipcc;
 extern RTC_HandleTypeDef hrtc;
-// extern DMA_HandleTypeDef hdma_usart1_tx;
-// extern UART_HandleTypeDef huart1;
 extern TIM_HandleTypeDef htim17;
 
 /* USER CODE BEGIN EV */
@@ -256,6 +254,8 @@ void FLASH_IRQHandler(void)
 	/* USER CODE END FLASH_IRQn 1 */
 }
 
-void EXTI15_10_IRQHandler(void) {}
+void EXTI15_10_IRQHandler(void)
+{
+}
 
 /* USER CODE END 1 */

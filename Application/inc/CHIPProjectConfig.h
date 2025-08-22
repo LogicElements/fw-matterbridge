@@ -24,7 +24,7 @@
 #ifndef CHIPPROJECTCONFIG_H
 #define CHIPPROJECTCONFIG_H
 
-#include "../../Core/inc/app_conf.h"
+#include "app_conf.h"
 
 // Use a default pairing code if one hasn't been provisioned in flash.
 #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE 20202021

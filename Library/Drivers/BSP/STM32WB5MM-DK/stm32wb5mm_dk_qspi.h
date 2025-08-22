@@ -24,7 +24,7 @@
  extern "C" {
 #endif
 /* Includes ------------------------------------------------------------------*/
-#include "stm32wb5mm_dk_conf.h"
+// #include "stm32wb5mm_dk_conf.h"
 #include "stm32wb5mm_dk_errno.h"
 #include "../Components/s25fl128s/s25fl128s.h"
 

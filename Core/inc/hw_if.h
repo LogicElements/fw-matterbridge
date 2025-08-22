@@ -40,49 +40,49 @@ extern "C" {
 #include "stm32wbxx_ll_system.h"
 #include "stm32wbxx_ll_utils.h"
 
-#ifdef USE_STM32WBXX_USB_DONGLE
-#include "stm32wbxx_usb_dongle.h"
-#endif
-#ifdef USE_STM32WBXX_NUCLEO
-#include "stm32wbxx_nucleo.h"
-#endif
-#ifdef USE_X_NUCLEO_EPD
-#include "x_nucleo_epd.h"
-#endif
-#ifdef USE_STM32WB5M_DK
-#include "stm32wb5mm_dk.h"
-#endif
+// #ifdef USE_STM32WBXX_USB_DONGLE
+// #include "stm32wbxx_usb_dongle.h"
+// #endif
+// #ifdef USE_STM32WBXX_NUCLEO
+// #include "stm32wbxx_nucleo.h"
+// #endif
+// #ifdef USE_X_NUCLEO_EPD
+// #include "x_nucleo_epd.h"
+// #endif
+// #ifdef USE_STM32WB5M_DK
+// #include "stm32wb5mm_dk.h"
+// #endif
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
 /* USER CODE END Includes */
 
-/******************************************************************************
- * HW UART
- ******************************************************************************/
-typedef enum
-{
-	hw_uart1,
-	hw_uart2,
-	hw_lpuart1,
-} hw_uart_id_t;
-
-typedef enum
-{
-	hw_uart_ok,
-	hw_uart_error,
-	hw_uart_busy,
-	hw_uart_to,
-} hw_status_t;
-
-void HW_UART_Init(hw_uart_id_t hw_uart_id);
-void HW_UART_Receive_IT(hw_uart_id_t hw_uart_id, uint8_t* pData, uint16_t Size, void (*Callback)(void));
-void HW_UART_Transmit_IT(hw_uart_id_t hw_uart_id, uint8_t* pData, uint16_t Size, void (*Callback)(void));
-hw_status_t HW_UART_Transmit(hw_uart_id_t hw_uart_id, uint8_t* p_data, uint16_t size, uint32_t timeout);
-hw_status_t HW_UART_Transmit_DMA(hw_uart_id_t hw_uart_id, uint8_t* p_data, uint16_t size, void (*Callback)(void));
-void HW_UART_Interrupt_Handler(hw_uart_id_t hw_uart_id);
-void HW_UART_DMA_Interrupt_Handler(hw_uart_id_t hw_uart_id);
+// /******************************************************************************
+//  * HW UART
+//  ******************************************************************************/
+// typedef enum
+// {
+// 	hw_uart1,
+// 	hw_uart2,
+// 	hw_lpuart1,
+// } hw_uart_id_t;
+//
+// typedef enum
+// {
+// 	hw_uart_ok,
+// 	hw_uart_error,
+// 	hw_uart_busy,
+// 	hw_uart_to,
+// } hw_status_t;
+//
+// void HW_UART_Init(hw_uart_id_t hw_uart_id);
+// void HW_UART_Receive_IT(hw_uart_id_t hw_uart_id, uint8_t* pData, uint16_t Size, void (*Callback)(void));
+// void HW_UART_Transmit_IT(hw_uart_id_t hw_uart_id, uint8_t* pData, uint16_t Size, void (*Callback)(void));
+// hw_status_t HW_UART_Transmit(hw_uart_id_t hw_uart_id, uint8_t* p_data, uint16_t size, uint32_t timeout);
+// hw_status_t HW_UART_Transmit_DMA(hw_uart_id_t hw_uart_id, uint8_t* p_data, uint16_t size, void (*Callback)(void));
+// void HW_UART_Interrupt_Handler(hw_uart_id_t hw_uart_id);
+// void HW_UART_DMA_Interrupt_Handler(hw_uart_id_t hw_uart_id);
 
 /******************************************************************************
  * HW TimerServer

@@ -312,11 +312,11 @@ extern "C" {
 
 #define TL_BLE_EVENT_FRAME_SIZE (TL_EVT_HDR_SIZE + CFG_TLBLE_MOST_EVENT_PAYLOAD_SIZE)
 
-/******************************************************************************
- * UART interfaces
- ******************************************************************************/
-#define CFG_DEBUG_TRACE_UART hw_uart1
-#define CFG_CLI_UART hw_lpuart1
+// /******************************************************************************
+//  * UART interfaces
+//  ******************************************************************************/
+// #define CFG_DEBUG_TRACE_UART hw_uart1
+// #define CFG_CLI_UART hw_lpuart1
 
 /******************************************************************************
  * IPCC interface
@@ -713,34 +713,34 @@ typedef enum
 /* Define the timer used by task that will refresh (in sec) the watchdog started be the SBSFU */
 #define IWD_RELOAD 5000
 
-/******************************************************************************
- * LCD support
- ******************************************************************************/
-#if defined(USE_STM32WB5M_DK)
-#define CFG_LCD_SUPPORTED 1
-#elif defined(USE_STM32WBXX_NUCLEO)
-#define CFG_LCD_SUPPORTED 0
-#else
-#define CFG_LCD_SUPPORTED 0
-#endif
+// /******************************************************************************
+//  * LCD support
+//  ******************************************************************************/
+// #if defined(USE_STM32WB5M_DK)
+// #define CFG_LCD_SUPPORTED 1
+// #elif defined(USE_STM32WBXX_NUCLEO)
+// #define CFG_LCD_SUPPORTED 0
+// #else
+// #define CFG_LCD_SUPPORTED 0
+// #endif
 
-#if ((OTA_SUPPORT == 1) || (CFG_FULL_LOW_POWER == 1))
-/******************************************************************************
- * LCD support override
- ******************************************************************************/
-#undef CFG_LCD_SUPPORTED
-#define CFG_LCD_SUPPORTED 0
-#endif /* ((OTA_SUPPORT == 1) || (CFG_FULL_LOW_POWER == 1)) */
-
-#define CFG_RGB_LED_DEMO 1
-#define CFG_IDENTIFY_LED_DEMO 1
-#define CFG_IDENTIFY_LED_R 0
-#define CFG_IDENTIFY_LED_G 0
-#define CFG_IDENTIFY_LED_B 50
-
-#if (CFG_RGB_LED_DEMO == 1U || CFG_IDENTIFY_LED_DEMO == 1U)
-#define CFG_RGB_LED_SUPPORTED 0
-#endif
+// #if ((OTA_SUPPORT == 1) || (CFG_FULL_LOW_POWER == 1))
+// /******************************************************************************
+//  * LCD support override
+//  ******************************************************************************/
+// #undef CFG_LCD_SUPPORTED
+// #define CFG_LCD_SUPPORTED 0
+// #endif /* ((OTA_SUPPORT == 1) || (CFG_FULL_LOW_POWER == 1)) */
+//
+// #define CFG_RGB_LED_DEMO 1
+// #define CFG_IDENTIFY_LED_DEMO 1
+// #define CFG_IDENTIFY_LED_R 0
+// #define CFG_IDENTIFY_LED_G 0
+// #define CFG_IDENTIFY_LED_B 50
+//
+// #if (CFG_RGB_LED_DEMO == 1U || CFG_IDENTIFY_LED_DEMO == 1U)
+// #define CFG_RGB_LED_SUPPORTED 0
+// #endif
 
 
 /*******************************************************************************
@@ -752,10 +752,10 @@ typedef enum
 /******************************************************************************
  * versions
  ******************************************************************************/
-#define X_CUBE_MATTER_VERSION "1.4.1"
-#define PRODUCT_NAME "Thermostat"
-#define VENDOR_NAME "STMicroelectronics"
-#define MATTER_SDK_VERSION "1.4"
+#define X_CUBE_MATTER_VERSION "1.4.2"
+#define PRODUCT_NAME "MatterBridge"
+#define VENDOR_NAME "Jablotron"
+#define MATTER_SDK_VERSION "1.4.1"
 
 /******************************************************************************
  * Matter Factory data
@@ -763,10 +763,10 @@ typedef enum
 #define CONFIG_STM32_FACTORY_DATA_ENABLE 0
 #define USE_STM32WBXX_DAC_CRYPTO 0
 
-typedef enum
-{
-	BUTTON_1 = 0x1,
-} button_type_t;
+// typedef enum
+// {
+// 	BUTTON_1 = 0x1,
+// } button_type_t;
 
 #ifdef __cplusplus
 } /* extern "C" */

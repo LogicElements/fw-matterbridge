@@ -53,9 +53,9 @@ extern "C" {
 
 /* Exported functions prototypes ---------------------------------------------*/
 void Error_Handler(void);
-void MX_USART1_UART_Init(void);
-void MX_I2C3_Init(void);
-void MX_SPI1_Init(void);
+// void MX_USART1_UART_Init(void);
+// void MX_I2C3_Init(void);
+// void MX_SPI1_Init(void);
 
 /* USER CODE BEGIN EFP */
 void HAL_TIM_MspPostInit(TIM_HandleTypeDef* htim);

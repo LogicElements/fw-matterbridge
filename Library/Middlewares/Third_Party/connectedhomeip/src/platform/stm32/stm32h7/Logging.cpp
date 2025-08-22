@@ -33,7 +33,7 @@
 #include <task.h>
 
 #define STM32_LOG_ENABLED         (1)
-#define LOG_COLOR_ENABLED         (1)
+#define LOG_COLOR_ENABLED         (0)
 #define HARD_FAULT_LOG_ENABLE     (0)
 
 #define LOG_ERROR "<error > "

@@ -61,8 +61,8 @@ extern void HW_IPCC_Tx_Handler(void);
 /* External variables --------------------------------------------------------*/
 extern IPCC_HandleTypeDef hipcc;
 extern RTC_HandleTypeDef hrtc;
-extern DMA_HandleTypeDef hdma_usart1_tx;
-extern UART_HandleTypeDef huart1;
+// extern DMA_HandleTypeDef hdma_usart1_tx;
+// extern UART_HandleTypeDef huart1;
 extern TIM_HandleTypeDef htim17;
 
 /* USER CODE BEGIN EV */

@@ -81,6 +81,7 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
 		"Application/inc"
 		"Core/inc"
+		"Library/Drivers/BSP/STM32WB5MM-DK"
 )
 
 target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC

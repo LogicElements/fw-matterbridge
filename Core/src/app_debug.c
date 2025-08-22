@@ -77,14 +77,14 @@ APPD_GpioConfig_t;
 PLACE_IN_SECTION("MB_MEM2") ALIGN(4) static SHCI_C2_DEBUG_TracesConfig_t APPD_TracesConfig = {0, 0, 0, 0};
 PLACE_IN_SECTION("MB_MEM2") ALIGN(4) static SHCI_C2_DEBUG_GeneralConfig_t APPD_GeneralConfig = {BLE_DTB_CFG, SYS_DBG_CFG1, {0, 0}};
 
-#ifdef CFG_DEBUG_TRACE_UART
-#if (CFG_HW_LPUART1_ENABLED == 1)
-extern void MX_LPUART1_UART_Init(void);
-#endif
-#if (CFG_HW_USART1_ENABLED == 1)
-extern void MX_USART1_UART_Init(void);
-#endif
-#endif
+// #ifdef CFG_DEBUG_TRACE_UART
+// #if (CFG_HW_LPUART1_ENABLED == 1)
+// extern void MX_LPUART1_UART_Init(void);
+// #endif
+// #if (CFG_HW_USART1_ENABLED == 1)
+// extern void MX_USART1_UART_Init(void);
+// #endif
+// #endif
 
 /**
  * THE DEBUG ON GPIO FOR CPU2 IS INTENDED TO BE USED ONLY ON REQUEST FROM ST SUPPORT

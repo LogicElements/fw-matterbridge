@@ -40,6 +40,7 @@ private:
 	friend AppTask& GetAppTask(void);
 	void DispatchEvent(AppEvent* event);
 	static void MatterEventHandler(const chip::DeviceLayer::ChipDeviceEvent* event, intptr_t arg);
+	static void UpdateLEDs(void);
 
 	enum Function_t
 	{

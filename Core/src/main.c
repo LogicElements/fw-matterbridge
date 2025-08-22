@@ -126,6 +126,13 @@ int main(void)
 	MX_TIM1_Init();
 
 	LED_Init();
+	LED_SetColorRGB(0, 0, 0, 0);
+	LED_SetColorRGB(1, 0, 0, 0);
+	LED_SetColorRGB(2, 0, 0, 0);
+	LED_SetColorRGB(3, 0, 0, 0);
+	LED_SetColorRGB(4, 0, 0, 0);
+	LED_Send(&htim1);
+
 	/* USER CODE END 2 */
 
 	/* Infinite loop */

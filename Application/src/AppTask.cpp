@@ -283,6 +283,24 @@ void AppTask::UpdateClusterState()
 	}
 }
 
+void AppTask::UpdateLEDs(void)
+{
+	if (sIsThreadProvisioned && sIsThreadEnabled)
+	{
+	}
+	else if ((sIsThreadProvisioned == false) || (sIsThreadEnabled == false))
+	{
+	}
+	if (sHaveBLEConnections)
+	{
+		LED_SetColorRGB(1, 0, 0, 255);
+		LED_Send(&htim1);
+	}
+	else if (sHaveBLEConnections == false)
+	{
+	}
+}
+
 void AppTask::MatterEventHandler(const ChipDeviceEvent* event, intptr_t)
 {
 	switch (event->Type)
@@ -290,12 +308,14 @@ void AppTask::MatterEventHandler(const ChipDeviceEvent* event, intptr_t)
 	case DeviceEventType::kServiceProvisioningChange:
 		{
 			sIsThreadProvisioned = event->ServiceProvisioningChange.IsServiceProvisioned;
+			UpdateLEDs();
 			break;
 		}
 
 	case DeviceEventType::kThreadConnectivityChange:
 		{
 			sIsThreadEnabled = (event->ThreadConnectivityChange.Result == kConnectivity_Established);
+			UpdateLEDs();
 			break;
 		}
 
@@ -303,6 +323,9 @@ void AppTask::MatterEventHandler(const ChipDeviceEvent* event, intptr_t)
 		{
 			sHaveBLEConnections = true;
 			APP_DBG("kCHIPoBLEConnectionEstablished");
+
+			UpdateLEDs();
+
 			break;
 		}
 
@@ -315,6 +338,7 @@ void AppTask::MatterEventHandler(const ChipDeviceEvent* event, intptr_t)
 				APP_DBG("Start timer to save nvm after commissioning finish");
 				sFabricNeedSaved = false;
 			}
+			UpdateLEDs();
 			break;
 		}
 
@@ -328,11 +352,13 @@ void AppTask::MatterEventHandler(const ChipDeviceEvent* event, intptr_t)
 				APP_DBG("Start timer to save nvm after commissioning finish");
 				sFabricNeedSaved = false; // put to false to avoid save in nvm 2 times
 			}
+			UpdateLEDs();
 			break;
 		}
 	case DeviceEventType::kFailSafeTimerExpired:
 		{
 			sFailCommissioning = true;
+			UpdateLEDs();
 			break;
 		}
 

@@ -20,6 +20,7 @@ void LED_Send(TIM_HandleTypeDef* tim)
 	HAL_TIM_PWM_Start_DMA(tim, TIM_CHANNEL_3, data, DATA_LENGTH);
 }
 
+// BUG: data should be filled with low duty (except start and end blanking interval)
 void LED_SetColorRGB(const uint8_t led, const uint8_t r, const uint8_t g, const uint8_t b)
 {
 	const uint32_t color = (uint32_t)g << 16 | (uint32_t)r << 8 | (uint32_t)b;

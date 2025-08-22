@@ -42,7 +42,7 @@
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN PV */
-// extern QSPI_HandleTypeDef hqspi;
+extern DMA_HandleTypeDef hdma_tim1_ch3;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -256,6 +256,17 @@ void FLASH_IRQHandler(void)
 
 void EXTI15_10_IRQHandler(void)
 {
+}
+
+void DMA1_Channel1_IRQHandler(void)
+{
+	/* USER CODE BEGIN DMA1_Channel1_IRQn 0 */
+
+	/* USER CODE END DMA1_Channel1_IRQn 0 */
+	HAL_DMA_IRQHandler(&hdma_tim1_ch3);
+	/* USER CODE BEGIN DMA1_Channel1_IRQn 1 */
+
+	/* USER CODE END DMA1_Channel1_IRQn 1 */
 }
 
 /* USER CODE END 1 */

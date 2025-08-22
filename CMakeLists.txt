@@ -63,7 +63,6 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
 		"Core/src/hw_timerserver.c"
 		"Core/src/main.c"
 		"Core/src/stm32_lpm_if.c"
-		"Core/src/stm32wb5mm_dk_qspi.c"
 		"Core/src/stm32wbxx_hal_msp.c"
 		"Core/src/stm32wbxx_hal_timebase_tim.c"
 		"Core/src/stm32wbxx_it.c"
@@ -74,6 +73,7 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
 		"Core/src/system_stm32wbxx.c"
 
 		"Library/Drivers/BSP/Components/s25fl128s/s25fl128s.c"
+		"Library/Drivers/BSP/STM32WB5MM-DK/stm32wb5mm_dk_qspi.c"
 
 		startup_stm32wb55xx_cm4.s
 )

@@ -20,7 +20,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "app_common.h"
-#include "app_conf.h"
+#include "../inc/app_conf.h"
 #include "app_entry.h"
 #include "dbg_trace.h"
 #include "ble.h"

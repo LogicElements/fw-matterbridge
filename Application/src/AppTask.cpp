@@ -20,9 +20,10 @@
 #include "AppTask.h"
 #include "AppEvent.h"
 #include "app_common.h"
-#include "app_thread.h"
 #include "cmsis_os.h"
+#include "CommissionableDataProvider.h"
 #include "dbg_trace.h"
+#include "FactoryDataProvider.h"
 #include "LED.h"
 
 #if (OTA_SUPPORT == 1)
@@ -42,7 +43,7 @@
 #include <app/util/attribute-storage.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <inet/EndPointStateOpenThread.h>
-#include <math.h>
+#include <cmath>
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>

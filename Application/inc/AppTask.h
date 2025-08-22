@@ -19,14 +19,9 @@
 #ifndef APP_TASK_H
 #define APP_TASK_H
 
-#include <stdbool.h>
-#include <stdint.h>
-
+#include <cstdint>
 #include "AppEvent.h"
-#include "app_entry.h"
-
 #include <platform/CHIPDeviceLayer.h>
-#include <platform/stm32/stm32wb/FactoryDataProvider.h>
 
 class AppTask
 {
@@ -60,7 +55,6 @@ private:
 	Function_t mFunction;
 	bool mFunctionTimerActive;
 	bool mSyncClusterToButtonAction;
-	//chip::Ble::BLEEndPoint * mBLEEndPoint;
 
 	static AppTask sAppTask;
 };
@@ -69,6 +63,5 @@ inline AppTask& GetAppTask(void)
 {
 	return AppTask::sAppTask;
 }
-
 
 #endif // APP_TASK_H

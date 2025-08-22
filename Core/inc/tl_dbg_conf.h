@@ -23,7 +23,7 @@
 /* USER CODE BEGIN Tl_Conf */
 
 /* Includes ------------------------------------------------------------------*/
-#include "app_conf.h"   /* required as some configuration used in dbg_trace.h are set there */
+#include "app_conf.h"
 #include "dbg_trace.h"
 #include "hw_if.h"
 

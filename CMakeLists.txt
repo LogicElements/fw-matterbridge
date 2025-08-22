@@ -38,30 +38,61 @@ add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
 )
 add_subdirectory(Library)
 
-file(GLOB SOURCE_FILES "Core/Src/*.c" "Core/Src/*.cpp")
-
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
-		${SOURCE_FILES}
+		"Application/src/AppTask.cpp"
+		"Application/src/IdentifierEffect.cpp"
+		"Application/src/LED.c"
+		"Application/src/stm32_factorydata.c"
+		"Application/src/ZclCallbacks.cpp"
 
-		"Core/Codegen/zap-generated/app/callback-stub.cpp"
-		"Core/Codegen/zap-generated/app/cluster-init-callback.cpp"
-		"Core/Codegen/zap-generated/IMClusterCommandHandler.cpp"
+		"Application/codegen/zap-generated/app/callback-stub.cpp"
+		"Application/codegen/zap-generated/app/cluster-init-callback.cpp"
+		"Application/codegen/zap-generated/IMClusterCommandHandler.cpp"
+
+		"Core/src/app_ble.c"
+		"Core/src/app_debug.c"
+		"Core/src/app_entry.cpp"
+		"Core/src/app_freertos.c"
+		"Core/src/app_matter.c"
+		"Core/src/app_thread.c"
+		"Core/src/custom_stm.c"
+		"Core/src/entropy_hardware_poll.c"
+		"Core/src/flash_wb.c"
+		"Core/src/freertos_port.c"
+		"Core/src/hw_ipcc.c"
+		"Core/src/hw_timerserver.c"
+		"Core/src/main.c"
+		"Core/src/stm32_lpm_if.c"
+		"Core/src/stm32wb5mm_dk_qspi.c"
+		"Core/src/stm32wbxx_hal_msp.c"
+		"Core/src/stm32wbxx_hal_timebase_tim.c"
+		"Core/src/stm32wbxx_it.c"
+		"Core/src/stm_ext_flash.c"
+		"Core/src/stm_logging.c"
+		"Core/src/syscalls.c"
+		"Core/src/sysmem.c"
+		"Core/src/system_stm32wbxx.c"
+
 		"Library/Drivers/BSP/Components/s25fl128s/s25fl128s.c"
 
 		startup_stm32wb55xx_cm4.s
 )
 
-target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE "Core/Inc")
+target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
+		"Application/inc"
+		"Core/inc"
+)
 
-target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC "Core/Codegen" "Core/Codegen/zap-generated")
+target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC
+		"Application/codegen"
+		"Application/codegen/zap-generated"
+)
 
 target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE
-#		USE_NUCLEO_64
-		USE_HAL_DRIVER
-#		USE_STM32WBXX_NUCLEO
-		STM32WB55xx
-		$<$<CONFIG:Debug>:DEBUG>
-		CHIP_DNSSD_DEFAULT_PLATFORM
+		"USE_HAL_DRIVER"
+		"STM32WB55xx"
+		"$<$<CONFIG:Debug>:DEBUG>"
+		"CHIP_DNSSD_DEFAULT_PLATFORM"
 		"OPENTHREAD_CONFIG_FILE=<openthread_api_config_matter.h>"
 		"CHIP_PLATFORM_CONFIG_INCLUDE=<CHIPPlatformConfig.h>"
 		"CHIP_PROJECT_CONFIG_INCLUDE=<CHIPProjectConfig.h>"

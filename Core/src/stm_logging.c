@@ -1,22 +1,22 @@
 /* USER CODE BEGIN Header */
 /**
-  ******************************************************************************
-  * File Name          : stm_logging.c
-  * Description        : This file contains all the defines and functions used
-  *                     for logging on Application examples.
-  *
-  ******************************************************************************
-  * @attention
-  *
-  * Copyright (c) 2019-2021 STMicroelectronics.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * File Name          : stm_logging.c
+ * Description        : This file contains all the defines and functions used
+ *                     for logging on Application examples.
+ *
+ ******************************************************************************
+ * @attention
+ *
+ * Copyright (c) 2019-2021 STMicroelectronics.
+ * All rights reserved.
+ *
+ * This software is licensed under terms that can be found in the LICENSE file
+ * in the root directory of this software component.
+ * If no LICENSE file comes with this software, it is provided AS-IS.
+ *
+ ******************************************************************************
+ */
 /* USER CODE END Header */
 
 /**
@@ -28,32 +28,32 @@
 #include <ctype.h>
 #include <inttypes.h>
 #include <stdarg.h>
-#include <stdio.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <string.h>
 
 #include "app_conf.h"
 #include "stm_logging.h"
 
-#define LOG_PARSE_BUFFER_SIZE  256U
+#define LOG_PARSE_BUFFER_SIZE 256U
 
 #define LOG_TIMESTAMP_ENABLE 0
 #define LOG_REGION_ENABLE 1U
-#define LOG_RTT_COLOR_ENABLE 0
+#define LOG_RTT_COLOR_ENABLE 1U
 
 #if (LOG_RTT_COLOR_ENABLE == 1U)
 #define RTT_COLOR_CODE_DEFAULT "\x1b[0m"
-#define RTT_COLOR_CODE_RED     "\x1b[0;91m"
-#define RTT_COLOR_CODE_GREEN   "\x1b[0;92m"
-#define RTT_COLOR_CODE_YELLOW  "\x1b[0;93m"
-#define RTT_COLOR_CODE_CYAN    "\x1b[0;96m"
+#define RTT_COLOR_CODE_RED "\x1b[0;91m"
+#define RTT_COLOR_CODE_GREEN "\x1b[0;92m"
+#define RTT_COLOR_CODE_YELLOW "\x1b[0;93m"
+#define RTT_COLOR_CODE_CYAN "\x1b[0;96m"
 
 #else /* LOG_RTT_COLOR_ENABLE == 1 */
 #define RTT_COLOR_CODE_DEFAULT ""
-#define RTT_COLOR_CODE_RED     ""
-#define RTT_COLOR_CODE_GREEN   ""
-#define RTT_COLOR_CODE_YELLOW  ""
-#define RTT_COLOR_CODE_CYAN    ""
+#define RTT_COLOR_CODE_RED ""
+#define RTT_COLOR_CODE_GREEN ""
+#define RTT_COLOR_CODE_YELLOW ""
+#define RTT_COLOR_CODE_CYAN ""
 #endif /* LOG_RTT_COLOR_ENABLE == 1 */
 
 #if (CFG_DEBUG_TRACE != 0)
@@ -66,8 +66,7 @@
  *
  * @returns  String with a log level color value.
  */
-static inline uint16_t logRegion(char* aLogString, uint16_t aMaxSize,
-                                 appliLogRegion_t aLogRegion)
+static inline uint16_t logRegion(char* aLogString, uint16_t aMaxSize, appliLogRegion_t aLogRegion)
 {
 	char logRegionString[30U];
 
@@ -136,11 +135,7 @@ static inline const char* levelToString(appliLogLevel_t aLogLevel)
  *
  * @returns  Number of bytes successfully written to the log buffer.
  */
-static inline uint16_t logLevel(char* aLogString, uint16_t aMaxSize,
-                                appliLogLevel_t aLogLevel)
-{
-	return snprintf(aLogString, aMaxSize, "%s", levelToString(aLogLevel));
-}
+static inline uint16_t logLevel(char* aLogString, uint16_t aMaxSize, appliLogLevel_t aLogLevel) { return snprintf(aLogString, aMaxSize, "%s", levelToString(aLogLevel)); }
 #endif /* CFG_DEBUG_TRACE */
 #endif /* LOG_RTT_COLOR_ENABLE */
 
@@ -153,11 +148,7 @@ static inline uint16_t logLevel(char* aLogString, uint16_t aMaxSize,
  *
  * @returns  Number of bytes successfully written to the log buffer.
  */
-static inline uint16_t logTimestamp(char* aLogString, uint16_t aMaxSize)
-{
-	return snprintf(aLogString, aMaxSize, "%s[%010ld]", RTT_COLOR_CODE_DEFAULT,
-	                otPlatAlarmMilliGetNow());
-}
+static inline uint16_t logTimestamp(char* aLogString, uint16_t aMaxSize) { return snprintf(aLogString, aMaxSize, "%s[%010ld]", RTT_COLOR_CODE_DEFAULT, otPlatAlarmMilliGetNow()); }
 #endif /* LOG_TIMESTAMP_ENABLE */
 
 /**
@@ -181,21 +172,18 @@ void logApplication(appliLogLevel_t aLogLevel, appliLogRegion_t aLogRegion, cons
 
 #if (LOG_RTT_COLOR_ENABLE == 1U)
 	/* Add level information */
-	length += logLevel(&logString[length], (LOG_PARSE_BUFFER_SIZE - length),
-	                   aLogLevel);
+	length += logLevel(&logString[length], (LOG_PARSE_BUFFER_SIZE - length), aLogLevel);
 #endif
 
 #if (LOG_REGION_ENABLE == 1U)
 	/* Add Region information */
-	length += logRegion(&logString[length], (LOG_PARSE_BUFFER_SIZE - length),
-	                    aLogRegion);
+	length += logRegion(&logString[length], (LOG_PARSE_BUFFER_SIZE - length), aLogRegion);
 #endif
 
 	/* Parse user string */
 	va_list paramList;
 	va_start(paramList, aFormat);
-	length += vsnprintf(&logString[length], (LOG_PARSE_BUFFER_SIZE - length),
-	                    aFormat, paramList);
+	length += vsnprintf(&logString[length], (LOG_PARSE_BUFFER_SIZE - length), aFormat, paramList);
 	logString[length++] = '\r';
 	logString[length++] = '\n';
 	logString[length++] = 0;

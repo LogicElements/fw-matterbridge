@@ -1,37 +1,37 @@
 /* USER CODE BEGIN Header */
 /**
-  ******************************************************************************
+ ******************************************************************************
  * @file    app_ble.c
  * @author  MCD Application Team
  * @brief   BLE Application
-  ******************************************************************************
-  * @attention
-  *
-  * Copyright (c) 2019-2021 STMicroelectronics.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @attention
+ *
+ * Copyright (c) 2019-2021 STMicroelectronics.
+ * All rights reserved.
+ *
+ * This software is licensed under terms that can be found in the LICENSE file
+ * in the root directory of this software component.
+ * If no LICENSE file comes with this software, it is provided AS-IS.
+ *
+ ******************************************************************************
+ */
 /* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
-#include "app_common.h"
-#include "dbg_trace.h"
-#include "ble.h"
-#include "tl.h"
 #include "app_ble.h"
+#include "CHIPProjectConfig.h"
 #include "FreeRTOS.h"
+#include "app_common.h"
+#include "app_matter.h"
+#include "ble.h"
 #include "cmsis_os.h"
-#include "timers.h"
+#include "dbg_trace.h"
+#include "otp.h"
 #include "shci.h"
 #include "stm32_lpm.h"
-#include "otp.h"
-#include "app_matter.h"
-#include "CHIPProjectConfig.h"
+#include "timers.h"
+#include "tl.h"
 #if (CONFIG_STM32_FACTORY_DATA_ENABLE == 1)
 #include "stm32_factorydata.h"
 #endif /* CONFIG_STM32_FACTORY_DATA_ENABLE */
@@ -170,14 +170,14 @@ typedef struct
 /* USER CODE END PTD */
 
 /* Private defines -----------------------------------------------------------*/
-#define APPBLE_GAP_DEVICE_NAME_LENGTH 	7
-#define FAST_ADV_TIMEOUT               (30*1000*1000/CFG_TS_TICK_VAL) /**< 30s */
-#define INITIAL_ADV_TIMEOUT            (1*1000*1000/CFG_TS_TICK_VAL) /**< 60s */
+#define APPBLE_GAP_DEVICE_NAME_LENGTH 7
+#define FAST_ADV_TIMEOUT (30 * 1000 * 1000 / CFG_TS_TICK_VAL) /**< 30s */
+#define INITIAL_ADV_TIMEOUT (1 * 1000 * 1000 / CFG_TS_TICK_VAL) /**< 60s */
 
-#define BD_ADDR_SIZE_LOCAL    			6
+#define BD_ADDR_SIZE_LOCAL 6
 
 /* USER CODE BEGIN PD */
-#define LED_ON_TIMEOUT                 (0.005*1000*1000/CFG_TS_TICK_VAL) /**< 5ms */
+#define LED_ON_TIMEOUT (0.005 * 1000 * 1000 / CFG_TS_TICK_VAL) /**< 5ms */
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -188,25 +188,17 @@ typedef struct
 /* Private variables ---------------------------------------------------------*/
 PLACE_IN_SECTION("MB_MEM1") ALIGN(4) static TL_CmdPacket_t BleCmdBuffer;
 
-static const uint8_t M_bd_addr[BD_ADDR_SIZE_LOCAL] =
-{
-	(uint8_t)((CFG_ADV_BD_ADDRESS & 0x0000000000FF)),
-	(uint8_t)((CFG_ADV_BD_ADDRESS & 0x00000000FF00) >> 8),
-	(uint8_t)((CFG_ADV_BD_ADDRESS & 0x000000FF0000) >> 16),
-	(uint8_t)((CFG_ADV_BD_ADDRESS & 0x0000FF000000) >> 24),
-	(uint8_t)((CFG_ADV_BD_ADDRESS & 0x00FF00000000) >> 32),
-	(uint8_t)((CFG_ADV_BD_ADDRESS & 0xFF0000000000) >> 40)
-};
+static const uint8_t M_bd_addr[BD_ADDR_SIZE_LOCAL] = {(uint8_t)((CFG_ADV_BD_ADDRESS & 0x0000000000FF)), (uint8_t)((CFG_ADV_BD_ADDRESS & 0x00000000FF00) >> 8), (uint8_t)((CFG_ADV_BD_ADDRESS & 0x000000FF0000) >> 16), (uint8_t)((CFG_ADV_BD_ADDRESS & 0x0000FF000000) >> 24), (uint8_t)((CFG_ADV_BD_ADDRESS & 0x00FF00000000) >> 32), (uint8_t)((CFG_ADV_BD_ADDRESS & 0xFF0000000000) >> 40)};
 static uint8_t bd_addr_udn[BD_ADDR_SIZE_LOCAL];
 
 /**
-*   Identity root key used to derive IRK and DHK(Legacy)
-*/
+ *   Identity root key used to derive IRK and DHK(Legacy)
+ */
 static const uint8_t BLE_CFG_IR_VALUE[16] = CFG_BLE_IR;
 
 /**
-* Encryption root key used to derive LTK(Legacy) and CSRK
-*/
+ * Encryption root key used to derive LTK(Legacy) and CSRK
+ */
 static const uint8_t BLE_CFG_ER_VALUE[16] = CFG_BLE_ER;
 
 static BleApplicationContext_t BleApplicationContext;
@@ -215,7 +207,7 @@ static uint16_t AdvIntervalMin, AdvIntervalMax;
 MATTER_App_Notification_evt_t handleNotification;
 
 #if L2CAP_REQUEST_NEW_CONN_PARAM != 0
-#define SIZE_TAB_CONN_INT            2
+#define SIZE_TAB_CONN_INT 2
 float tab_conn_interval[SIZE_TAB_CONN_INT] = {50, 1000}; /* ms */
 uint8_t index_con_int, mutex;
 #endif
@@ -231,12 +223,9 @@ static const char local_name[] = {AD_TYPE_COMPLETE_LOCAL_NAME, 'S', 'T', 'D', 'K
 /* Byte 10-11: VendorID      */
 /* Byte 12-13: ProductID     */
 
-uint8_t a_AdvData[15] = {
-	0x02, AD_TYPE_FLAGS, 0x06,
-	0x0B, AD_TYPE_SERVICE_DATA, 0xF6, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-};
+uint8_t a_AdvData[15] = {0x02, AD_TYPE_FLAGS, 0x06, 0x0B, AD_TYPE_SERVICE_DATA, 0xF6, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
-uint8_t manuf_data[15] = {0x02, 0x01, 0x06, 0x0B, 0x16, 0xF6, 0xFF, 0x00, 0x00, 0x0F, 0xF1, 0xFF, 0x04, 0x80, 0x00,};
+uint8_t manuf_data[15] = {0x02, 0x01, 0x06, 0x0B, 0x16, 0xF6, 0xFF, 0x00, 0x00, 0x0F, 0xF1, 0xFF, 0x04, 0x80, 0x00};
 
 
 /* USER CODE BEGIN PV */
@@ -247,7 +236,7 @@ uint8_t manuf_data[15] = {0x02, 0x01, 0x06, 0x0B, 0x16, 0xF6, 0xFF, 0x00, 0x00, 
 osMutexId_t MtxHciId;
 osSemaphoreId_t SemHciId;
 osThreadId_t HciUserEvtProcessId;
-#if(L2CAP_REQUEST_NEW_CONN_PARAM != 0)
+#if (L2CAP_REQUEST_NEW_CONN_PARAM != 0)
 osThreadId_t ConnIntUpdateReqProcessId;
 #endif
 
@@ -261,7 +250,7 @@ const osThreadAttr_t HciUserEvtProcess_attr = {
 	.stack_size = CFG_HCI_USER_EVT_PROCESS_STACK_SIZE
 };
 
-#if(L2CAP_REQUEST_NEW_CONN_PARAM != 0)
+#if (L2CAP_REQUEST_NEW_CONN_PARAM != 0)
 const osThreadAttr_t ConnIntUpdateReqProcess_attr = {
 	.name = CFG_CONN_INT_UPD_REQ_PROCESS_NAME,
 	.attr_bits = CFG_CONN_INT_UPD_REQ_PROCESS_ATTR_BITS,
@@ -281,7 +270,7 @@ static void Ble_Hci_Gap_Gatt_Init(void);
 static const uint8_t* BleGetBdAddress(void);
 static void HciUserEvtProcess(void* argument);
 static void fill_advData(uint8_t* p_adv_data, uint8_t tab_size);
-#if(L2CAP_REQUEST_NEW_CONN_PARAM != 0)
+#if (L2CAP_REQUEST_NEW_CONN_PARAM != 0)
 static void ConnIntUpdateReqProcess(void* argument);
 static void BLE_SVC_L2CAP_Conn_Update(uint16_t Connection_Handle);
 #endif
@@ -297,8 +286,7 @@ void APP_BLE_Init_Dyn_1(void)
 
 	/* USER CODE END APP_BLE_Init_1 */
 
-	SHCI_C2_Ble_Init_Cmd_Packet_t ble_init_cmd_packet =
-	{
+	SHCI_C2_Ble_Init_Cmd_Packet_t ble_init_cmd_packet = {
 		{{0, 0, 0}}, /**< Header unused */
 		{
 			0, /** pBleBufferAddress not used */
@@ -364,11 +352,11 @@ void APP_BLE_Init_Dyn_1(void)
 	/**
 	 * Initialization of ADV - Ad Manufacturer Element - Support OTA Bit Mask
 	 */
-#if(RADIO_ACTIVITY_EVENT != 0)
+#if (RADIO_ACTIVITY_EVENT != 0)
 	aci_hal_set_radio_activity_mask(0x0006);
 #endif
 
-#if (L2CAP_REQUEST_NEW_CONN_PARAM != 0 )
+#if (L2CAP_REQUEST_NEW_CONN_PARAM != 0)
 	ConnIntUpdateReqProcessId = osThreadNew(ConnIntUpdateReqProcess, NULL, &ConnIntUpdateReqProcess_attr);
 
 	index_con_int = 0;
@@ -481,10 +469,7 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification(void* pckt)
 	return (SVCCTL_UserEvtFlowEnable);
 }
 
-APP_BLE_ConnStatus_t APP_BLE_Get_Server_Connection_Status(void)
-{
-	return BleApplicationContext.Device_Connection_Status;
-}
+APP_BLE_ConnStatus_t APP_BLE_Get_Server_Connection_Status(void) { return BleApplicationContext.Device_Connection_Status; }
 
 
 /* USER CODE BEGIN FD*/
@@ -494,7 +479,7 @@ void APP_BLE_Key_Button1_Action(void)
 
 void APP_BLE_Key_Button2_Action(void)
 {
-#if (L2CAP_REQUEST_NEW_CONN_PARAM != 0 )
+#if (L2CAP_REQUEST_NEW_CONN_PARAM != 0)
 	osThreadFlagsSet(ConnIntUpdateReqProcessId, 1);
 #endif
 }
@@ -548,9 +533,7 @@ static void Ble_Hci_Gap_Gatt_Init(void)
 	 */
 
 	bd_addr = BleGetBdAddress();
-	aci_hal_write_config_data(CONFIG_DATA_PUBADDR_OFFSET,
-	                          CONFIG_DATA_PUBADDR_LEN,
-	                          (uint8_t*)bd_addr);
+	aci_hal_write_config_data(CONFIG_DATA_PUBADDR_OFFSET, CONFIG_DATA_PUBADDR_LEN, (uint8_t*)bd_addr);
 
 	/**
 	 * Static random Address
@@ -568,8 +551,8 @@ static void Ble_Hci_Gap_Gatt_Init(void)
 	aci_hal_write_config_data(CONFIG_DATA_IR_OFFSET, CONFIG_DATA_IR_LEN, (uint8_t*)BLE_CFG_IR_VALUE);
 
 	/**
-	* Write Encryption root key used to derive LTK and CSRK
-	*/
+	 * Write Encryption root key used to derive LTK and CSRK
+	 */
 	aci_hal_write_config_data(CONFIG_DATA_ER_OFFSET, CONFIG_DATA_ER_LEN, (uint8_t*)BLE_CFG_ER_VALUE);
 
 	/**
@@ -598,9 +581,7 @@ static void Ble_Hci_Gap_Gatt_Init(void)
 	if (role > 0)
 	{
 		const char* name = "STM32WB";
-		aci_gap_init(role, 0,
-		             APPBLE_GAP_DEVICE_NAME_LENGTH,
-		             &gap_service_handle, &gap_dev_name_char_handle, &gap_appearance_char_handle);
+		aci_gap_init(role, 0, APPBLE_GAP_DEVICE_NAME_LENGTH, &gap_service_handle, &gap_dev_name_char_handle, &gap_appearance_char_handle);
 
 		if (aci_gatt_update_char_value(gap_service_handle, gap_dev_name_char_handle, 0, strlen(name), (uint8_t*)name))
 		{
@@ -608,18 +589,14 @@ static void Ble_Hci_Gap_Gatt_Init(void)
 		}
 	}
 
-	if (aci_gatt_update_char_value(gap_service_handle,
-	                               gap_appearance_char_handle,
-	                               0,
-	                               2,
-	                               (uint8_t*)&appearance))
+	if (aci_gatt_update_char_value(gap_service_handle, gap_appearance_char_handle, 0, 2, (uint8_t*)&appearance))
 	{
 		BLE_DBG_SVCCTL_MSG("Appearance aci_gatt_update_char_value failed.\n");
 	}
 	/**
-	   * Initialize Default PHY
-	   */
-	hci_le_set_default_phy(ALL_PHYS_PREFERENCE,TX_2M_PREFERRED,RX_2M_PREFERRED);
+	 * Initialize Default PHY
+	 */
+	hci_le_set_default_phy(ALL_PHYS_PREFERENCE, TX_2M_PREFERRED, RX_2M_PREFERRED);
 
 	/**
 	 * Initialize IO capability
@@ -642,16 +619,7 @@ static void Ble_Hci_Gap_Gatt_Init(void)
 		BleApplicationContext.BleApplicationContext_legacy.bleSecurityParam.OOB_Data[index] = (uint8_t)index;
 	}
 
-	aci_gap_set_authentication_requirement(BleApplicationContext.BleApplicationContext_legacy.bleSecurityParam.bonding_mode,
-	                                       BleApplicationContext.BleApplicationContext_legacy.bleSecurityParam.mitm_mode,
-	                                       0,
-	                                       0,
-	                                       BleApplicationContext.BleApplicationContext_legacy.bleSecurityParam.encryptionKeySizeMin,
-	                                       BleApplicationContext.BleApplicationContext_legacy.bleSecurityParam.encryptionKeySizeMax,
-	                                       BleApplicationContext.BleApplicationContext_legacy.bleSecurityParam.Use_Fixed_Pin,
-	                                       BleApplicationContext.BleApplicationContext_legacy.bleSecurityParam.Fixed_Pin,
-	                                       0
-	);
+	aci_gap_set_authentication_requirement(BleApplicationContext.BleApplicationContext_legacy.bleSecurityParam.bonding_mode, BleApplicationContext.BleApplicationContext_legacy.bleSecurityParam.mitm_mode, 0, 0, BleApplicationContext.BleApplicationContext_legacy.bleSecurityParam.encryptionKeySizeMin, BleApplicationContext.BleApplicationContext_legacy.bleSecurityParam.encryptionKeySizeMax, BleApplicationContext.BleApplicationContext_legacy.bleSecurityParam.Use_Fixed_Pin, BleApplicationContext.BleApplicationContext_legacy.bleSecurityParam.Fixed_Pin, 0);
 
 	/* USER CODE BEGIN Ble_Hci_Gap_Gatt_Init_1*/
 	/* Initialize Advertise Data */
@@ -684,12 +652,9 @@ void APP_BLE_Adv_Request(APP_BLE_ConnStatus_t New_Status)
 		Max_Inter = CFG_LP_CONN_ADV_INTERVAL_MAX;
 	}
 
-	APP_DBG_MSG("First index in %d state \n",
-	            BleApplicationContext.Device_Connection_Status);
+	APP_DBG_MSG("First index in %d state \n", BleApplicationContext.Device_Connection_Status);
 
-	if ((New_Status == APP_BLE_LP_ADV)
-		&& ((BleApplicationContext.Device_Connection_Status == APP_BLE_FAST_ADV)
-			|| (BleApplicationContext.Device_Connection_Status == APP_BLE_LP_ADV)))
+	if ((New_Status == APP_BLE_LP_ADV) && ((BleApplicationContext.Device_Connection_Status == APP_BLE_FAST_ADV) || (BleApplicationContext.Device_Connection_Status == APP_BLE_LP_ADV)))
 	{
 		/* Connection in ADVERTISE mode have to stop the current advertising */
 		ret = aci_gap_set_non_discoverable();
@@ -706,17 +671,8 @@ void APP_BLE_Adv_Request(APP_BLE_ConnStatus_t New_Status)
 	BleApplicationContext.Device_Connection_Status = New_Status;
 	/* Start Fast or Low Power Advertising */
 	ret = aci_gap_set_discoverable(
-		ADV_IND,
-		Min_Inter,
-		Max_Inter,
-		GAP_PUBLIC_ADDR,
-		NO_WHITE_LIST_USE, /* use white list */
-		sizeof(local_name),
-		(uint8_t*)&local_name,
-		BleApplicationContext.BleApplicationContext_legacy.advtServUUIDlen,
-		BleApplicationContext.BleApplicationContext_legacy.advtServUUID,
-		0,
-		0);
+		ADV_IND, Min_Inter, Max_Inter, GAP_PUBLIC_ADDR, NO_WHITE_LIST_USE, /* use white list */
+		sizeof(local_name), (uint8_t*)&local_name, BleApplicationContext.BleApplicationContext_legacy.advtServUUIDlen, BleApplicationContext.BleApplicationContext_legacy.advtServUUID, 0, 0);
 	/* Update Advertising data */
 	ret = aci_gap_update_adv_data(sizeof(a_AdvData), (uint8_t*)a_AdvData);
 
@@ -834,7 +790,7 @@ void APP_BLE_Adv_Cancel(void)
 }
 
 
-#if(L2CAP_REQUEST_NEW_CONN_PARAM != 0)
+#if (L2CAP_REQUEST_NEW_CONN_PARAM != 0)
 void BLE_SVC_L2CAP_Conn_Update(uint16_t Connection_Handle)
 {
 	/* USER CODE BEGIN BLE_SVC_L2CAP_Conn_Update_1 */
@@ -850,9 +806,7 @@ void BLE_SVC_L2CAP_Conn_Update(uint16_t Connection_Handle)
 		uint16_t timeout_multiplier = L2CAP_TIMEOUT_MULTIPLIER;
 		tBleStatus result;
 
-		result = aci_l2cap_connection_parameter_update_req(BleApplicationContext.BleApplicationContext_legacy.connectionHandle,
-		                                                   interval_min, interval_max,
-		                                                   peripheral_latency, timeout_multiplier);
+		result = aci_l2cap_connection_parameter_update_req(BleApplicationContext.BleApplicationContext_legacy.connectionHandle, interval_min, interval_max, peripheral_latency, timeout_multiplier);
 		if (result == BLE_STATUS_SUCCESS)
 		{
 			APP_DBG_MSG("BLE_SVC_L2CAP_Conn_Update(), Successfully \r\n\r");
@@ -874,8 +828,7 @@ static void ConnIntUpdateReqProcess(void* argument)
 	for (;;)
 	{
 		osThreadFlagsWait(1, osFlagsWaitAny, osWaitForever);
-		if (BleApplicationContext.Device_Connection_Status != APP_BLE_FAST_ADV &&
-			BleApplicationContext.Device_Connection_Status != APP_BLE_IDLE)
+		if (BleApplicationContext.Device_Connection_Status != APP_BLE_FAST_ADV && BleApplicationContext.Device_Connection_Status != APP_BLE_IDLE)
 		{
 			BLE_SVC_L2CAP_Conn_Update(BleApplicationContext.BleApplicationContext_legacy.connectionHandle);
 		}
@@ -915,8 +868,7 @@ static void fill_advData(uint8_t* p_adv_data, uint8_t tab_size)
 			uint16_t vendorId = 0;
 			uint16_t productId = 0;
 
-			err = FACTORYDATA_GetValue(TAG_ID_SETUP_DISCRIMINATOR, (uint8_t*)&setupDiscriminator,
-			                           sizeof(setupDiscriminator), &tlvDataLength);
+			err = FACTORYDATA_GetValue(TAG_ID_SETUP_DISCRIMINATOR, (uint8_t*)&setupDiscriminator, sizeof(setupDiscriminator), &tlvDataLength);
 
 			if (err == DATAFACTORY_OK)
 			{
@@ -928,8 +880,7 @@ static void fill_advData(uint8_t* p_adv_data, uint8_t tab_size)
 				APP_DBG_MSG("Failed to get from Factory Data Discriminator.\n");
 			}
 
-			err = FACTORYDATA_GetValue(TAG_ID_VENDOR_ID, (uint8_t*)&vendorId,
-			                           sizeof(vendorId), &tlvDataLength);
+			err = FACTORYDATA_GetValue(TAG_ID_VENDOR_ID, (uint8_t*)&vendorId, sizeof(vendorId), &tlvDataLength);
 			if (err == DATAFACTORY_OK)
 			{
 				p_adv_data[i + 7] = (uint8_t)(vendorId & 0xFF);
@@ -941,8 +892,7 @@ static void fill_advData(uint8_t* p_adv_data, uint8_t tab_size)
 			}
 
 
-			err = FACTORYDATA_GetValue(TAG_ID_PRODUCT_ID, (uint8_t*)&productId,
-			                           sizeof(productId), &tlvDataLength);
+			err = FACTORYDATA_GetValue(TAG_ID_PRODUCT_ID, (uint8_t*)&productId, sizeof(productId), &tlvDataLength);
 			if (err == DATAFACTORY_OK)
 			{
 				p_adv_data[i + 9] = (uint8_t)(productId & 0xFF);

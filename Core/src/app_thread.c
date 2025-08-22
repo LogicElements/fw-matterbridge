@@ -4,34 +4,34 @@
  * File Name          : App/app_thread.c
  * Description        : Thread Application.
  ******************************************************************************
-  * @attention
-  *
-  * Copyright (c) 2019-2021 STMicroelectronics.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
-  *
-  ******************************************************************************
-  */
+ * @attention
+ *
+ * Copyright (c) 2019-2021 STMicroelectronics.
+ * All rights reserved.
+ *
+ * This software is licensed under terms that can be found in the LICENSE file
+ * in the root directory of this software component.
+ * If no LICENSE file comes with this software, it is provided AS-IS.
+ *
+ ******************************************************************************
+ */
 /* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
-#include "app_common.h"
-#include "utilities_common.h"
-#include "app_entry.h"
-#include "dbg_trace.h"
 #include "app_thread.h"
-#include "stm32wbxx_core_interface_def.h"
-#include "openthread_api_wb.h"
-#include "shci.h"
-#include "stm_logging.h"
-#include "app_conf.h"
-#include "stm32_lpm.h"
 #include "FreeRTOS.h"
+#include "app_common.h"
+#include "app_conf.h"
+#include "app_entry.h"
 #include "cmsis_os.h"
+#include "dbg_trace.h"
+#include "openthread_api_wb.h"
 #include "queue.h"
+#include "shci.h"
+#include "stm32_lpm.h"
+#include "stm32wbxx_core_interface_def.h"
+#include "stm_logging.h"
+#include "utilities_common.h"
 
 /* Private includes -----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -44,19 +44,11 @@
 /* USER CODE END PTD */
 
 /* Private defines -----------------------------------------------------------*/
-#define C_SIZE_CMD_STRING       256U
-#define THREAD_LINK_POLL_PERIOD         (5*1000*1000/CFG_TS_TICK_VAL) /**< 5s */
+#define C_SIZE_CMD_STRING 256U
+#define THREAD_LINK_POLL_PERIOD (5 * 1000 * 1000 / CFG_TS_TICK_VAL) /**< 5s */
 #define MO_NOTIF_QUEUE_SIZE 10
 /* FreeRtos stacks attributes */
-const osThreadAttr_t ThreadMsgM0ToM4Process_attr = {
-	.name = CFG_THREAD_MSG_M0_TO_M4_PROCESS_NAME,
-	.attr_bits = CFG_THREAD_MSG_M0_TO_M4_PROCESS_ATTR_BITS,
-	.cb_mem = CFG_THREAD_MSG_M0_TO_M4_PROCESS_CB_MEM,
-	.cb_size = CFG_THREAD_MSG_M0_TO_M4_PROCESS_CB_SIZE,
-	.stack_mem = CFG_THREAD_MSG_M0_TO_M4_PROCESS_STACK_MEM,
-	.priority = CFG_THREAD_MSG_M0_TO_M4_PROCESS_PRIORITY,
-	.stack_size = CFG_THREAD_MSG_M0_TO_M4_PROCESS_STACK_SIZE
-};
+const osThreadAttr_t ThreadMsgM0ToM4Process_attr = {.name = CFG_THREAD_MSG_M0_TO_M4_PROCESS_NAME, .attr_bits = CFG_THREAD_MSG_M0_TO_M4_PROCESS_ATTR_BITS, .cb_mem = CFG_THREAD_MSG_M0_TO_M4_PROCESS_CB_MEM, .cb_size = CFG_THREAD_MSG_M0_TO_M4_PROCESS_CB_SIZE, .stack_mem = CFG_THREAD_MSG_M0_TO_M4_PROCESS_STACK_MEM, .priority = CFG_THREAD_MSG_M0_TO_M4_PROCESS_PRIORITY, .stack_size = CFG_THREAD_MSG_M0_TO_M4_PROCESS_STACK_SIZE};
 
 static osSemaphoreId_t OtCmdProcessSem;
 static osSemaphoreId_t OtCmdAckSem;
@@ -72,7 +64,7 @@ static osSemaphoreId_t OtCmdAckSem;
 
 /* Private function prototypes -----------------------------------------------*/
 
-#if ( CFG_LPM_SUPPORTED == 1)
+#if (CFG_LPM_SUPPORTED == 1)
 static void APP_THREAD_DeviceConfig(void);
 #endif /* ( CFG_LPM_SUPPORTED == 1) */
 static void APP_THREAD_TraceError(const char* pMess, uint32_t ErrCode);
@@ -91,61 +83,11 @@ static void APP_THREAD_FreeRTOSProcessMsgM0ToM4Task(void* argument);
 /* Private variables ---------------------------------------------------------*/
 static TL_CmdPacket_t* p_thread_otcmdbuffer;
 static TL_EvtPacket_t* p_thread_notif_M0_to_M4;
-PLACE_IN_SECTION (
-
-
-"MB_MEM1"
-)
-ALIGN (
-
-
-4
-)
-static TL_TH_Config_t ThreadConfigBuffer;
-PLACE_IN_SECTION (
-
-
-"MB_MEM2"
-)
-ALIGN (
-
-
-4
-)
-static TL_CmdPacket_t ThreadOtCmdBuffer;
-PLACE_IN_SECTION (
-
-
-"MB_MEM2"
-)
-ALIGN (
-
-
-4
-)
-static uint8_t ThreadNotifRspEvtBuffer[sizeof(TL_PacketHeader_t) + TL_EVT_HDR_SIZE + 255U];
-PLACE_IN_SECTION (
-
-
-"MB_MEM2"
-)
-ALIGN (
-
-
-4
-)
-static TL_CmdPacket_t ThreadCliCmdBuffer;
-PLACE_IN_SECTION (
-
-
-"MB_MEM2"
-)
-ALIGN (
-
-
-4
-)
-static TL_CmdPacket_t ThreadCliNotBuffer;
+PLACE_IN_SECTION("MB_MEM1") ALIGN(4) static TL_TH_Config_t ThreadConfigBuffer;
+PLACE_IN_SECTION("MB_MEM2") ALIGN(4) static TL_CmdPacket_t ThreadOtCmdBuffer;
+PLACE_IN_SECTION("MB_MEM2") ALIGN(4) static uint8_t ThreadNotifRspEvtBuffer[sizeof(TL_PacketHeader_t) + TL_EVT_HDR_SIZE + 255U];
+PLACE_IN_SECTION("MB_MEM2") ALIGN(4) static TL_CmdPacket_t ThreadCliCmdBuffer;
+PLACE_IN_SECTION("MB_MEM2") ALIGN(4) static TL_CmdPacket_t ThreadCliNotBuffer;
 extern uint8_t g_ot_notification_allowed;
 
 static QueueHandle_t MoNotifQueue;
@@ -174,8 +116,8 @@ void APP_THREAD_Init_Dyn_1(void)
 	APP_THREAD_RegisterCmdBuffer(&ThreadOtCmdBuffer);
 
 	/**
-   * Do not allow standby in the application
-   */
+	 * Do not allow standby in the application
+	 */
 	UTIL_LPM_SetOffMode(1 << CFG_LPM_APP_THREAD, UTIL_LPM_DISABLE);
 
 	/* Init config buffer and call TL_THREAD_Init */
@@ -209,7 +151,7 @@ void APP_THREAD_Init_Dyn_1(void)
 void APP_THREAD_Init_Dyn_2(void)
 {
 	/* Initialize and configure the Thread device*/
-#if ( CFG_LPM_SUPPORTED == 1)
+#if (CFG_LPM_SUPPORTED == 1)
 	APP_THREAD_DeviceConfig();
 
 	/* Allow the 800_15_4 IP to enter in low power mode */
@@ -222,11 +164,11 @@ void APP_THREAD_Init_Dyn_2(void)
 }
 
 /**
-  * @brief  Trace the error or the warning reported.
-  * @param  ErrId :
-  * @param  ErrCode
-  * @retval None
-  */
+ * @brief  Trace the error or the warning reported.
+ * @param  ErrId :
+ * @param  ErrCode
+ * @retval None
+ */
 void APP_THREAD_Error(uint32_t ErrId, uint32_t ErrCode)
 {
 	/* USER CODE BEGIN APP_THREAD_Error_1 */
@@ -299,7 +241,7 @@ void APP_THREAD_Error(uint32_t ErrId, uint32_t ErrCode)
  *
  *************************************************************/
 
-#if ( CFG_LPM_SUPPORTED == 1)
+#if (CFG_LPM_SUPPORTED == 1)
 /**
  * @brief Thread initialization.
  * @param  None
@@ -310,9 +252,9 @@ static void APP_THREAD_DeviceConfig(void)
 	otError error = OT_ERROR_NONE;
 	otLinkModeConfig OT_LinkMode = {0};
 	/* Set the pool period to 5 sec. It means that when the device will enter
-   * in 'sleepy end device' mode, it will send an ACK_Request every 5 sec.
-   * This message will act as keep alive message.
-   */
+	 * in 'sleepy end device' mode, it will send an ACK_Request every 5 sec.
+	 * This message will act as keep alive message.
+	 */
 	error = otLinkSetPollPeriod(NULL, THREAD_LINK_POLL_PERIOD);
 	/* Set the sleepy end device mode */
 	OT_LinkMode.mRxOnWhenIdle = 0;
@@ -339,13 +281,13 @@ static void APP_THREAD_DeviceConfig(void)
 
 
 /**
-  * @brief  Warn the user that an error has occurred.In this case,
-  *         the LEDs on the Board will start blinking.
-  *
-  * @param  pMess  : Message associated to the error.
-  * @param  ErrCode: Error code associated to the module (OpenThread or other module if any)
-  * @retval None
-  */
+ * @brief  Warn the user that an error has occurred.In this case,
+ *         the LEDs on the Board will start blinking.
+ *
+ * @param  pMess  : Message associated to the error.
+ * @param  ErrCode: Error code associated to the module (OpenThread or other module if any)
+ * @retval None
+ */
 static void APP_THREAD_TraceError(const char* pMess, uint32_t ErrCode)
 {
 	/* USER CODE BEGIN TRACE_ERROR */
@@ -375,8 +317,7 @@ void APP_THREAD_CheckWirelessFirmwareInfo(void)
 	}
 	else
 	{
-		APP_DBG("- STM32WB Cube Firmware Version : %d.%d.%d.%d", p_wireless_info->VersionMajor,
-		        p_wireless_info->VersionMinor, p_wireless_info->VersionSub, p_wireless_info->VersionBranch);
+		APP_DBG("- STM32WB Cube Firmware Version : %d.%d.%d.%d", p_wireless_info->VersionMajor, p_wireless_info->VersionMinor, p_wireless_info->VersionSub, p_wireless_info->VersionBranch);
 		APP_DBG("**********************************************************");
 	}
 }
@@ -385,7 +326,7 @@ void APP_THREAD_CheckWirelessFirmwareInfo(void)
  *
  * FREERTOS WRAPPER FUNCTIONS
  *
-*************************************************************/
+ *************************************************************/
 static void APP_THREAD_FreeRTOSProcessMsgM0ToM4Task(void* argument)
 {
 	UNUSED(argument);
@@ -426,32 +367,20 @@ static void APP_THREAD_FreeRTOSProcessMsgM0ToM4Task(void* argument)
  *
  *************************************************************/
 
-void APP_THREAD_RegisterCmdBuffer(TL_CmdPacket_t* p_buffer)
-{
-	p_thread_otcmdbuffer = p_buffer;
-}
+void APP_THREAD_RegisterCmdBuffer(TL_CmdPacket_t* p_buffer) { p_thread_otcmdbuffer = p_buffer; }
 
-Thread_OT_Cmd_Request_t* THREAD_Get_OTCmdPayloadBuffer(void)
-{
-	return (Thread_OT_Cmd_Request_t*)p_thread_otcmdbuffer->cmdserial.cmd.payload;
-}
+Thread_OT_Cmd_Request_t* THREAD_Get_OTCmdPayloadBuffer(void) { return (Thread_OT_Cmd_Request_t*)p_thread_otcmdbuffer->cmdserial.cmd.payload; }
 
-Thread_OT_Cmd_Request_t* THREAD_Get_OTCmdRspPayloadBuffer(void)
-{
-	return (Thread_OT_Cmd_Request_t*)((TL_EvtPacket_t*)p_thread_otcmdbuffer)->evtserial.evt.payload;
-}
+Thread_OT_Cmd_Request_t* THREAD_Get_OTCmdRspPayloadBuffer(void) { return (Thread_OT_Cmd_Request_t*)((TL_EvtPacket_t*)p_thread_otcmdbuffer)->evtserial.evt.payload; }
 
-Thread_OT_Cmd_Request_t* THREAD_Get_NotificationPayloadBuffer(void)
-{
-	return (Thread_OT_Cmd_Request_t*)(p_thread_notif_M0_to_M4)->evtserial.evt.payload;
-}
+Thread_OT_Cmd_Request_t* THREAD_Get_NotificationPayloadBuffer(void) { return (Thread_OT_Cmd_Request_t*)(p_thread_notif_M0_to_M4)->evtserial.evt.payload; }
 
 static void Ot_Cmd_Transfer_Common(void)
 {
 	/* OpenThread OT command cmdcode range 0x280 .. 0x3DF = 352 */
 	p_thread_otcmdbuffer->cmdserial.cmd.cmdcode = 0x280U;
 	/* Size = otCmdBuffer->Size (Number of OT cmd arguments : 1 arg = 32bits so multiply by 4 to get size in bytes)
-   * + ID (4 bytes) + Size (4 bytes) */
+	 * + ID (4 bytes) + Size (4 bytes) */
 	uint32_t l_size = ((Thread_OT_Cmd_Request_t*)(p_thread_otcmdbuffer->cmdserial.cmd.payload))->Size * 4U + 8U;
 	p_thread_otcmdbuffer->cmdserial.cmd.plen = l_size;
 
@@ -468,10 +397,7 @@ static void Ot_Cmd_Transfer_Common(void)
  * @param   None
  * @return  None
  */
-void Ot_Cmd_Transfer(void)
-{
-	Ot_Cmd_Transfer_Common();
-}
+void Ot_Cmd_Transfer(void) { Ot_Cmd_Transfer_Common(); }
 
 /**
  * @brief  This function is used to transfer the Ot commands from the
@@ -513,7 +439,7 @@ void APP_THREAD_TL_THREAD_INIT(void)
 void TL_THREAD_CliNotReceived(TL_EvtPacket_t* Notbuffer)
 {
 	TL_CmdPacket_t* l_CliBuffer = (TL_CmdPacket_t*)Notbuffer;
-	//uint8_t l_size = l_CliBuffer->cmdserial.cmd.plen;
+	// uint8_t l_size = l_CliBuffer->cmdserial.cmd.plen;
 
 	/* WORKAROUND: if string to output is "> " then respond directly to M0 and do not output it */
 	if (strcmp((const char*)l_CliBuffer->cmdserial.cmd.payload, "> ") != 0)
@@ -558,74 +484,62 @@ void TL_THREAD_NotReceived(TL_EvtPacket_t* Notbuffer)
 }
 
 /**
-  * @brief  This function is called before sending any ot command to the M0
-  *         core. The purpose of this function is to be able to check if
-  *         there are no notifications coming from the M0 core which are
-  *         pending before sending a new ot command.
-  * @param  None
-  * @retval None
-  */
-void Pre_OtCmdProcessing(void)
-{
-	osSemaphoreAcquire(OtCmdProcessSem, osWaitForever);
-}
+ * @brief  This function is called before sending any ot command to the M0
+ *         core. The purpose of this function is to be able to check if
+ *         there are no notifications coming from the M0 core which are
+ *         pending before sending a new ot command.
+ * @param  None
+ * @retval None
+ */
+void Pre_OtCmdProcessing(void) { osSemaphoreAcquire(OtCmdProcessSem, osWaitForever); }
 
 /**
-  * @brief  This function is called at the end of any ot commands sent to the M0
-  *         core. It is the counterpart of Pre_OtCmdProcessing() function, 
-  *         unlocking sending of new ot commands.
-  * @param  None
-  * @retval None
-  */
-void Post_OtCmdProcessing(void)
-{
-	osMutexRelease(OtCmdProcessSem);
-}
+ * @brief  This function is called at the end of any ot commands sent to the M0
+ *         core. It is the counterpart of Pre_OtCmdProcessing() function,
+ *         unlocking sending of new ot commands.
+ * @param  None
+ * @retval None
+ */
+void Post_OtCmdProcessing(void) { osMutexRelease(OtCmdProcessSem); }
 
 /**
-  * @brief  This function waits for getting an acknowledgment from the M0.
-  *
-  * @param  None
-  * @retval None
-  */
-static void Wait_Getting_Ack_From_M0(void)
-{
-	osSemaphoreAcquire(OtCmdAckSem, osWaitForever);
-}
+ * @brief  This function waits for getting an acknowledgment from the M0.
+ *
+ * @param  None
+ * @retval None
+ */
+static void Wait_Getting_Ack_From_M0(void) { osSemaphoreAcquire(OtCmdAckSem, osWaitForever); }
 
 /**
-  * @brief  Receive an acknowledgment from the M0+ core.
-  *         Each command send by the M4 to the M0 are acknowledged.
-  *         This function is called under interrupt.
-  * @param  None
-  * @retval None
-  */
-static void Receive_Ack_From_M0(void)
-{
-	osSemaphoreRelease(OtCmdAckSem);
-}
+ * @brief  Receive an acknowledgment from the M0+ core.
+ *         Each command send by the M4 to the M0 are acknowledged.
+ *         This function is called under interrupt.
+ * @param  None
+ * @retval None
+ */
+static void Receive_Ack_From_M0(void) { osSemaphoreRelease(OtCmdAckSem); }
 
 /**
-  * @brief  Receive a notification from the M0+ through the IPCC.
-  *         This function is called under interrupt.
-  * @param  None
-  * @retval None
-  */
+ * @brief  Receive a notification from the M0+ through the IPCC.
+ *         This function is called under interrupt.
+ * @param  None
+ * @retval None
+ */
 static void Receive_Notification_From_M0(void)
 {
 	/* The xHigherPriorityTaskWoken parameter must be initialized to pdFALSE as
-     it will get set to pdTRUE inside the interrupt safe API function if a
-     context switch is required. */
+	 it will get set to pdTRUE inside the interrupt safe API function if a
+	 context switch is required. */
 	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
 	uint8_t NotUsed = 0;
 	xQueueSendToFrontFromISR(MoNotifQueue, &NotUsed, &xHigherPriorityTaskWoken);
 
 	/* Pass the xHigherPriorityTaskWoken value into portEND_SWITCHING_ISR(). If
-     xHigherPriorityTaskWoken was set to pdTRUE inside xSemaphoreGiveFromISR()
-     then calling portEND_SWITCHING_ISR() will request a context switch. If
-     xHigherPriorityTaskWoken is still pdFALSE then calling
-     portEND_SWITCHING_ISR() will have no effect */
+	 xHigherPriorityTaskWoken was set to pdTRUE inside xSemaphoreGiveFromISR()
+	 then calling portEND_SWITCHING_ISR() will request a context switch. If
+	 xHigherPriorityTaskWoken is still pdFALSE then calling
+	 portEND_SWITCHING_ISR() will have no effect */
 	portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
 }
 

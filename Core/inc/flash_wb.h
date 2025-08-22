@@ -52,6 +52,7 @@ typedef enum
 	SECTOR_DEFAULT = 0,
 	SECTOR_NO_SECURE,
 	SECTOR_SECURE
+
 } NVM_Sector;
 
 /* Exported functions ------------------------------------------------------- */
@@ -113,7 +114,7 @@ NVM_StatusTypeDef NM_DeleteKey(const char* Keyname, NVM_Sector sector);
  * @param  Addr: return the Address of the OT buffer
  * @retval return state of function
  */
-NVM_StatusTypeDef NM_GetOtNVMAddr(uint32_t * NVMAddr);
+NVM_StatusTypeDef NM_GetOtNVMAddr(uint32_t* NVMAddr);
 
 /**
  * @brief  Erase all persistent and reboot program

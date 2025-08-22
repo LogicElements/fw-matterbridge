@@ -1,25 +1,25 @@
 /* USER CODE BEGIN Header */
 /**
-  ******************************************************************************
-  * @file    stm32wbxx_it.c
-  * @brief   Interrupt Service Routines.
-  ******************************************************************************
-  * @attention
-  *
-  * Copyright (c) 2023 STMicroelectronics.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file    stm32wbxx_it.c
+ * @brief   Interrupt Service Routines.
+ ******************************************************************************
+ * @attention
+ *
+ * Copyright (c) 2023 STMicroelectronics.
+ * All rights reserved.
+ *
+ * This software is licensed under terms that can be found in the LICENSE file
+ * in the root directory of this software component.
+ * If no LICENSE file comes with this software, it is provided AS-IS.
+ *
+ ******************************************************************************
+ */
 /* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
-#include "main.h"
 #include "stm32wbxx_it.h"
+#include "main.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "../inc/app_conf.h"
@@ -50,7 +50,7 @@
 #if (USE_CUSTOM_IPCC_HANDLER == 1)
 extern void HW_IPCC_Rx_Handler(void);
 extern void HW_IPCC_Tx_Handler(void);
-#endif //(USE_CUSTOM_IPCC_HANDLER) 
+#endif //(USE_CUSTOM_IPCC_HANDLER)
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -73,8 +73,8 @@ extern TIM_HandleTypeDef htim17;
 /*           Cortex Processor Interruption and Exception Handlers          */
 /******************************************************************************/
 /**
-  * @brief This function handles Non maskable interrupt.
-  */
+ * @brief This function handles Non maskable interrupt.
+ */
 void NMI_Handler(void)
 {
 	/* USER CODE BEGIN NonMaskableInt_IRQn 0 */
@@ -88,8 +88,8 @@ void NMI_Handler(void)
 }
 
 /**
-  * @brief This function handles Hard fault interrupt.
-  */
+ * @brief This function handles Hard fault interrupt.
+ */
 void HardFault_Handler(void)
 {
 	/* USER CODE BEGIN HardFault_IRQn 0 */
@@ -103,8 +103,8 @@ void HardFault_Handler(void)
 }
 
 /**
-  * @brief This function handles Memory management fault.
-  */
+ * @brief This function handles Memory management fault.
+ */
 void MemManage_Handler(void)
 {
 	/* USER CODE BEGIN MemoryManagement_IRQn 0 */
@@ -118,8 +118,8 @@ void MemManage_Handler(void)
 }
 
 /**
-  * @brief This function handles Prefetch fault, memory access fault.
-  */
+ * @brief This function handles Prefetch fault, memory access fault.
+ */
 void BusFault_Handler(void)
 {
 	/* USER CODE BEGIN BusFault_IRQn 0 */
@@ -133,8 +133,8 @@ void BusFault_Handler(void)
 }
 
 /**
-  * @brief This function handles Undefined instruction or illegal state.
-  */
+ * @brief This function handles Undefined instruction or illegal state.
+ */
 void UsageFault_Handler(void)
 {
 	/* USER CODE BEGIN UsageFault_IRQn 0 */
@@ -148,8 +148,8 @@ void UsageFault_Handler(void)
 }
 
 /**
-  * @brief This function handles Debug monitor.
-  */
+ * @brief This function handles Debug monitor.
+ */
 void DebugMon_Handler(void)
 {
 	/* USER CODE BEGIN DebugMonitor_IRQn 0 */
@@ -168,8 +168,8 @@ void DebugMon_Handler(void)
 /******************************************************************************/
 
 /**
-  * @brief This function handles RTC wake-up interrupt through EXTI line 19.
-  */
+ * @brief This function handles RTC wake-up interrupt through EXTI line 19.
+ */
 void RTC_WKUP_IRQHandler(void)
 {
 	/* USER CODE BEGIN RTC_WKUP_IRQn 0 */
@@ -182,8 +182,8 @@ void RTC_WKUP_IRQHandler(void)
 }
 
 /**
-  * @brief This function handles TIM1 trigger and commutation interrupts and TIM17 global interrupt.
-  */
+ * @brief This function handles TIM1 trigger and commutation interrupts and TIM17 global interrupt.
+ */
 void TIM1_TRG_COM_TIM17_IRQHandler(void)
 {
 	/* USER CODE BEGIN TIM1_TRG_COM_TIM17_IRQn 0 */
@@ -196,8 +196,8 @@ void TIM1_TRG_COM_TIM17_IRQHandler(void)
 }
 
 /**
-  * @brief This function handles IPCC RX occupied interrupt.
-  */
+ * @brief This function handles IPCC RX occupied interrupt.
+ */
 void IPCC_C1_RX_IRQHandler(void)
 {
 	/* USER CODE BEGIN IPCC_C1_RX_IRQn 0 */
@@ -207,13 +207,13 @@ void IPCC_C1_RX_IRQHandler(void)
 	/* USER CODE END IPCC_C1_RX_IRQn 0 */
 	HAL_IPCC_RX_IRQHandler(&hipcc);
 	/* USER CODE BEGIN IPCC_C1_RX_IRQn 1 */
-#endif //(USE_CUSTOM_IPCC_HANDLER)    
+#endif //(USE_CUSTOM_IPCC_HANDLER)
 	/* USER CODE END IPCC_C1_RX_IRQn 1 */
 }
 
 /**
-  * @brief This function handles IPCC TX free interrupt.
-  */
+ * @brief This function handles IPCC TX free interrupt.
+ */
 void IPCC_C1_TX_IRQHandler(void)
 {
 	/* USER CODE BEGIN IPCC_C1_TX_IRQn 0 */
@@ -223,13 +223,13 @@ void IPCC_C1_TX_IRQHandler(void)
 	/* USER CODE END IPCC_C1_TX_IRQn 0 */
 	HAL_IPCC_TX_IRQHandler(&hipcc);
 	/* USER CODE BEGIN IPCC_C1_TX_IRQn 1 */
-#endif //(USE_CUSTOM_IPCC_HANDLER)     
+#endif //(USE_CUSTOM_IPCC_HANDLER)
 	/* USER CODE END IPCC_C1_TX_IRQn 1 */
 }
 
 /**
-  * @brief This function handles HSEM global interrupt.
-  */
+ * @brief This function handles HSEM global interrupt.
+ */
 void HSEM_IRQHandler(void)
 {
 	/* USER CODE BEGIN HSEM_IRQn 0 */
@@ -243,8 +243,8 @@ void HSEM_IRQHandler(void)
 
 /* USER CODE BEGIN 1 */
 /**
-  * @brief This function handles Flash global interrupt.
-  */
+ * @brief This function handles Flash global interrupt.
+ */
 void FLASH_IRQHandler(void)
 {
 	/* USER CODE BEGIN FLASH_IRQn 0 */
@@ -256,8 +256,6 @@ void FLASH_IRQHandler(void)
 	/* USER CODE END FLASH_IRQn 1 */
 }
 
-void EXTI15_10_IRQHandler(void)
-{
-}
+void EXTI15_10_IRQHandler(void) {}
 
 /* USER CODE END 1 */

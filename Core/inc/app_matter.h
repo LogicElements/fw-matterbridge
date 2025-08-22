@@ -20,6 +20,7 @@
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __APP_MATTER_H
 #define __APP_MATTER_H
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {

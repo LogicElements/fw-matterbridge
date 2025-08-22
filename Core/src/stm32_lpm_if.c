@@ -29,9 +29,9 @@
 const struct UTIL_LPM_Driver_s UTIL_PowerDriver = {
 	PWR_EnterSleepMode, PWR_ExitSleepMode,
 
-	PWR_EnterStopMode, PWR_ExitStopMode,
+	PWR_EnterStopMode,	PWR_ExitStopMode,
 
-	PWR_EnterOffMode, PWR_ExitOffMode,
+	PWR_EnterOffMode,	PWR_ExitOffMode,
 };
 
 /* Private function prototypes -----------------------------------------------*/
@@ -263,7 +263,8 @@ static void EnterLowPower(void)
 	 * This function is called from CRITICAL SECTION
 	 */
 
-	while (LL_HSEM_1StepLock(HSEM, CFG_HW_RCC_SEMID));
+	while (LL_HSEM_1StepLock(HSEM, CFG_HW_RCC_SEMID))
+		;
 
 	if (!LL_HSEM_1StepLock(HSEM, CFG_HW_ENTRY_STOP_MODE_SEMID))
 	{
@@ -296,7 +297,8 @@ static void ExitLowPower(void)
 	/* Release ENTRY_STOP_MODE semaphore */
 	LL_HSEM_ReleaseLock(HSEM, CFG_HW_ENTRY_STOP_MODE_SEMID, 0);
 
-	while (LL_HSEM_1StepLock(HSEM, CFG_HW_RCC_SEMID));
+	while (LL_HSEM_1StepLock(HSEM, CFG_HW_RCC_SEMID))
+		;
 
 	if (LL_RCC_GetSysClkSource() == LL_RCC_SYS_CLKSOURCE_STATUS_HSI)
 	{
@@ -304,10 +306,13 @@ static void ExitLowPower(void)
 		/* USER CODE BEGIN ExitLowPower_1 */
 		LL_RCC_HSE_Enable();
 		__HAL_FLASH_SET_LATENCY(FLASH_LATENCY_1);
-		while (__HAL_FLASH_GET_LATENCY() != FLASH_LATENCY_1);
-		while (!LL_RCC_HSE_IsReady());
+		while (__HAL_FLASH_GET_LATENCY() != FLASH_LATENCY_1)
+			;
+		while (!LL_RCC_HSE_IsReady())
+			;
 		LL_RCC_SetSysClkSource(LL_RCC_SYS_CLKSOURCE_HSE);
-		while (LL_RCC_GetSysClkSource() != LL_RCC_SYS_CLKSOURCE_STATUS_HSE);
+		while (LL_RCC_GetSysClkSource() != LL_RCC_SYS_CLKSOURCE_STATUS_HSE)
+			;
 		/* USER CODE END ExitLowPower_1 */
 	}
 	else
@@ -332,10 +337,12 @@ static void ExitLowPower(void)
 static void Switch_On_HSI(void)
 {
 	LL_RCC_HSI_Enable();
-	while (!LL_RCC_HSI_IsReady());
+	while (!LL_RCC_HSI_IsReady())
+		;
 	LL_RCC_SetSysClkSource(LL_RCC_SYS_CLKSOURCE_HSI);
 	LL_RCC_SetSMPSClockSource(LL_RCC_SMPS_CLKSOURCE_HSI);
-	while (LL_RCC_GetSysClkSource() != LL_RCC_SYS_CLKSOURCE_STATUS_HSI);
+	while (LL_RCC_GetSysClkSource() != LL_RCC_SYS_CLKSOURCE_STATUS_HSI)
+		;
 	return;
 }
 

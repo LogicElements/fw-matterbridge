@@ -29,8 +29,8 @@
 extern "C" {
 #endif
 
-#define EXTERNAL_FLASH_ADDRESS  0x90000000U
-#define OTA_MAX_SIZE 0x100000  // 1 Mbytes
+#define EXTERNAL_FLASH_ADDRESS 0x90000000U
+#define OTA_MAX_SIZE 0x100000 // 1 Mbytes
 
 typedef enum
 {

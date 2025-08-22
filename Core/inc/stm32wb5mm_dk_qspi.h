@@ -189,7 +189,7 @@ int32_t BSP_QSPI_ReadID(uint32_t Instance, uint8_t* Id);
 
 /* These functions can be modified in case the current settings
    need to be changed for specific application needs */
-HAL_StatusTypeDef MX_QSPI_Init(QSPI_HandleTypeDef * hQspi, MX_QSPI_Init_t * Config);
+HAL_StatusTypeDef MX_QSPI_Init(QSPI_HandleTypeDef* hQspi, MX_QSPI_Init_t* Config);
 
 /**
  * @}

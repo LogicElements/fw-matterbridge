@@ -17,8 +17,8 @@
  */
 
 /* Includes ------------------------------------------------------------------*/
-#include "common_blesvc.h"
 #include "app_matter.h"
+#include "common_blesvc.h"
 
 /* Private typedef -----------------------------------------------------------*/
 typedef struct
@@ -29,15 +29,15 @@ typedef struct
 } CustomContext_t;
 
 /* Private defines -----------------------------------------------------------*/
-#define UUID_128_SUPPORTED  1
+#define UUID_128_SUPPORTED 1
 
 #if (UUID_128_SUPPORTED == 1)
-#define BM_UUID_LENGTH  UUID_TYPE_128
+#define BM_UUID_LENGTH UUID_TYPE_128
 #else
-#define BM_UUID_LENGTH  UUID_TYPE_16
+#define BM_UUID_LENGTH UUID_TYPE_16
 #endif
 
-#define BM_REQ_CHAR_SIZE    (3)
+#define BM_REQ_CHAR_SIZE (3)
 
 /* Private macros ------------------------------------------------------------*/
 
@@ -48,11 +48,7 @@ MATTER_App_Notification_evt_t Notification;
 /**
  * START of Section BLE_DRIVER_CONTEXT
  */
-PLACE_IN_SECTION(
-
-	"BLE_DRIVER_CONTEXT"
-)
-static CustomContext_t aCustomContext;
+PLACE_IN_SECTION("BLE_DRIVER_CONTEXT") static CustomContext_t aCustomContext;
 
 /**
  * END of Section BLE_DRIVER_CONTEXT
@@ -63,20 +59,34 @@ static SVCCTL_EvtAckStatus_t Matter_Event_Handler(void* Event);
 /* Functions Definition ------------------------------------------------------*/
 /* Private functions ----------------------------------------------------------*/
 
-#define COPY_UUID_128(uuid_struct, uuid_15, uuid_14, uuid_13, uuid_12, uuid_11, uuid_10, uuid_9, uuid_8, uuid_7, uuid_6, uuid_5, uuid_4, uuid_3, uuid_2, uuid_1, uuid_0) \
-do {\
-    uuid_struct[0] = uuid_0; uuid_struct[1] = uuid_1; uuid_struct[2] = uuid_2; uuid_struct[3] = uuid_3; \
-        uuid_struct[4] = uuid_4; uuid_struct[5] = uuid_5; uuid_struct[6] = uuid_6; uuid_struct[7] = uuid_7; \
-            uuid_struct[8] = uuid_8; uuid_struct[9] = uuid_9; uuid_struct[10] = uuid_10; uuid_struct[11] = uuid_11; \
-                uuid_struct[12] = uuid_12; uuid_struct[13] = uuid_13; uuid_struct[14] = uuid_14; uuid_struct[15] = uuid_15; \
-}while(0)
+#define COPY_UUID_128(uuid_struct, uuid_15, uuid_14, uuid_13, uuid_12, uuid_11, uuid_10, uuid_9, uuid_8, uuid_7, uuid_6, uuid_5, uuid_4, uuid_3, uuid_2, uuid_1, uuid_0)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               \
+	do                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 \
+	{                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  \
+		uuid_struct[0] = uuid_0;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       \
+		uuid_struct[1] = uuid_1;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       \
+		uuid_struct[2] = uuid_2;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       \
+		uuid_struct[3] = uuid_3;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       \
+		uuid_struct[4] = uuid_4;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       \
+		uuid_struct[5] = uuid_5;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       \
+		uuid_struct[6] = uuid_6;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       \
+		uuid_struct[7] = uuid_7;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       \
+		uuid_struct[8] = uuid_8;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       \
+		uuid_struct[9] = uuid_9;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       \
+		uuid_struct[10] = uuid_10;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     \
+		uuid_struct[11] = uuid_11;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     \
+		uuid_struct[12] = uuid_12;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     \
+		uuid_struct[13] = uuid_13;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     \
+		uuid_struct[14] = uuid_14;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     \
+		uuid_struct[15] = uuid_15;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     \
+	}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  \
+	while (0)
 
 /* Hardware Characteristics Service */
 
 #define MATTER_SERVICE_UUID (0xFFF6)
-#define COPY_CHAR_RX_UUID(uuid_struct) COPY_UUID_128(uuid_struct,0x18,0xEE,0x2E,0xF5,0x26,0x3D,0x45,0x59,0x95,0x9F,0x4F,0x9C,0x42,0x9F,0x9D,0x11)
-#define COPY_CHAR_TX_UUID(uuid_struct) COPY_UUID_128(uuid_struct,0x18,0xEE,0x2E,0xF5,0x26,0x3D,0x45,0x59,0x95,0x9F,0x4F,0x9C,0x42,0x9F,0x9D,0x12)
-#define COPY_CHAR_ADDCOMMISSIONING_UUID(uuid_struct) COPY_UUID_128(uuid_struct,0x64,0x63,0x02,0x38,0x87,0x72,0x45,0xF2,0xB8,0x7D,0x74,0x8A,0x83,0x21,0x8F,0x04)
+#define COPY_CHAR_RX_UUID(uuid_struct) COPY_UUID_128(uuid_struct, 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F, 0x9D, 0x11)
+#define COPY_CHAR_TX_UUID(uuid_struct) COPY_UUID_128(uuid_struct, 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F, 0x9D, 0x12)
+#define COPY_CHAR_ADDCOMMISSIONING_UUID(uuid_struct) COPY_UUID_128(uuid_struct, 0x64, 0x63, 0x02, 0x38, 0x87, 0x72, 0x45, 0xF2, 0xB8, 0x7D, 0x74, 0x8A, 0x83, 0x21, 0x8F, 0x04)
 
 /* Public functions ----------------------------------------------------------*/
 /**
@@ -101,34 +111,27 @@ void SVCCTL_InitCustomSvc(void)
 
 	uint16_t uuid = MATTER_SERVICE_UUID;
 
-	aci_gatt_add_service(UUID_TYPE_16, (Service_UUID_t*)&uuid,
-	                     PRIMARY_SERVICE, 8, &(aCustomContext.CustomSvcHdle));
+	aci_gatt_add_service(UUID_TYPE_16, (Service_UUID_t*)&uuid, PRIMARY_SERVICE, 8, &(aCustomContext.CustomSvcHdle));
 
 	/**
 	 *  Add RX Characteristic
 	 */
 	COPY_CHAR_RX_UUID(uuid16.Char_UUID_128);
-	aci_gatt_add_char(aCustomContext.CustomSvcHdle,
-	                  UUID_TYPE_128, &uuid16, 247,
-	                  CHAR_PROP_WRITE,
-	                  ATTR_PERMISSION_NONE,
-	                  GATT_NOTIFY_ATTRIBUTE_WRITE | GATT_NOTIFY_WRITE_REQ_AND_WAIT_FOR_APPL_RESP, /* gattEvtMask */
-	                  10, /* encryKeySize */
-	                  1, /* isVariable */
-	                  &(aCustomContext.WriteClientToServerCharHdle));
+	aci_gatt_add_char(
+		aCustomContext.CustomSvcHdle, UUID_TYPE_128, &uuid16, 247, CHAR_PROP_WRITE, ATTR_PERMISSION_NONE, GATT_NOTIFY_ATTRIBUTE_WRITE | GATT_NOTIFY_WRITE_REQ_AND_WAIT_FOR_APPL_RESP, /* gattEvtMask */
+		10, /* encryKeySize */
+		1, /* isVariable */
+		&(aCustomContext.WriteClientToServerCharHdle));
 
 	/**
 	 *   Add notification Characteristic
 	 */
 	COPY_CHAR_TX_UUID(uuid16.Char_UUID_128);
-	aci_gatt_add_char(aCustomContext.CustomSvcHdle,
-	                  UUID_TYPE_128, &uuid16, 247,
-	                  CHAR_PROP_INDICATE,
-	                  ATTR_PERMISSION_NONE,
-	                  GATT_NOTIFY_ATTRIBUTE_WRITE, /* gattEvtMask */
-	                  10, /* encryKeySize */
-	                  1, /* isVariable: 1 */
-	                  &(aCustomContext.NotifyServerToClientCharHdle));
+	aci_gatt_add_char(
+		aCustomContext.CustomSvcHdle, UUID_TYPE_128, &uuid16, 247, CHAR_PROP_INDICATE, ATTR_PERMISSION_NONE, GATT_NOTIFY_ATTRIBUTE_WRITE, /* gattEvtMask */
+		10, /* encryKeySize */
+		1, /* isVariable: 1 */
+		&(aCustomContext.NotifyServerToClientCharHdle));
 
 	return;
 }
@@ -146,9 +149,10 @@ tBleStatus CUSTOM_STM_App_Update_Char(uint16_t UUID, uint8_t* pPayload, uint16_t
 	{
 	case P2P_NOTIFY_CHAR_UUID:
 
-		result = aci_gatt_update_char_value(aCustomContext.CustomSvcHdle, aCustomContext.NotifyServerToClientCharHdle, 0, /* charValOffset */
-		                                    Length, /* charValueLen */
-		                                    (uint8_t*)pPayload);
+		result = aci_gatt_update_char_value(
+			aCustomContext.CustomSvcHdle, aCustomContext.NotifyServerToClientCharHdle, 0, /* charValOffset */
+			Length, /* charValueLen */
+			(uint8_t*)pPayload);
 
 		break;
 
@@ -196,13 +200,13 @@ static SVCCTL_EvtAckStatus_t Matter_Event_Handler(void* Event)
 					if (attribute_modified->Attr_Handle == (aCustomContext.NotifyServerToClientCharHdle + 2))
 					{
 						/**
-				 * Descriptor handle
-				 */
+						 * Descriptor handle
+						 */
 						return_value = SVCCTL_EvtAckFlowEnable;
 						APP_DBG_MSG("Subscribe for c2 notification\n");
 						/**
-				 * Indicate to application
-				 */
+						 * Indicate to application
+						 */
 						if (attribute_modified->Attr_Data[0] & COMSVC_Indication)
 						{
 							Notification.Evt_Opcode = MATTER_STM_INDICATE_ENABLED_EVT;
@@ -236,9 +240,10 @@ static SVCCTL_EvtAckStatus_t Matter_Event_Handler(void* Event)
 				{
 					aci_gatt_write_permit_req_event_rp0* write_perm_req;
 					write_perm_req = (aci_gatt_write_permit_req_event_rp0*)blecore_evt->data;
-					aci_gatt_write_resp(write_perm_req->Connection_Handle, write_perm_req->Attribute_Handle, 0x00, /* write_status = 0 (no error))*/
-					                    0x00, /* err_code */
-					                    write_perm_req->Data_Length, (uint8_t*)&(write_perm_req->Data[0]));
+					aci_gatt_write_resp(
+						write_perm_req->Connection_Handle, write_perm_req->Attribute_Handle, 0x00, /* write_status = 0 (no error))*/
+						0x00, /* err_code */
+						write_perm_req->Data_Length, (uint8_t*)&(write_perm_req->Data[0]));
 				}
 				break;
 			default:
@@ -252,4 +257,4 @@ static SVCCTL_EvtAckStatus_t Matter_Event_Handler(void* Event)
 	}
 
 	return (return_value);
-}/* end SVCCTL_EvtAckStatus_t */
+} /* end SVCCTL_EvtAckStatus_t */

@@ -280,11 +280,11 @@ void HAL_RTC_MspDeInit(RTC_HandleTypeDef* hrtc)
 
 /* USER CODE BEGIN 1 */
 /**
-  * @brief TIM_Base MSP Initialization
-  * This function configures the hardware resources used in this example
-  * @param htim_base: TIM_Base handle pointer
-  * @retval None
-  */
+ * @brief TIM_Base MSP Initialization
+ * This function configures the hardware resources used in this example
+ * @param htim_base: TIM_Base handle pointer
+ * @retval None
+ */
 void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* htim_base)
 {
 	if (htim_base->Instance == TIM1)
@@ -346,11 +346,11 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef* htim)
 }
 
 /**
-  * @brief TIM_Base MSP De-Initialization
-  * This function freeze the hardware resources used in this example
-  * @param htim_base: TIM_Base handle pointer
-  * @retval None
-  */
+ * @brief TIM_Base MSP De-Initialization
+ * This function freeze the hardware resources used in this example
+ * @param htim_base: TIM_Base handle pointer
+ * @retval None
+ */
 void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef* htim_base)
 {
 	if (htim_base->Instance == TIM1)

@@ -79,8 +79,8 @@ BSP_QSPI_Ctx_t QSPI_Ctx[QSPI_INSTANCES_NUMBER];
 /** @defgroup STM32WB5MM_DK_QSPI_Private_Functions Private Functions
  * @{
  */
-static void QSPI_MspInit(QSPI_HandleTypeDef * hQspi);
-static void QSPI_MspDeInit(QSPI_HandleTypeDef * hSspi);
+static void QSPI_MspInit(QSPI_HandleTypeDef* hQspi);
+static void QSPI_MspDeInit(QSPI_HandleTypeDef* hSspi);
 static int32_t QSPI_ResetMemory(uint32_t Instance);
 static int32_t QSPI_DummyCyclesCfg(uint32_t Instance);
 

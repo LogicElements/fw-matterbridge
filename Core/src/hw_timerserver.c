@@ -1,21 +1,21 @@
 /* USER CODE BEGIN Header */
 /**
-  ******************************************************************************
-  * @file    hw_timerserver.c
-  * @author  MCD Application Team
-  * @brief   Hardware timerserver source file for STM32WPAN Middleware.
-  ******************************************************************************
-  * @attention
-  *
-  * Copyright (c) 2021 STMicroelectronics.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file    hw_timerserver.c
+ * @author  MCD Application Team
+ * @brief   Hardware timerserver source file for STM32WPAN Middleware.
+ ******************************************************************************
+ * @attention
+ *
+ * Copyright (c) 2021 STMicroelectronics.
+ * All rights reserved.
+ *
+ * This software is licensed under terms that can be found in the LICENSE file
+ * in the root directory of this software component.
+ * If no LICENSE file comes with this software, it is provided AS-IS.
+ *
+ ******************************************************************************
+ */
 /* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
@@ -55,8 +55,8 @@ typedef struct
 } TimerContext_t;
 
 /* Private defines -----------------------------------------------------------*/
-#define SSR_FORBIDDEN_VALUE   0xFFFFFFFF
-#define TIMER_LIST_EMPTY      0xFFFF
+#define SSR_FORBIDDEN_VALUE 0xFFFFFFFF
+#define TIMER_LIST_EMPTY 0xFFFF
 
 /* Private macros ------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
@@ -65,26 +65,11 @@ typedef struct
  * START of Section TIMERSERVER_CONTEXT
  */
 
-PLACE_IN_SECTION (
-"TIMERSERVER_CONTEXT"
-)
-static volatile TimerContext_t aTimerContext[CFG_HW_TS_MAX_NBR_CONCURRENT_TIMER];
-PLACE_IN_SECTION (
-"TIMERSERVER_CONTEXT"
-)
-static volatile uint8_t CurrentRunningTimerID;
-PLACE_IN_SECTION (
-"TIMERSERVER_CONTEXT"
-)
-static volatile uint8_t PreviousRunningTimerID;
-PLACE_IN_SECTION (
-"TIMERSERVER_CONTEXT"
-)
-static volatile uint32_t SSRValueOnLastSetup;
-PLACE_IN_SECTION (
-"TIMERSERVER_CONTEXT"
-)
-static volatile WakeupTimerLimitation_Status_t WakeupTimerLimitation;
+PLACE_IN_SECTION("TIMERSERVER_CONTEXT") static volatile TimerContext_t aTimerContext[CFG_HW_TS_MAX_NBR_CONCURRENT_TIMER];
+PLACE_IN_SECTION("TIMERSERVER_CONTEXT") static volatile uint8_t CurrentRunningTimerID;
+PLACE_IN_SECTION("TIMERSERVER_CONTEXT") static volatile uint8_t PreviousRunningTimerID;
+PLACE_IN_SECTION("TIMERSERVER_CONTEXT") static volatile uint32_t SSRValueOnLastSetup;
+PLACE_IN_SECTION("TIMERSERVER_CONTEXT") static volatile WakeupTimerLimitation_Status_t WakeupTimerLimitation;
 
 /**
  * END of Section TIMERSERVER_CONTEXT
@@ -204,8 +189,8 @@ static uint16_t linkTimer(uint8_t TimerID)
 	if (CurrentRunningTimerID == CFG_HW_TS_MAX_NBR_CONCURRENT_TIMER)
 	{
 		/**
-     * No timer in the list
-     */
+		 * No timer in the list
+		 */
 		PreviousRunningTimerID = CurrentRunningTimerID;
 		CurrentRunningTimerID = TimerID;
 		aTimerContext[TimerID].NextID = CFG_HW_TS_MAX_NBR_CONCURRENT_TIMER;
@@ -218,19 +203,19 @@ static uint16_t linkTimer(uint8_t TimerID)
 		time_elapsed = ReturnTimeElapsed();
 
 		/**
-     * update count of the timer to be linked
-     */
+		 * update count of the timer to be linked
+		 */
 		aTimerContext[TimerID].CountLeft += time_elapsed;
 		time_left = aTimerContext[TimerID].CountLeft;
 
 		/**
-     * Search for index where the new timer shall be linked
-     */
+		 * Search for index where the new timer shall be linked
+		 */
 		if (aTimerContext[CurrentRunningTimerID].CountLeft <= time_left)
 		{
 			/**
-       * Search for the ID after the first one
-       */
+			 * Search for the ID after the first one
+			 */
 			timer_id_lookup = CurrentRunningTimerID;
 			next_id = aTimerContext[timer_id_lookup].NextID;
 			while ((next_id != CFG_HW_TS_MAX_NBR_CONCURRENT_TIMER) && (aTimerContext[next_id].CountLeft <= time_left))
@@ -240,15 +225,15 @@ static uint16_t linkTimer(uint8_t TimerID)
 			}
 
 			/**
-       * Link after the ID
-       */
+			 * Link after the ID
+			 */
 			LinkTimerAfter(TimerID, timer_id_lookup);
 		}
 		else
 		{
 			/**
-       * Link before the first ID
-       */
+			 * Link before the first ID
+			 */
 			LinkTimerBefore(TimerID, CurrentRunningTimerID);
 			PreviousRunningTimerID = CurrentRunningTimerID;
 			CurrentRunningTimerID = TimerID;
@@ -287,8 +272,8 @@ static void UnlinkTimer(uint8_t TimerID, RequestReadSSR_t RequestReadSSR)
 	}
 
 	/**
-   * Timer is out of the list
-   */
+	 * Timer is out of the list
+	 */
 	aTimerContext[TimerID].TimerIDStatus = TimerID_Created;
 
 	if ((CurrentRunningTimerID == CFG_HW_TS_MAX_NBR_CONCURRENT_TIMER) && (RequestReadSSR == SSR_Read_Requested))
@@ -326,9 +311,9 @@ static uint16_t ReturnTimeElapsed(void)
 		}
 
 		/**
-     * At this stage, ReturnValue holds the number of ticks counted by SSR
-     * Need to translate in number of ticks counted by the Wakeuptimer
-     */
+		 * At this stage, ReturnValue holds the number of ticks counted by SSR
+		 * Need to translate in number of ticks counted by the Wakeuptimer
+		 */
 		return_value = return_value * AsynchPrescalerUserConfig;
 		return_value = return_value >> WakeupTimerDivider;
 	}
@@ -351,18 +336,18 @@ static uint16_t ReturnTimeElapsed(void)
 static void RestartWakeupCounter(uint16_t Value)
 {
 	/**
-   * The wakeuptimer has been disabled in the calling function to reduce the time to poll the WUTWF
-   * FLAG when the new value will have to be written
-   *  __HAL_RTC_WAKEUPTIMER_DISABLE(&hrtc);
-   */
+	 * The wakeuptimer has been disabled in the calling function to reduce the time to poll the WUTWF
+	 * FLAG when the new value will have to be written
+	 *  __HAL_RTC_WAKEUPTIMER_DISABLE(&hrtc);
+	 */
 
 	if (Value == 0)
 	{
 		SSRValueOnLastSetup = ReadRtcSsrValue();
 
 		/**
-     * Simulate that the Timer expired
-     */
+		 * Simulate that the Timer expired
+		 */
 		HAL_NVIC_SetPendingIRQ(CFG_HW_TS_RTC_WAKEUP_HANDLER_ID);
 	}
 	else
@@ -372,15 +357,16 @@ static void RestartWakeupCounter(uint16_t Value)
 			Value -= 1;
 		}
 
-		while (__HAL_RTC_WAKEUPTIMER_GET_FLAG(&hrtc, RTC_FLAG_WUTWF) == RESET);
+		while (__HAL_RTC_WAKEUPTIMER_GET_FLAG(&hrtc, RTC_FLAG_WUTWF) == RESET)
+			;
 
 		/**
-     * make sure to clear the flags after checking the WUTWF.
-     * It takes 2 RTCCLK between the time the WUTE bit is disabled and the
-     * time the timer is disabled. The WUTWF bit somehow guarantee the system is stable
-     * Otherwise, when the timer is periodic with 1 Tick, it may generate an extra interrupt in between
-     * due to the autoreload feature
-     */
+		 * make sure to clear the flags after checking the WUTWF.
+		 * It takes 2 RTCCLK between the time the WUTE bit is disabled and the
+		 * time the timer is disabled. The WUTWF bit somehow guarantee the system is stable
+		 * Otherwise, when the timer is periodic with 1 Tick, it may generate an extra interrupt in between
+		 * due to the autoreload feature
+		 */
 		__HAL_RTC_WAKEUPTIMER_CLEAR_FLAG(&hrtc, RTC_FLAG_WUTF); /**<  Clear flag in RTC module */
 		__HAL_RTC_WAKEUPTIMER_EXTI_CLEAR_FLAG(); /**<  Clear flag in EXTI module */
 		HAL_NVIC_ClearPendingIRQ(CFG_HW_TS_RTC_WAKEUP_HANDLER_ID); /**<  Clear pending bit in NVIC */
@@ -388,8 +374,8 @@ static void RestartWakeupCounter(uint16_t Value)
 		MODIFY_REG(RTC->WUTR, RTC_WUTR_WUT, Value);
 
 		/**
-     * Update the value here after the WUTWF polling that may take some time
-     */
+		 * Update the value here after the WUTWF polling that may take some time
+		 */
 		SSRValueOnLastSetup = ReadRtcSsrValue();
 
 		__HAL_RTC_WAKEUPTIMER_ENABLE(&hrtc); /**<  Enable the Wakeup Timer */
@@ -415,35 +401,36 @@ static void RescheduleTimerList(void)
 	uint16_t time_elapsed;
 
 	/**
-   * The wakeuptimer is disabled now to reduce the time to poll the WUTWF
-   * FLAG when the new value will have to be written
-   */
+	 * The wakeuptimer is disabled now to reduce the time to poll the WUTWF
+	 * FLAG when the new value will have to be written
+	 */
 	if ((READ_BIT(RTC->CR, RTC_CR_WUTE) == (RTC_CR_WUTE)) == SET)
 	{
 		/**
-     * Wait for the flag to be back to 0 when the wakeup timer is enabled
-     */
-		while (__HAL_RTC_WAKEUPTIMER_GET_FLAG(&hrtc, RTC_FLAG_WUTWF) == SET);
+		 * Wait for the flag to be back to 0 when the wakeup timer is enabled
+		 */
+		while (__HAL_RTC_WAKEUPTIMER_GET_FLAG(&hrtc, RTC_FLAG_WUTWF) == SET)
+			;
 	}
 	__HAL_RTC_WAKEUPTIMER_DISABLE(&hrtc); /**<  Disable the Wakeup Timer */
 
 	localTimerID = CurrentRunningTimerID;
 
 	/**
-   * Calculate what will be the value to write in the wakeuptimer
-   */
+	 * Calculate what will be the value to write in the wakeuptimer
+	 */
 	timecountleft = aTimerContext[localTimerID].CountLeft;
 
 	/**
-   * Read how much has been counted
-   */
+	 * Read how much has been counted
+	 */
 	time_elapsed = ReturnTimeElapsed();
 
 	if (timecountleft < time_elapsed)
 	{
 		/**
-     * There is no tick left to count
-     */
+		 * There is no tick left to count
+		 */
 		wakeup_timer_value = 0;
 		WakeupTimerLimitation = WakeupTimerValue_LargeEnough;
 	}
@@ -452,8 +439,8 @@ static void RescheduleTimerList(void)
 		if (timecountleft > (time_elapsed + MaxWakeupTimerSetup))
 		{
 			/**
-       * The number of tick left is greater than the Wakeuptimer maximum value
-       */
+			 * The number of tick left is greater than the Wakeuptimer maximum value
+			 */
 			wakeup_timer_value = MaxWakeupTimerSetup;
 
 			WakeupTimerLimitation = WakeupTimerValue_Overpassed;
@@ -466,8 +453,8 @@ static void RescheduleTimerList(void)
 	}
 
 	/**
-   * update ticks left to be counted for each timer
-   */
+	 * update ticks left to be counted for each timer
+	 */
 	while (localTimerID != CFG_HW_TS_MAX_NBR_CONCURRENT_TIMER)
 	{
 		if (aTimerContext[localTimerID].CountLeft < time_elapsed)
@@ -482,8 +469,8 @@ static void RescheduleTimerList(void)
 	}
 
 	/**
-   * Write next count
-   */
+	 * Write next count
+	 */
 	RestartWakeupCounter(wakeup_timer_value);
 
 	return;
@@ -516,10 +503,10 @@ void HW_TS_RTC_Wakeup_Handler(void)
 	__HAL_RTC_WRITEPROTECTION_DISABLE(&hrtc);
 
 	/**
-   * Disable the Wakeup Timer
-   * This may speed up a bit the processing to wait the timer to be disabled
-   * The timer is still counting 2 RTCCLK
-   */
+	 * Disable the Wakeup Timer
+	 * This may speed up a bit the processing to wait the timer to be disabled
+	 * The timer is still counting 2 RTCCLK
+	 */
 	__HAL_RTC_WAKEUPTIMER_DISABLE(&hrtc);
 
 	local_current_running_timer_id = CurrentRunningTimerID;
@@ -530,12 +517,12 @@ void HW_TS_RTC_Wakeup_Handler(void)
 		timer_process_id = aTimerContext[local_current_running_timer_id].TimerProcessID;
 
 		/**
-     * It should be good to check whether the TimeElapsed is greater or not than the tick left to be counted
-     * However, due to the inaccuracy of the reading of the time elapsed, it may return there is 1 tick
-     * to be left whereas the count is over
-     * A more secure implementation has been done with a flag to state whereas the full count has been written
-     * in the wakeuptimer or not
-     */
+		 * It should be good to check whether the TimeElapsed is greater or not than the tick left to be counted
+		 * However, due to the inaccuracy of the reading of the time elapsed, it may return there is 1 tick
+		 * to be left whereas the count is over
+		 * A more secure implementation has been done with a flag to state whereas the full count has been written
+		 * in the wakeuptimer or not
+		 */
 		if (WakeupTimerLimitation != WakeupTimerValue_Overpassed)
 		{
 			if (aTimerContext[local_current_running_timer_id].TimerMode == hw_ts_Repeated)
@@ -573,19 +560,20 @@ void HW_TS_RTC_Wakeup_Handler(void)
 	else
 	{
 		/**
-     * We should never end up in this case
-     * However, if due to any bug in the timer server this is the case, the mistake may not impact the user.
-     * We could just clean the interrupt flag and get out from this unexpected interrupt
-     */
-		while (__HAL_RTC_WAKEUPTIMER_GET_FLAG(&hrtc, RTC_FLAG_WUTWF) == RESET);
+		 * We should never end up in this case
+		 * However, if due to any bug in the timer server this is the case, the mistake may not impact the user.
+		 * We could just clean the interrupt flag and get out from this unexpected interrupt
+		 */
+		while (__HAL_RTC_WAKEUPTIMER_GET_FLAG(&hrtc, RTC_FLAG_WUTWF) == RESET)
+			;
 
 		/**
-     * make sure to clear the flags after checking the WUTWF.
-     * It takes 2 RTCCLK between the time the WUTE bit is disabled and the
-     * time the timer is disabled. The WUTWF bit somehow guarantee the system is stable
-     * Otherwise, when the timer is periodic with 1 Tick, it may generate an extra interrupt in between
-     * due to the autoreload feature
-     */
+		 * make sure to clear the flags after checking the WUTWF.
+		 * It takes 2 RTCCLK between the time the WUTE bit is disabled and the
+		 * time the timer is disabled. The WUTWF bit somehow guarantee the system is stable
+		 * Otherwise, when the timer is periodic with 1 Tick, it may generate an extra interrupt in between
+		 * due to the autoreload feature
+		 */
 		__HAL_RTC_WAKEUPTIMER_CLEAR_FLAG(&hrtc, RTC_FLAG_WUTF); /**<  Clear flag in RTC module */
 		__HAL_RTC_WAKEUPTIMER_EXTI_CLEAR_FLAG(); /**<  Clear flag in EXTI module */
 
@@ -611,8 +599,8 @@ void HW_TS_Init(HW_TS_InitMode_t TimerInitMode, RTC_HandleTypeDef* phrtc)
 	SET_BIT(RTC->CR, RTC_CR_BYPSHAD);
 
 	/**
-   * Readout the user config
-   */
+	 * Readout the user config
+	 */
 	WakeupTimerDivider = (4 - ((uint32_t)(READ_BIT(RTC->CR, RTC_CR_WUCKSEL))));
 
 	AsynchPrescalerUserConfig = (uint8_t)(READ_BIT(RTC->PRER, RTC_PRER_PREDIV_A) >> (uint32_t)POSITION_VAL(RTC_PRER_PREDIV_A)) + 1;
@@ -620,9 +608,9 @@ void HW_TS_Init(HW_TS_InitMode_t TimerInitMode, RTC_HandleTypeDef* phrtc)
 	SynchPrescalerUserConfig = (uint16_t)(READ_BIT(RTC->PRER, RTC_PRER_PREDIV_S)) + 1;
 
 	/**
-   *  Margin is taken to avoid wrong calculation when the wrap around is there and some
-   *  application interrupts may have delayed the reading
-   */
+	 *  Margin is taken to avoid wrong calculation when the wrap around is there and some
+	 *  application interrupts may have delayed the reading
+	 */
 	localmaxwakeuptimersetup = ((((SynchPrescalerUserConfig - 1) * AsynchPrescalerUserConfig) - CFG_HW_TS_RTC_HANDLER_MAX_DELAY) >> WakeupTimerDivider);
 
 	if (localmaxwakeuptimersetup >= 0xFFFF)
@@ -635,8 +623,8 @@ void HW_TS_Init(HW_TS_InitMode_t TimerInitMode, RTC_HandleTypeDef* phrtc)
 	}
 
 	/**
-   * Configure EXTI module
-   */
+	 * Configure EXTI module
+	 */
 	LL_EXTI_EnableRisingTrig_0_31(RTC_EXTI_LINE_WAKEUPTIMER_EVENT);
 	LL_EXTI_EnableIT_0_31(RTC_EXTI_LINE_WAKEUPTIMER_EVENT);
 
@@ -646,8 +634,8 @@ void HW_TS_Init(HW_TS_InitMode_t TimerInitMode, RTC_HandleTypeDef* phrtc)
 		SSRValueOnLastSetup = SSR_FORBIDDEN_VALUE;
 
 		/**
-     * Initialize the timer server
-     */
+		 * Initialize the timer server
+		 */
 		for (loop = 0; loop < CFG_HW_TS_MAX_NBR_CONCURRENT_TIMER; loop++)
 		{
 			aTimerContext[loop].TimerIDStatus = TimerID_Free;
@@ -666,8 +654,8 @@ void HW_TS_Init(HW_TS_InitMode_t TimerInitMode, RTC_HandleTypeDef* phrtc)
 		if (__HAL_RTC_WAKEUPTIMER_GET_FLAG(&hrtc, RTC_FLAG_WUTF) != RESET)
 		{
 			/**
-       * Simulate that the Timer expired
-       */
+			 * Simulate that the Timer expired
+			 */
 			HAL_NVIC_SetPendingIRQ(CFG_HW_TS_RTC_WAKEUP_HANDLER_ID);
 		}
 	}
@@ -761,30 +749,32 @@ void HW_TS_Stop(uint8_t timer_id)
 		if (localcurrentrunningtimerid == CFG_HW_TS_MAX_NBR_CONCURRENT_TIMER)
 		{
 			/**
-       * List is empty
-       */
+			 * List is empty
+			 */
 
 			/**
-       * Disable the timer
-       */
+			 * Disable the timer
+			 */
 			if ((READ_BIT(RTC->CR, RTC_CR_WUTE) == (RTC_CR_WUTE)) == SET)
 			{
 				/**
-         * Wait for the flag to be back to 0 when the wakeup timer is enabled
-         */
-				while (__HAL_RTC_WAKEUPTIMER_GET_FLAG(&hrtc, RTC_FLAG_WUTWF) == SET);
+				 * Wait for the flag to be back to 0 when the wakeup timer is enabled
+				 */
+				while (__HAL_RTC_WAKEUPTIMER_GET_FLAG(&hrtc, RTC_FLAG_WUTWF) == SET)
+					;
 			}
 			__HAL_RTC_WAKEUPTIMER_DISABLE(&hrtc); /**<  Disable the Wakeup Timer */
 
-			while (__HAL_RTC_WAKEUPTIMER_GET_FLAG(&hrtc, RTC_FLAG_WUTWF) == RESET);
+			while (__HAL_RTC_WAKEUPTIMER_GET_FLAG(&hrtc, RTC_FLAG_WUTWF) == RESET)
+				;
 
 			/**
-       * make sure to clear the flags after checking the WUTWF.
-       * It takes 2 RTCCLK between the time the WUTE bit is disabled and the
-       * time the timer is disabled. The WUTWF bit somehow guarantee the system is stable
-       * Otherwise, when the timer is periodic with 1 Tick, it may generate an extra interrupt in between
-       * due to the autoreload feature
-       */
+			 * make sure to clear the flags after checking the WUTWF.
+			 * It takes 2 RTCCLK between the time the WUTE bit is disabled and the
+			 * time the timer is disabled. The WUTWF bit somehow guarantee the system is stable
+			 * Otherwise, when the timer is periodic with 1 Tick, it may generate an extra interrupt in between
+			 * due to the autoreload feature
+			 */
 			__HAL_RTC_WAKEUPTIMER_CLEAR_FLAG(&hrtc, RTC_FLAG_WUTF); /**<  Clear flag in RTC module */
 			__HAL_RTC_WAKEUPTIMER_EXTI_CLEAR_FLAG(); /**<  Clear flag in EXTI module */
 			HAL_NVIC_ClearPendingIRQ(CFG_HW_TS_RTC_WAKEUP_HANDLER_ID); /**<  Clear pending bit in NVIC */

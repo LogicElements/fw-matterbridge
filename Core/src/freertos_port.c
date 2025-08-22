@@ -1,30 +1,30 @@
 /* USER CODE BEGIN Header */
 /**
-  ******************************************************************************
-  * File Name          : freertos_port.c
-  * Description        : Custom porting of FreeRTOS functionalities
-  *
-  ******************************************************************************
-  * @attention
-  *
-  * Copyright (c) 2019-2021 STMicroelectronics.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * File Name          : freertos_port.c
+ * Description        : Custom porting of FreeRTOS functionalities
+ *
+ ******************************************************************************
+ * @attention
+ *
+ * Copyright (c) 2019-2021 STMicroelectronics.
+ * All rights reserved.
+ *
+ * This software is licensed under terms that can be found in the LICENSE file
+ * in the root directory of this software component.
+ * If no LICENSE file comes with this software, it is provided AS-IS.
+ *
+ ******************************************************************************
+ */
 /* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
 #include "app_common.h"
 
-#include "FreeRTOS.h"
-#include "task.h"
-#include "stm32_lpm.h"
 #include <limits.h>
+#include "FreeRTOS.h"
+#include "stm32_lpm.h"
+#include "task.h"
 
 /* Private typedef -----------------------------------------------------------*/
 typedef struct
@@ -37,36 +37,36 @@ typedef struct
 #ifndef configSYSTICK_CLOCK_HZ
 #define configSYSTICK_CLOCK_HZ configCPU_CLOCK_HZ
 /* Ensure the SysTick is clocked at the same frequency as the core. */
-#define portNVIC_SYSTICK_CLK_BIT        ( 1UL << 2UL )
+#define portNVIC_SYSTICK_CLK_BIT (1UL << 2UL)
 #else
 /* The way the SysTick is clocked is not modified in case it is not the same
-        as the core. */
-#define portNVIC_SYSTICK_CLK_BIT        ( 0 )
+		as the core. */
+#define portNVIC_SYSTICK_CLK_BIT (0)
 #endif
 
-#define CPU_CLOCK_KHZ   ( configCPU_CLOCK_HZ / 1000 )
+#define CPU_CLOCK_KHZ (configCPU_CLOCK_HZ / 1000)
 
 /* Constants required to manipulate the core.  Registers first... */
-#define portNVIC_SYSTICK_CTRL_REG               ( * ( ( volatile uint32_t * ) 0xe000e010 ) )
-#define portNVIC_SYSTICK_LOAD_REG               ( * ( ( volatile uint32_t * ) 0xe000e014 ) )
-#define portNVIC_SYSTICK_CURRENT_VALUE_REG      ( * ( ( volatile uint32_t * ) 0xe000e018 ) )
-#define portNVIC_SYSTICK_INT_BIT                ( 1UL << 1UL )
-#define portNVIC_SYSTICK_ENABLE_BIT             ( 1UL << 0UL )
-#define portNVIC_SYSTICK_COUNT_FLAG_BIT         ( 1UL << 16UL )
+#define portNVIC_SYSTICK_CTRL_REG (*((volatile uint32_t*)0xe000e010))
+#define portNVIC_SYSTICK_LOAD_REG (*((volatile uint32_t*)0xe000e014))
+#define portNVIC_SYSTICK_CURRENT_VALUE_REG (*((volatile uint32_t*)0xe000e018))
+#define portNVIC_SYSTICK_INT_BIT (1UL << 1UL)
+#define portNVIC_SYSTICK_ENABLE_BIT (1UL << 0UL)
+#define portNVIC_SYSTICK_COUNT_FLAG_BIT (1UL << 16UL)
 
 /* Private macros ------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 /*
  * The number of SysTick increments that make up one tick period.
  */
-#if ( CFG_LPM_SUPPORTED != 0)
+#if (CFG_LPM_SUPPORTED != 0)
 static uint32_t ulTimerCountsForOneTick;
 
 static LpTimerContext_t LpTimerContext;
 #endif
 /* Global variables ----------------------------------------------------------*/
 /* Private function prototypes -----------------------------------------------*/
-#if ( CFG_LPM_SUPPORTED != 0)
+#if (CFG_LPM_SUPPORTED != 0)
 static void LpTimerInit(void);
 static void LpTimerCb(void);
 static void LpTimerStart(uint32_t time_to_sleep);
@@ -87,39 +87,39 @@ void vPortSetupTimerInterrupt(void);
 void vPortSuppressTicksAndSleep(TickType_t xExpectedIdleTime)
 {
 	/* If low power is not used, do not stop the SysTick and continue execution */
-#if ( CFG_LPM_SUPPORTED != 0)
+#if (CFG_LPM_SUPPORTED != 0)
 	/**
-   * Although this is not documented as such, when xExpectedIdleTime = 0xFFFFFFFF = (~0),
-   * it likely means the system may enter low power for ever ( from a FreeRTOS point of view ).
-   * Otherwise, for a FreeRTOS tick set to 1ms, that would mean it is requested to wakeup in 8 years from now.
-   * When the system may enter low power mode for ever, FreeRTOS is not really interested to maintain a
-   * systick count and when the system exits from low power mode, there is no need to update the count with
-   * the time spent in low power mode
-   */
+	 * Although this is not documented as such, when xExpectedIdleTime = 0xFFFFFFFF = (~0),
+	 * it likely means the system may enter low power for ever ( from a FreeRTOS point of view ).
+	 * Otherwise, for a FreeRTOS tick set to 1ms, that would mean it is requested to wakeup in 8 years from now.
+	 * When the system may enter low power mode for ever, FreeRTOS is not really interested to maintain a
+	 * systick count and when the system exits from low power mode, there is no need to update the count with
+	 * the time spent in low power mode
+	 */
 	uint32_t ulCompleteTickPeriods;
 
 	/* Stop the SysTick  to avoid the interrupt to occur while in the critical section.
-   * Otherwise, this will prevent the device to enter low power mode
-   * At this time, an update of the systick will not be considered
-   *
-   */
+	 * Otherwise, this will prevent the device to enter low power mode
+	 * At this time, an update of the systick will not be considered
+	 *
+	 */
 	portNVIC_SYSTICK_CTRL_REG &= ~portNVIC_SYSTICK_ENABLE_BIT;
 
 	/* Enter a critical section but don't use the taskENTER_CRITICAL()
-        method as that will mask interrupts that should exit sleep mode. */
+		  method as that will mask interrupts that should exit sleep mode. */
 	__disable_irq();
 	__DSB();
 	__ISB();
 
 	/* If a context switch is pending or a task is waiting for the scheduler
-        to be unsuspended then abandon the low power entry. */
+		  to be unsuspended then abandon the low power entry. */
 	if (eTaskConfirmSleepModeStatus() == eAbortSleep)
 	{
 		/* Restart SysTick. */
 		portNVIC_SYSTICK_CTRL_REG |= portNVIC_SYSTICK_ENABLE_BIT;
 
 		/* Re-enable interrupts - see comments above __disable_interrupt()
-                call above. */
+					call above. */
 		__enable_irq();
 	}
 	else
@@ -138,10 +138,10 @@ void vPortSuppressTicksAndSleep(TickType_t xExpectedIdleTime)
 		if (xExpectedIdleTime != (~0))
 		{
 			/**
-       * Get the number of FreeRTOS ticks that has been suppressed
-       * In the current implementation, this shall be kept in critical section
-       * so that the timer server return the correct elapsed time
-       */
+			 * Get the number of FreeRTOS ticks that has been suppressed
+			 * In the current implementation, this shall be kept in critical section
+			 * so that the timer server return the correct elapsed time
+			 */
 			ulCompleteTickPeriods = LpGetElapsedTime();
 			vTaskStepTick(ulCompleteTickPeriods);
 		}
@@ -171,7 +171,7 @@ void vPortSuppressTicksAndSleep(TickType_t xExpectedIdleTime)
  * sleep mode, it is easier and simpler to go with a low power timer as soon as the tick need to be
  * suppressed.
  */
-#if ( CFG_LPM_SUPPORTED != 0)
+#if (CFG_LPM_SUPPORTED != 0)
 void vPortSetupTimerInterrupt(void)
 {
 	LpTimerInit();
@@ -196,7 +196,7 @@ void vPortSetupTimerInterrupt(void)
  * @param  None
  * @retval None
  */
-#if ( CFG_LPM_SUPPORTED != 0)
+#if (CFG_LPM_SUPPORTED != 0)
 static void LpTimerInit(void)
 {
 	(void)HW_TS_Create(CFG_TIM_PROC_ID_ISR, &(LpTimerContext.LpTimerFreeRTOS_Id), hw_ts_SingleShot, LpTimerCb);
@@ -211,12 +211,12 @@ static void LpTimerInit(void)
  * @param  None
  * @retval None
  */
-#if ( CFG_LPM_SUPPORTED != 0)
+#if (CFG_LPM_SUPPORTED != 0)
 static void LpTimerCb(void)
 {
 	/**
-   * Nothing to be done
-   */
+	 * Nothing to be done
+	 */
 
 	return;
 }
@@ -228,7 +228,7 @@ static void LpTimerCb(void)
  * @param  time_to_sleep : Number of FreeRTOS ticks
  * @retval None
  */
-#if ( CFG_LPM_SUPPORTED != 0)
+#if (CFG_LPM_SUPPORTED != 0)
 static void LpTimerStart(uint32_t time_to_sleep)
 {
 	uint64_t time;
@@ -248,11 +248,11 @@ static void LpTimerStart(uint32_t time_to_sleep)
 	HW_TS_Start(LpTimerContext.LpTimerFreeRTOS_Id, (uint32_t)time);
 
 	/**
-   * There might be other timers already running in the timer server that may elapse
-   * before this one.
-   * Store how long before the next event so that on wakeup, it will be possible to calculate
-   * how long the tick has been suppressed
-   */
+	 * There might be other timers already running in the timer server that may elapse
+	 * before this one.
+	 * Store how long before the next event so that on wakeup, it will be possible to calculate
+	 * how long the tick has been suppressed
+	 */
 	LpTimerContext.LpTimeLeftOnEntry = HW_TS_RTC_ReadLeftTicksToCount();
 
 	return;
@@ -265,14 +265,15 @@ static void LpTimerStart(uint32_t time_to_sleep)
  * @param  None
  * @retval None
  */
-#if ( CFG_LPM_SUPPORTED != 0)
+#if (CFG_LPM_SUPPORTED != 0)
 static void LpEnter(void)
 {
 
-#if ( CFG_LPM_SUPPORTED == 1)
-UTIL_LPM_EnterLowPower();
+
+#if (CFG_LPM_SUPPORTED == 1)
+	UTIL_LPM_EnterLowPower();
 #endif
-return;
+	return;
 }
 #endif
 
@@ -282,7 +283,7 @@ return;
  * @param  None
  * @retval The number of tick rate (FreeRTOS tick)
  */
-#if ( CFG_LPM_SUPPORTED != 0)
+#if (CFG_LPM_SUPPORTED != 0)
 static uint32_t LpGetElapsedTime(void)
 {
 	uint64_t val_ticks, time_ps;
@@ -293,12 +294,12 @@ static uint32_t LpGetElapsedTime(void)
 	time_ps = (uint64_t)((CFG_TS_TICK_VAL_PS) * (uint64_t)(LpTimerContext.LpTimeLeftOnEntry - LpTimeLeftOnExit));
 
 	/* time_ps can be less than 1 RTOS tick in following situations
-   * a) MCU didn't go to STOP2 due to wake-up unrelated to Timer Server or woke up from STOP2 very shortly after.
-   *    Advancing RTOS clock by 1 FreeRTOS tick doesn't hurt in this case.
-   * b) vPortSuppressTicksAndSleep(xExpectedIdleTime) was called with xExpectedIdleTime = 2 which is minimum value defined by configEXPECTED_IDLE_TIME_BEFORE_SLEEP.
-   *    The xExpectedIdleTime is decremented by one RTOS tick to wake-up in advance.
-   *    Ex: RTOS tick is 1ms, the timer Server wakes the MCU in ~977 us. RTOS clock should be advanced by 1 ms.
-   * */
+	 * a) MCU didn't go to STOP2 due to wake-up unrelated to Timer Server or woke up from STOP2 very shortly after.
+	 *    Advancing RTOS clock by 1 FreeRTOS tick doesn't hurt in this case.
+	 * b) vPortSuppressTicksAndSleep(xExpectedIdleTime) was called with xExpectedIdleTime = 2 which is minimum value defined by configEXPECTED_IDLE_TIME_BEFORE_SLEEP.
+	 *    The xExpectedIdleTime is decremented by one RTOS tick to wake-up in advance.
+	 *    Ex: RTOS tick is 1ms, the timer Server wakes the MCU in ~977 us. RTOS clock should be advanced by 1 ms.
+	 * */
 	if (time_ps <= (1e12 / configTICK_RATE_HZ)) /* time_ps < RTOS tick */
 	{
 		val_ticks = 1;
@@ -311,11 +312,11 @@ static uint32_t LpGetElapsedTime(void)
 	}
 
 	/**
-   * The system may have been out from another reason than the timer
-   * Stop the timer after the elapsed time is calculated other wise, HW_TS_RTC_ReadLeftTicksToCount()
-   * may return 0xFFFF ( TIMER LIST EMPTY )
-   * It does not hurt stopping a timer that exists but is not running.
-   */
+	 * The system may have been out from another reason than the timer
+	 * Stop the timer after the elapsed time is calculated other wise, HW_TS_RTC_ReadLeftTicksToCount()
+	 * may return 0xFFFF ( TIMER LIST EMPTY )
+	 * It does not hurt stopping a timer that exists but is not running.
+	 */
 	HW_TS_Stop(LpTimerContext.LpTimerFreeRTOS_Id);
 
 	return (uint32_t)val_ticks;

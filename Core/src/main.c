@@ -1,20 +1,20 @@
 /* USER CODE BEGIN Header */
 /**
-  ******************************************************************************
-  * @file           : main.c
-  * @brief          : Main program body
-  ******************************************************************************
-  * @attention
-  *
-  * Copyright (c) 2023 STMicroelectronics.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file           : main.c
+ * @brief          : Main program body
+ ******************************************************************************
+ * @attention
+ *
+ * Copyright (c) 2023 STMicroelectronics.
+ * All rights reserved.
+ *
+ * This software is licensed under terms that can be found in the LICENSE file
+ * in the root directory of this software component.
+ * If no LICENSE file comes with this software, it is provided AS-IS.
+ *
+ ******************************************************************************
+ */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
@@ -22,9 +22,9 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "app_entry.h"
-#include "app_conf.h"
 #include "LED.h"
+#include "app_conf.h"
+#include "app_entry.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -55,11 +55,7 @@ TIM_HandleTypeDef htim1;
 
 /* Definitions for defaultTask */
 osThreadId_t defaultTaskHandle;
-const osThreadAttr_t defaultTask_attributes = {
-	.name = "defaultTask",
-	.priority = (osPriority_t)osPriorityNormal,
-	.stack_size = 256 * 4
-};
+const osThreadAttr_t defaultTask_attributes = {.name = "defaultTask", .priority = (osPriority_t)osPriorityNormal, .stack_size = 256 * 4};
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -73,7 +69,7 @@ static void MX_RTC_Init(void);
 static void MX_RNG_Init(void);
 static void MX_DMA_Init(void);
 static void MX_TIM1_Init(void);
-#if ((ENABLE_IWDG_SUPPORT ==1) && (ENABLE_IWDG_INIT == 1))
+#if ((ENABLE_IWDG_SUPPORT == 1) && (ENABLE_IWDG_INIT == 1))
 static void MX_IWDG_Init(void);
 #endif /* ((ENABLE_IWDG_SUPPORT ==1) && (ENABLE_IWDG_INIT == 1)) */
 static void MX_RF_Init(void);
@@ -89,9 +85,9 @@ void StartDefaultTask(void* argument);
 /* USER CODE END 0 */
 
 /**
-  * @brief  The application entry point.
-  * @retval int
-  */
+ * @brief  The application entry point.
+ * @retval int
+ */
 int main(void)
 {
 	/* USER CODE BEGIN 1 */
@@ -167,7 +163,7 @@ int main(void)
 	defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
 
 	/* USER CODE BEGIN RTOS_THREADS */
-#endif /* (ENABLE_DEFAULTTASK == 1) */ 
+#endif /* (ENABLE_DEFAULTTASK == 1) */
 	/* add threads, ... */
 	APPE_Init();
 	/* USER CODE END RTOS_THREADS */
@@ -193,27 +189,27 @@ int main(void)
 }
 
 /**
-  * @brief System Clock Configuration
-  * @retval None
-  */
+ * @brief System Clock Configuration
+ * @retval None
+ */
 void SystemClock_Config(void)
 {
 	RCC_OscInitTypeDef RCC_OscInitStruct = {0};
 	RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
 
 	/** Configure LSE Drive Capability
-  */
+	 */
 	HAL_PWR_EnableBkUpAccess();
 	__HAL_RCC_LSEDRIVE_CONFIG(RCC_LSEDRIVE_MEDIUMHIGH);
 
 	/** Configure the main internal regulator output voltage
-  */
+	 */
 	__HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
 
 	/** Initializes the RCC Oscillators according to the specified parameters
-  * in the RCC_OscInitTypeDef structure.
-  */
-	RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI48 | RCC_OSCILLATORTYPE_HSI		| RCC_OSCILLATORTYPE_LSI1 | RCC_OSCILLATORTYPE_HSE		| RCC_OSCILLATORTYPE_LSE;
+	 * in the RCC_OscInitTypeDef structure.
+	 */
+	RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI48 | RCC_OSCILLATORTYPE_HSI | RCC_OSCILLATORTYPE_LSI1 | RCC_OSCILLATORTYPE_HSE | RCC_OSCILLATORTYPE_LSE;
 	RCC_OscInitStruct.HSEState = RCC_HSE_ON;
 	RCC_OscInitStruct.LSEState = RCC_LSE_ON;
 	RCC_OscInitStruct.HSIState = RCC_HSI_ON;
@@ -233,8 +229,8 @@ void SystemClock_Config(void)
 	}
 
 	/** Configure the SYSCLKSource, HCLK, PCLK1 and PCLK2 clocks dividers
-  */
-	RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK4 | RCC_CLOCKTYPE_HCLK2		| RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK		| RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
+	 */
+	RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK4 | RCC_CLOCKTYPE_HCLK2 | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
 	RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
 	RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
 	RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
@@ -249,15 +245,15 @@ void SystemClock_Config(void)
 }
 
 /**
-  * @brief Peripherals Common Clock Configuration
-  * @retval None
-  */
+ * @brief Peripherals Common Clock Configuration
+ * @retval None
+ */
 void PeriphCommonClock_Config(void)
 {
 	RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
 
 	/** Initializes the peripherals clock
-  */
+	 */
 	PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_SMPS | RCC_PERIPHCLK_RFWAKEUP;
 	PeriphClkInitStruct.RFWakeUpClockSelection = RCC_RFWKPCLKSOURCE_LSE;
 	PeriphClkInitStruct.SmpsClockSelection = RCC_SMPSCLKSOURCE_HSE;
@@ -273,10 +269,10 @@ void PeriphCommonClock_Config(void)
 }
 
 /**
-  * @brief IPCC Initialization Function
-  * @param None
-  * @retval None
-  */
+ * @brief IPCC Initialization Function
+ * @param None
+ * @retval None
+ */
 static void MX_IPCC_Init(void)
 {
 	/* USER CODE BEGIN IPCC_Init 0 */
@@ -297,10 +293,10 @@ static void MX_IPCC_Init(void)
 }
 
 /**
-  * @brief IWDG Initialization Function
-  * @param None
-  * @retval None
-  */
+ * @brief IWDG Initialization Function
+ * @param None
+ * @retval None
+ */
 static void MX_IWDG_Init(void)
 {
 	/* USER CODE BEGIN IWDG_Init 0 */
@@ -316,7 +312,7 @@ static void MX_IWDG_Init(void)
 	hiwdg.Init.Reload = 3125;
 	if (HAL_IWDG_Init(&hiwdg) != HAL_OK)
 	{
-	  Error_Handler();
+		Error_Handler();
 	}
 	/* USER CODE BEGIN IWDG_Init 2 */
 
@@ -324,10 +320,10 @@ static void MX_IWDG_Init(void)
 }
 
 /**
-  * @brief RF Initialization Function
-  * @param None
-  * @retval None
-  */
+ * @brief RF Initialization Function
+ * @param None
+ * @retval None
+ */
 static void MX_RF_Init(void)
 {
 	/* USER CODE BEGIN RF_Init 0 */
@@ -343,10 +339,10 @@ static void MX_RF_Init(void)
 }
 
 /**
-  * @brief RNG Initialization Function
-  * @param None
-  * @retval None
-  */
+ * @brief RNG Initialization Function
+ * @param None
+ * @retval None
+ */
 static void MX_RNG_Init(void)
 {
 	/* USER CODE BEGIN RNG_Init 0 */
@@ -368,10 +364,10 @@ static void MX_RNG_Init(void)
 }
 
 /**
-  * @brief RTC Initialization Function
-  * @param None
-  * @retval None
-  */
+ * @brief RTC Initialization Function
+ * @param None
+ * @retval None
+ */
 static void MX_RTC_Init(void)
 {
 	/* USER CODE BEGIN RTC_Init 0 */
@@ -383,7 +379,7 @@ static void MX_RTC_Init(void)
 	/* USER CODE END RTC_Init 1 */
 
 	/** Initialize RTC Only
-  */
+	 */
 	hrtc.Instance = RTC;
 	hrtc.Init.HourFormat = RTC_HOURFORMAT_24;
 	hrtc.Init.AsynchPrediv = 15;
@@ -398,7 +394,7 @@ static void MX_RTC_Init(void)
 	}
 
 	/** Enable the WakeUp
-  */
+	 */
 	if (HAL_RTCEx_SetWakeUpTimer_IT(&hrtc, 0, RTC_WAKEUPCLOCK_RTCCLK_DIV16) != HAL_OK)
 	{
 		Error_Handler();
@@ -409,10 +405,10 @@ static void MX_RTC_Init(void)
 }
 
 /**
-  * @brief TIM1 Initialization Function
-  * @param None
-  * @retval None
-  */
+ * @brief TIM1 Initialization Function
+ * @param None
+ * @retval None
+ */
 static void MX_TIM1_Init(void)
 {
 	/* USER CODE BEGIN TIM1_Init 0 */
@@ -489,8 +485,8 @@ static void MX_TIM1_Init(void)
 }
 
 /**
-  * Enable DMA controller clock
-  */
+ * Enable DMA controller clock
+ */
 static void MX_DMA_Init(void)
 {
 	/* DMA controller clock enable */
@@ -504,10 +500,10 @@ static void MX_DMA_Init(void)
 }
 
 /**
-  * @brief GPIO Initialization Function
-  * @param None
-  * @retval None
-  */
+ * @brief GPIO Initialization Function
+ * @param None
+ * @retval None
+ */
 static void MX_GPIO_Init(void)
 {
 	GPIO_InitTypeDef GPIO_InitStruct = {0};
@@ -523,17 +519,17 @@ static void MX_GPIO_Init(void)
 	__HAL_RCC_GPIOE_CLK_ENABLE();
 
 	/*Configure GPIO pins : PA2 PA0 PA10 PA12
-                           PA8 PA9 PA6 PA5
-                           PA4 */
+						   PA8 PA9 PA6 PA5
+						   PA4 */
 	GPIO_InitStruct.Pin = GPIO_PIN_2 | GPIO_PIN_0 | GPIO_PIN_10 | GPIO_PIN_12 | GPIO_PIN_8 | GPIO_PIN_9 | GPIO_PIN_6 | GPIO_PIN_5 | GPIO_PIN_4;
 	GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
 	GPIO_InitStruct.Pull = GPIO_NOPULL;
 	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
 	/*Configure GPIO pins : PC3 PC2 PC1 PC0
-                           PC10 PC11 PC12 PC6
-                           PC13 PC5 PC4 PC9
-                           PC7 PC8 */
+						   PC10 PC11 PC12 PC6
+						   PC13 PC5 PC4 PC9
+						   PC7 PC8 */
 	GPIO_InitStruct.Pin = GPIO_PIN_3 | GPIO_PIN_2 | GPIO_PIN_1 | GPIO_PIN_0 | GPIO_PIN_10 | GPIO_PIN_11 | GPIO_PIN_12 | GPIO_PIN_6 | GPIO_PIN_13 | GPIO_PIN_5 | GPIO_PIN_4 | GPIO_PIN_9 | GPIO_PIN_7 | GPIO_PIN_8;
 	GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
 	GPIO_InitStruct.Pull = GPIO_NOPULL;
@@ -546,23 +542,23 @@ static void MX_GPIO_Init(void)
 	HAL_GPIO_Init(GPIOH, &GPIO_InitStruct);
 
 	/*Configure GPIO pins : PB8 PB5 PB14 PB15
-                           PB12 PB1 PB0 PB10
-                           PB2 */
+						   PB12 PB1 PB0 PB10
+						   PB2 */
 	GPIO_InitStruct.Pin = GPIO_PIN_8 | GPIO_PIN_5 | GPIO_PIN_14 | GPIO_PIN_15 | GPIO_PIN_12 | GPIO_PIN_1 | GPIO_PIN_0 | GPIO_PIN_10 | GPIO_PIN_2;
 	GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
 	GPIO_InitStruct.Pull = GPIO_NOPULL;
 	HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
 	/*Configure GPIO pins : PD0 PD1 PD14 PD13
-                           PD12 PD2 PD4 PD9
-                           PD8 PD15 PD10 PD11 */
+						   PD12 PD2 PD4 PD9
+						   PD8 PD15 PD10 PD11 */
 	GPIO_InitStruct.Pin = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_14 | GPIO_PIN_13 | GPIO_PIN_12 | GPIO_PIN_2 | GPIO_PIN_4 | GPIO_PIN_9 | GPIO_PIN_8 | GPIO_PIN_15 | GPIO_PIN_10 | GPIO_PIN_11;
 	GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
 	GPIO_InitStruct.Pull = GPIO_NOPULL;
 	HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
 	/*Configure GPIO pins : PE4 PE1 PE3 PE2
-                           PE0 */
+						   PE0 */
 	GPIO_InitStruct.Pin = GPIO_PIN_4 | GPIO_PIN_1 | GPIO_PIN_3 | GPIO_PIN_2 | GPIO_PIN_0;
 	GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
 	GPIO_InitStruct.Pull = GPIO_NOPULL;
@@ -574,23 +570,18 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN 4 */
 
-void RTOS_AppConfigureTimerForRuntimeStats()
-{
-}
+void RTOS_AppConfigureTimerForRuntimeStats() {}
 
-uint32_t RTOS_AppGetRuntimeCounterValueFromISR()
-{
-	return HAL_GetTick();
-}
+uint32_t RTOS_AppGetRuntimeCounterValueFromISR() { return HAL_GetTick(); }
 
 /* USER CODE END 4 */
 
 /* USER CODE BEGIN Header_StartDefaultTask */
 /**
-  * @brief  Function implementing the defaultTask thread.
-  * @param  argument: Not used
-  * @retval None
-  */
+ * @brief  Function implementing the defaultTask thread.
+ * @param  argument: Not used
+ * @retval None
+ */
 /* USER CODE END Header_StartDefaultTask */
 void StartDefaultTask(void* argument)
 {
@@ -604,13 +595,13 @@ void StartDefaultTask(void* argument)
 }
 
 /**
-  * @brief  Period elapsed callback in non blocking mode
-  * @note   This function is called  when TIM17 interrupt took place, inside
-  * HAL_TIM_IRQHandler(). It makes a direct call to HAL_IncTick() to increment
-  * a global variable "uwTick" used as application time base.
-  * @param  htim : TIM handle
-  * @retval None
-  */
+ * @brief  Period elapsed callback in non blocking mode
+ * @note   This function is called  when TIM17 interrupt took place, inside
+ * HAL_TIM_IRQHandler(). It makes a direct call to HAL_IncTick() to increment
+ * a global variable "uwTick" used as application time base.
+ * @param  htim : TIM handle
+ * @retval None
+ */
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim)
 {
 	/* USER CODE BEGIN Callback 0 */
@@ -626,9 +617,9 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim)
 }
 
 /**
-  * @brief  This function is executed in case of error occurrence.
-  * @retval None
-  */
+ * @brief  This function is executed in case of error occurrence.
+ * @retval None
+ */
 void Error_Handler(void)
 {
 	/* USER CODE BEGIN Error_Handler_Debug */
@@ -640,19 +631,19 @@ void Error_Handler(void)
 	/* USER CODE END Error_Handler_Debug */
 }
 
-#ifdef  USE_FULL_ASSERT
+#ifdef USE_FULL_ASSERT
 /**
-  * @brief  Reports the name of the source file and the source line number
-  *         where the assert_param error has occurred.
-  * @param  file: pointer to the source file name
-  * @param  line: assert_param error line source number
-  * @retval None
-  */
+ * @brief  Reports the name of the source file and the source line number
+ *         where the assert_param error has occurred.
+ * @param  file: pointer to the source file name
+ * @param  line: assert_param error line source number
+ * @retval None
+ */
 void assert_failed(uint8_t* file, uint32_t line)
 {
 	/* USER CODE BEGIN 6 */
 	/* User can add his own implementation to report the file name and line number,
-     ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
+	 ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
 	/* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */

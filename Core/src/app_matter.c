@@ -19,14 +19,14 @@
 /* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
-#include "app_common.h"
-#include "../inc/app_conf.h"
-#include "app_entry.h"
-#include "dbg_trace.h"
-#include "ble.h"
 #include "app_matter.h"
+#include "app_common.h"
+#include "app_conf.h"
+#include "app_entry.h"
+#include "ble.h"
 #include "cmsis_os.h"
 #include "custom_stm.h"
+#include "dbg_trace.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -73,12 +73,7 @@ typedef struct
  * START of Section BLE_APP_CONTEXT
  */
 
-PLACE_IN_SECTION (
-
-
-"BLE_APP_CONTEXT"
-)
-static P2P_Server_App_Context_t P2P_Server_App_Context;
+PLACE_IN_SECTION("BLE_APP_CONTEXT") static P2P_Server_App_Context_t P2P_Server_App_Context;
 
 BLEReceiveCallback BLEReceiveCb = NULL;
 BLETXCharCCCDWriteCallback BLETXCharCCCDWriteCb = NULL;
@@ -95,30 +90,15 @@ BLEDAckCallback BLEAckCb = NULL;
 /* USER CODE BEGIN PFP */
 /* USER CODE END PFP */
 
-void APP_MATTER_BLE_Set_Receive_Callback(BLEReceiveCallback aCallback)
-{
-	BLEReceiveCb = aCallback;
-}
+void APP_MATTER_BLE_Set_Receive_Callback(BLEReceiveCallback aCallback) { BLEReceiveCb = aCallback; }
 
-void APP_MATTER_BLE_Set_TXCharCCCDWrite_Callback(BLETXCharCCCDWriteCallback aCallback)
-{
-	BLETXCharCCCDWriteCb = aCallback;
-}
+void APP_MATTER_BLE_Set_TXCharCCCDWrite_Callback(BLETXCharCCCDWriteCallback aCallback) { BLETXCharCCCDWriteCb = aCallback; }
 
-void APP_MATTER_BLE_Set_Connection_Callback(BLEConnectionCallback aCallback)
-{
-	BLEConnectionCb = aCallback;
-}
+void APP_MATTER_BLE_Set_Connection_Callback(BLEConnectionCallback aCallback) { BLEConnectionCb = aCallback; }
 
-void APP_MATTER_BLE_Set_Disconnection_Callback(BLEDisconnectionCallback aCallback)
-{
-	BLEDisconnectionCb = aCallback;
-}
+void APP_MATTER_BLE_Set_Disconnection_Callback(BLEDisconnectionCallback aCallback) { BLEDisconnectionCb = aCallback; }
 
-void APP_MATTER_BLE_Set_Ack_After_Indicate_Callback(BLEDAckCallback aCallback)
-{
-	BLEAckCb = aCallback;
-}
+void APP_MATTER_BLE_Set_Ack_After_Indicate_Callback(BLEDAckCallback aCallback) { BLEAckCb = aCallback; }
 
 /* Functions Definition ------------------------------------------------------*/
 void APP_MATTER_Notification(MATTER_App_Notification_evt_t* pNotification)
@@ -128,8 +108,8 @@ void APP_MATTER_Notification(MATTER_App_Notification_evt_t* pNotification)
 	/* USER CODE END APP_MATTER_Notification */
 	switch (pNotification->Evt_Opcode)
 	{
-	/* USER CODE BEGIN APP_MATTER_Notification */
-	/* USER CODE END APP_MATTER_Notification */
+		/* USER CODE BEGIN APP_MATTER_Notification */
+		/* USER CODE END APP_MATTER_Notification */
 
 	case MATTER_STM_CONN_HANDLE_EVT:
 		/* USER CODE BEGIN PEER_CONN_HANDLE_EVT */
@@ -171,13 +151,12 @@ void APP_MATTER_Notification(MATTER_App_Notification_evt_t* pNotification)
 		/* USER CODE END P2PS_STM_NOTIFY_DISABLED_EVT */
 		break;
 
-	case MATTER_STM_WRITE_EVT:
-		;
+	case MATTER_STM_WRITE_EVT:;
 		BLE_Matter_RX Message;
 		Message.Length = pNotification->DataTransfered.Length;
 		Message.Payload = pNotification->DataTransfered.pPayload;
 		Message.connid = pNotification->ConnectionHandle;
-		BLEReceiveCb(&Message); //call matter callback
+		BLEReceiveCb(&Message); // call matter callback
 		/* USER CODE BEGIN MATTER_STM_WRITE_EVT */
 
 		/* USER CODE END MATTER_STM_WRITE_EVT */

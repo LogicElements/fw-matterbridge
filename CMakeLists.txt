@@ -44,6 +44,7 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
 		"Application/src/LED.c"
 		"Application/src/stm32_factorydata.c"
 		"Application/src/ZclCallbacks.cpp"
+		"Application/src/LED_Animation.cpp"
 
 		"Application/codegen/zap-generated/app/callback-stub.cpp"
 		"Application/codegen/zap-generated/app/cluster-init-callback.cpp"
@@ -82,7 +83,6 @@ target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
 		"Application/inc"
 		"Core/inc"
 		"Library/Drivers/BSP/STM32WB5MM-DK"
-#		Library/Drivers/BSP/STM32WB5MM-DK/stm32wb5mm_dk_qspi.h
 )
 
 target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC

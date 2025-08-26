@@ -3,10 +3,12 @@
 
 #ifdef __cplusplus
 extern "C" {
+
+
+
 #endif
 
 #include <stdint.h>
-#include "stm32wbxx_hal.h"
 
 typedef struct Color
 {
@@ -17,7 +19,9 @@ typedef struct Color
 
 void LED_Init(void);
 
-void LED_Send(TIM_HandleTypeDef* tim);
+void LED_Send();
+
+void LED_Reset();
 
 void LED_SetColorRGB(uint8_t led, uint8_t r, uint8_t g, uint8_t b);
 

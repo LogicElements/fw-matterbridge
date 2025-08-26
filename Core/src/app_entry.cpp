@@ -35,6 +35,8 @@
 #include "AppTask.h"
 #include "STM32FreeRtosHooks.h"
 #include "flash_wb.h"
+#include "LED.h"
+#include "LED_Animation.h"
 #include "otp.h"
 #include "stm_ext_flash.h"
 
@@ -69,15 +71,46 @@ size_t DbgTraceWrite(int handle, const unsigned char* buf, size_t bufSize);
 osMutexId_t MtxShciId;
 osSemaphoreId_t SemShciId;
 osThreadId_t ShciUserEvtProcessId;
+osThreadId_t OsPushButtonProcessId;
+
+LED ledPower(0, LED::Effect::Breathing, 2500, 0, 100, 0);
+LED ledCommissioning(1, LED::Effect::Off, 1000, 0, 0, 100);
+LED ledIdentifier(2, LED::Effect::Off, 1000, 0, 190, 90);
 
 #if (ENABLE_IWDG_SUPPORT == 1)
 osThreadId_t OsIWDSBSFUId;
 #endif /* (ENABLE_IWDG_SUPPORT == 1) */
 
-const osThreadAttr_t ShciUserEvtProcess_attr = {.name = CFG_SHCI_USER_EVT_PROCESS_NAME, .attr_bits = CFG_SHCI_USER_EVT_PROCESS_ATTR_BITS, .cb_mem = CFG_SHCI_USER_EVT_PROCESS_CB_MEM, .cb_size = CFG_SHCI_USER_EVT_PROCESS_CB_SIZE, .stack_mem = CFG_SHCI_USER_EVT_PROCESS_STACK_MEM, .stack_size = CFG_SHCI_USER_EVT_PROCESS_STACK_SIZE, .priority = CFG_SHCI_USER_EVT_PROCESS_PRIORITY};
+const osThreadAttr_t ShciUserEvtProcess_attr = {
+	.name = CFG_SHCI_USER_EVT_PROCESS_NAME,
+	.attr_bits = CFG_SHCI_USER_EVT_PROCESS_ATTR_BITS,
+	.cb_mem = CFG_SHCI_USER_EVT_PROCESS_CB_MEM,
+	.cb_size = CFG_SHCI_USER_EVT_PROCESS_CB_SIZE,
+	.stack_mem = CFG_SHCI_USER_EVT_PROCESS_STACK_MEM,
+	.stack_size = CFG_SHCI_USER_EVT_PROCESS_STACK_SIZE,
+	.priority = CFG_SHCI_USER_EVT_PROCESS_PRIORITY
+};
+
+const osThreadAttr_t PushButtonProcess_attr = {
+	.name = CFG_PUSH_BUTTON_EVT_PROCESS_NAME,
+	.attr_bits = CFG_PUSH_BUTTON_EVT_PROCESS_ATTR_BITS,
+	.cb_mem = CFG_PUSH_BUTTON_EVT_PROCESS_CB_MEM,
+	.cb_size = CFG_PUSH_BUTTON_EVT_PROCESS_CB_SIZE,
+	.stack_mem = CFG_PUSH_BUTTON_EVT_PROCESS_STACK_MEM,
+	.stack_size = CFG_PUSH_BUTTON_EVT_PROCESS_STACK_SIZE,
+	.priority = CFG_PUSH_BUTTON_EVT_PROCESS_PRIORITY
+};
 
 #if (ENABLE_IWDG_SUPPORT == 1)
-const osThreadAttr_t IWDSBSFU_attr = {.name = CFG_IWD_SBSFU_EVT_PROCESS_NAME, .attr_bits = CFG_IWD_SBSFU_EVT_PROCESS_ATTR_BITS, .cb_mem = CFG_IWD_SBSFU_EVT_PROCESS_CB_MEM, .cb_size = CFG_IWD_SBSFU_EVT_PROCESS_CB_SIZE, .stack_mem = CFG_IWD_SBSFU_EVT_PROCESS_STACK_MEM, .stack_size = CFG_IWD_SBSFU_EVT_PROCESS_STACK_SIZE, .priority = CFG_IWD_SBSFU_EVT_PROCESS_PRIORITY};
+const osThreadAttr_t IWDSBSFU_attr = {
+	.name = CFG_IWD_SBSFU_EVT_PROCESS_NAME,
+	.attr_bits = CFG_IWD_SBSFU_EVT_PROCESS_ATTR_BITS,
+	.cb_mem = CFG_IWD_SBSFU_EVT_PROCESS_CB_MEM,
+	.cb_size = CFG_IWD_SBSFU_EVT_PROCESS_CB_SIZE,
+	.stack_mem = CFG_IWD_SBSFU_EVT_PROCESS_STACK_MEM,
+	.stack_size = CFG_IWD_SBSFU_EVT_PROCESS_STACK_SIZE,
+	.priority = CFG_IWD_SBSFU_EVT_PROCESS_PRIORITY
+};
 #endif /* (ENABLE_IWDG_SUPPORT == 1) */
 
 /* USER CODE END GFP */
@@ -104,6 +137,7 @@ static void APPE_SysEvtError(SCHI_SystemErrCode_t ErrorCode);
 static void Init_Debug(void);
 
 static void ShciUserEvtProcess(void* argument);
+static void LEDProcess(void* argument);
 
 #if (ENABLE_IWDG_SUPPORT == 1)
 static void IWDSBSFUEvtProcess(void* argument);
@@ -196,7 +230,7 @@ void APPE_Init(void)
 	 */
 	UTIL_LPM_SetOffMode(1 << CFG_LPM_APP, UTIL_LPM_DISABLE);
 
-	// OsPushButtonProcessId = osThreadNew(PushButtonEvtProcess, NULL, &PushButtonProcess_attr);
+	OsPushButtonProcessId = osThreadNew(LEDProcess, NULL, &PushButtonProcess_attr);
 #if (ENABLE_IWDG_SUPPORT == 1)
 	OsIWDSBSFUId = osThreadNew(IWDSBSFUEvtProcess, NULL, &IWDSBSFU_attr);
 #endif /* (ENABLE_IWDG_SUPPORT == 1) */
@@ -442,16 +476,16 @@ static void APPE_SysStatusNot(SHCI_TL_CmdStatus_t status)
 {
 	switch (status)
 	{
-	case SHCI_TL_CmdBusy:
-		osMutexAcquire(MtxShciId, osWaitForever);
-		break;
+		case SHCI_TL_CmdBusy:
+			osMutexAcquire(MtxShciId, osWaitForever);
+			break;
 
-	case SHCI_TL_CmdAvailable:
-		osMutexRelease(MtxShciId);
-		break;
+		case SHCI_TL_CmdAvailable:
+			osMutexRelease(MtxShciId);
+			break;
 
-	default:
-		break;
+		default:
+			break;
 	}
 	return;
 }
@@ -472,16 +506,16 @@ static void APPE_SysUserEvtRx(void* pPayload)
 
 	switch (p_sys_event->subevtcode)
 	{
-	case SHCI_SUB_EVT_CODE_READY:
-		APPE_SysEvtReadyProcessing();
-		break;
+		case SHCI_SUB_EVT_CODE_READY:
+			APPE_SysEvtReadyProcessing();
+			break;
 
-	case SHCI_SUB_EVT_ERROR_NOTIF:
-		APPE_SysEvtError((SCHI_SystemErrCode_t)(p_sys_event->payload[0]));
-		break;
+		case SHCI_SUB_EVT_ERROR_NOTIF:
+			APPE_SysEvtError((SCHI_SystemErrCode_t)(p_sys_event->payload[0]));
+			break;
 
-	default:
-		break;
+		default:
+			break;
 	}
 	return;
 }
@@ -496,17 +530,17 @@ static void APPE_SysEvtError(SCHI_SystemErrCode_t ErrorCode)
 {
 	switch (ErrorCode)
 	{
-	case ERR_THREAD_LLD_FATAL_ERROR:
-		APP_DBG("** ERR_THREAD : LLD_FATAL_ERROR \n");
-		break;
+		case ERR_THREAD_LLD_FATAL_ERROR:
+			APP_DBG("** ERR_THREAD : LLD_FATAL_ERROR \n");
+			break;
 
-	case ERR_THREAD_UNKNOWN_CMD:
-		APP_DBG("** ERR_THREAD : UNKNOWN_CMD \n");
-		break;
+		case ERR_THREAD_UNKNOWN_CMD:
+			APP_DBG("** ERR_THREAD : UNKNOWN_CMD \n");
+			break;
 
-	default:
-		APP_DBG("** ERR_THREAD : ErroCode=%d \n", ErrorCode);
-		break;
+		default:
+			APP_DBG("** ERR_THREAD : ErroCode=%d \n", ErrorCode);
+			break;
 	}
 	return;
 }
@@ -591,6 +625,24 @@ static void ExtPA_Init(void)
  * WRAP FUNCTIONS
  *
  *************************************************************/
+
+static void LEDProcess(void* argument)
+{
+	UNUSED(argument);
+
+	while (true)
+	{
+		ledPower.Update();
+		ledCommissioning.Update();
+		ledIdentifier.Update();
+
+		if (LED::dirty)
+		{
+			LED_Send();
+			LED::dirty = false;
+		}
+	}
+}
 
 static void ShciUserEvtProcess(void* argument)
 {

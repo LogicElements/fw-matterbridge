@@ -25,6 +25,7 @@
 #include "dbg_trace.h"
 #include "FactoryDataProvider.h"
 #include "LED.h"
+#include "LED_Animation.h"
 
 #if (OTA_SUPPORT == 1)
 #include "ota.h"
@@ -80,7 +81,7 @@ static bool sFabricNeedSaved = false;
 static bool sFailCommissioning = false;
 static bool sHaveFabric = false;
 
-extern TIM_HandleTypeDef htim1;
+extern LED ledCommissioning;
 
 DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
@@ -149,6 +150,8 @@ CHIP_ERROR AppTask::Init()
 		// Enable BLE advertisements
 		Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
 		APP_DBG("BLE advertising started. Waiting for Pairing.");
+
+		ledCommissioning.SetEffect(LED::Effect::Blinking);
 	}
 	else
 	{
@@ -214,9 +217,6 @@ void AppTask::AppTaskMain(void* pvParameter)
 			eventReceived = xQueueReceive(sAppEventQueue, &event, 0);
 		}
 
-		LED_SetColorRGB(0, 255, 0, 0);
-		LED_Send(&htim1);
-
 #if HIGHWATERMARK
 		uxHighWaterMark = uxTaskGetStackHighWaterMark(NULL);
 		vPortGetHeapStats(&HeapStatsInfo);
@@ -258,46 +258,59 @@ void AppTask::DispatchEvent(AppEvent* aEvent)
  */
 float tempTime = 0.0f;
 
-void AppTask::UpdateClusterState()
+// void AppTask::UpdateClusterState()
+// {
+// 	if (PlatformMgr().TryLockChipStack())
+// 	{
+// 		ChipLogProgress(NotSpecified, "UpdateClusterState");
+//
+// 		float temp = 2000 + 500 * sinf(tempTime);
+// 		tempTime += 0.25f;
+//
+// 		Protocols::InteractionModel::Status status = Thermostat::Attributes::LocalTemperature::Set(1, static_cast<int16_t>(temp));
+// 		if (status != Protocols::InteractionModel::Status::Success)
+// 		{
+// 			ChipLogError(NotSpecified, "ERR: updating local temperature %x", static_cast<uint8_t>(status));
+// 		}
+//
+// 		int16_t coolingSP = 0, heatingSP = 0;
+// 		Thermostat::Attributes::OccupiedCoolingSetpoint::Get(1, &coolingSP);
+// 		Thermostat::Attributes::OccupiedHeatingSetpoint::Get(1, &heatingSP);
+//
+// 		ChipLogError(NotSpecified, "ERR: cooling %d, heating %d", coolingSP, heatingSP);
+//
+// 		PlatformMgr().UnlockChipStack();
+// 	}
+// }
+
+void AppTask::UpdateLEDs()
 {
-	if (PlatformMgr().TryLockChipStack())
-	{
-		ChipLogProgress(NotSpecified, "UpdateClusterState");
+	ledCommissioning.SetEffect(LED::Effect::Solid);
 
-		float temp = 2000 + 500 * sinf(tempTime);
-		tempTime += 0.25f;
-
-		Protocols::InteractionModel::Status status = Thermostat::Attributes::LocalTemperature::Set(1, static_cast<int16_t>(temp));
-		if (status != Protocols::InteractionModel::Status::Success)
-		{
-			ChipLogError(NotSpecified, "ERR: updating local temperature %x", static_cast<uint8_t>(status));
-		}
-
-		int16_t coolingSP = 0, heatingSP = 0;
-		Thermostat::Attributes::OccupiedCoolingSetpoint::Get(1, &coolingSP);
-		Thermostat::Attributes::OccupiedHeatingSetpoint::Get(1, &heatingSP);
-
-		ChipLogError(NotSpecified, "ERR: cooling %d, heating %d", coolingSP, heatingSP);
-
-		PlatformMgr().UnlockChipStack();
-	}
-}
-
-void AppTask::UpdateLEDs(void)
-{
 	if (sIsThreadProvisioned && sIsThreadEnabled)
 	{
+		ledCommissioning.SetColor(0, 100, 0);
 	}
-	else if ((sIsThreadProvisioned == false) || (sIsThreadEnabled == false))
+	else
 	{
+		ledCommissioning.SetColor(0, 0, 0);
 	}
+
 	if (sHaveBLEConnections)
 	{
-		LED_SetColorRGB(1, 0, 0, 255);
-		LED_Send(&htim1);
 	}
-	else if (sHaveBLEConnections == false)
+	else
 	{
+		ledCommissioning.SetColor(0, 0, 0);
+	}
+	if (sHaveFabric)
+	{
+		ledCommissioning.SetColor(0, 100, 0);
+	}
+
+	if (sFailCommissioning)
+	{
+		ledCommissioning.SetColor(100, 0, 0);
 	}
 }
 
@@ -305,70 +318,77 @@ void AppTask::MatterEventHandler(const ChipDeviceEvent* event, intptr_t)
 {
 	switch (event->Type)
 	{
-	case DeviceEventType::kServiceProvisioningChange:
-		{
-			sIsThreadProvisioned = event->ServiceProvisioningChange.IsServiceProvisioned;
-			UpdateLEDs();
-			break;
-		}
-
-	case DeviceEventType::kThreadConnectivityChange:
-		{
-			sIsThreadEnabled = (event->ThreadConnectivityChange.Result == kConnectivity_Established);
-			UpdateLEDs();
-			break;
-		}
-
-	case DeviceEventType::kCHIPoBLEConnectionEstablished:
-		{
-			sHaveBLEConnections = true;
-			APP_DBG("kCHIPoBLEConnectionEstablished");
-
-			UpdateLEDs();
-
-			break;
-		}
-
-	case DeviceEventType::kCHIPoBLEConnectionClosed:
-		{
-			sHaveBLEConnections = false;
-			APP_DBG("kCHIPoBLEConnectionClosed");
-			if (sFabricNeedSaved)
+		case DeviceEventType::kCHIPoBLEAdvertisingChange:
 			{
-				APP_DBG("Start timer to save nvm after commissioning finish");
-				sFabricNeedSaved = false;
+				if (event->CHIPoBLEAdvertisingChange.Result == kActivity_Stopped)
+				{
+					ledCommissioning.SetColor(0, 0, 0);
+				}
+				break;
 			}
-			UpdateLEDs();
-			break;
-		}
-
-	case DeviceEventType::kCommissioningComplete:
-		{
-			sFabricNeedSaved = true;
-			sHaveFabric = true;
-			// check if ble is on, since before save in nvm we need to stop m0, Better to write in nvm when m0 is less busy
-			if (sHaveBLEConnections == false)
+		case DeviceEventType::kServiceProvisioningChange:
 			{
-				APP_DBG("Start timer to save nvm after commissioning finish");
-				sFabricNeedSaved = false; // put to false to avoid save in nvm 2 times
+				sIsThreadProvisioned = event->ServiceProvisioningChange.IsServiceProvisioned;
+				UpdateLEDs();
+				break;
 			}
-			UpdateLEDs();
-			break;
-		}
-	case DeviceEventType::kFailSafeTimerExpired:
-		{
-			sFailCommissioning = true;
-			UpdateLEDs();
-			break;
-		}
 
-	case DeviceEventType::kDnssdInitialized:
+		case DeviceEventType::kThreadConnectivityChange:
+			{
+				sIsThreadEnabled = event->ThreadConnectivityChange.Result == kConnectivity_Established;
+				UpdateLEDs();
+				break;
+			}
+
+		case DeviceEventType::kCHIPoBLEConnectionEstablished:
+			{
+				sHaveBLEConnections = true;
+				APP_DBG("kCHIPoBLEConnectionEstablished");
+
+				UpdateLEDs();
+
+				break;
+			}
+
+		case DeviceEventType::kCHIPoBLEConnectionClosed:
+			{
+				sHaveBLEConnections = false;
+				APP_DBG("kCHIPoBLEConnectionClosed");
+				if (sFabricNeedSaved)
+				{
+					APP_DBG("Start timer to save nvm after commissioning finish");
+					sFabricNeedSaved = false;
+				}
+				UpdateLEDs();
+				break;
+			}
+		case DeviceEventType::kCommissioningComplete:
+			{
+				sFabricNeedSaved = true;
+				sHaveFabric = true;
+				// check if ble is on, since before save in nvm we need to stop m0, Better to write in nvm when m0 is less busy
+				if (sHaveBLEConnections == false)
+				{
+					APP_DBG("Start timer to save nvm after commissioning finish");
+					sFabricNeedSaved = false; // put to false to avoid save in nvm 2 times
+				}
+				UpdateLEDs();
+				break;
+			}
+		case DeviceEventType::kFailSafeTimerExpired:
+			{
+				sFailCommissioning = true;
+				UpdateLEDs();
+				break;
+			}
+
+		case DeviceEventType::kDnssdInitialized:
 #if (OTA_SUPPORT == 1)
-		InitializeOTARequestor();
+			InitializeOTARequestor();
 #endif
-		break;
+			break;
 
-	default:
-		break;
+		default:
+			break;
 	}
 }

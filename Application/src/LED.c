@@ -6,31 +6,45 @@
 #define LOW_DUTY 22 // should be between 200-400 ns
 #define HIGH_DUTY 44 // should be between 580-1000 ns
 
-#define DATA_LENGTH (BLANK_INTERVAL + 24 * NUM_LEDS + BLANK_INTERVAL)
+#define LED_LENGTH (24 * NUM_LEDS)
+#define DATA_LENGTH (LED_LENGTH + 2 * BLANK_INTERVAL)
 
 uint32_t data[DATA_LENGTH];
 
+extern TIM_HandleTypeDef htim1;
+
 void LED_Init(void)
 {
-	memset(data, 0, sizeof data);
+	LED_Reset();
 }
 
-void LED_Send(TIM_HandleTypeDef* tim)
+void LED_Send()
 {
-	HAL_TIM_PWM_Start_DMA(tim, TIM_CHANNEL_3, data, DATA_LENGTH);
+	HAL_TIM_PWM_Start_DMA(&htim1, TIM_CHANNEL_3, data, DATA_LENGTH);
 }
 
-// BUG: data should be filled with low duty (except start and end blanking interval)
+void LED_Reset()
+{
+	memset(data, 0, DATA_LENGTH);
+
+	uint32_t* offset = data + BLANK_INTERVAL;
+	for (uint32_t i = 0; i < LED_LENGTH; i++)
+	{
+		offset[i] = 22;
+	}
+}
+
 void LED_SetColorRGB(const uint8_t led, const uint8_t r, const uint8_t g, const uint8_t b)
 {
 	const uint32_t color = (uint32_t)g << 16 | (uint32_t)r << 8 | (uint32_t)b;
 
+	uint32_t* offset = data + BLANK_INTERVAL;
 	for (int i = 23; i >= 0; i--)
 	{
 		if (color & 1 << i)
-			data[BLANK_INTERVAL + 24 * led + 23 - i] = HIGH_DUTY;
+			offset[24 * led + 23 - i] = HIGH_DUTY;
 		else
-			data[BLANK_INTERVAL + 24 * led + 23 - i] = LOW_DUTY;
+			offset[24 * led + 23 - i] = LOW_DUTY;
 	}
 }
 

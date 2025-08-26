@@ -24,7 +24,6 @@
 #include "CommissionableDataProvider.h"
 #include "dbg_trace.h"
 #include "FactoryDataProvider.h"
-#include "LED.h"
 #include "LED_Animation.h"
 
 #if (OTA_SUPPORT == 1)
@@ -72,7 +71,15 @@ FactoryDataProvider mFactoryDataProvider;
 #define NVM_TIMEOUT 1000 // timer to handle PB to save data in nvm or do a factory reset
 
 static QueueHandle_t sAppEventQueue;
-const osThreadAttr_t AppTask_attr = {.name = APPTASK_NAME, .attr_bits = APP_ATTR_BITS, .cb_mem = APP_CB_MEM, .cb_size = APP_CB_SIZE, .stack_mem = APP_STACK_MEM, .stack_size = APP_STACK_SIZE, .priority = APP_PRIORITY};
+const osThreadAttr_t AppTask_attr = {
+	.name = APPTASK_NAME,
+	.attr_bits = APP_ATTR_BITS,
+	.cb_mem = APP_CB_MEM,
+	.cb_size = APP_CB_SIZE,
+	.stack_mem = APP_STACK_MEM,
+	.stack_size = APP_STACK_SIZE,
+	.priority = APP_PRIORITY
+};
 
 static bool sIsThreadProvisioned = false;
 static bool sIsThreadEnabled = false;
@@ -100,9 +107,9 @@ CHIP_ERROR AppTask::StartAppTask()
 	return CHIP_NO_ERROR;
 }
 
-void LockOpenThreadTask(void) { ThreadStackMgr().LockThreadStack(); }
+void LockOpenThreadTask() { ThreadStackMgr().LockThreadStack(); }
 
-void UnlockOpenThreadTask(void) { ThreadStackMgr().UnlockThreadStack(); }
+void UnlockOpenThreadTask() { ThreadStackMgr().UnlockThreadStack(); }
 
 CHIP_ERROR AppTask::Init()
 {
@@ -140,6 +147,14 @@ CHIP_ERROR AppTask::Init()
 
 	gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
 	SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
+
+	err = ThermostatMgr().Init();
+	if (err != CHIP_NO_ERROR)
+	{
+		APP_DBG("TempMgr().Init() failed");
+		return err;
+	}
+	ThermostatMgr().SetCallbacks(ActionCompleted);
 
 	ConfigurationMgr().LogDeviceConfig();
 
@@ -258,30 +273,34 @@ void AppTask::DispatchEvent(AppEvent* aEvent)
  */
 float tempTime = 0.0f;
 
-// void AppTask::UpdateClusterState()
-// {
-// 	if (PlatformMgr().TryLockChipStack())
-// 	{
-// 		ChipLogProgress(NotSpecified, "UpdateClusterState");
-//
-// 		float temp = 2000 + 500 * sinf(tempTime);
-// 		tempTime += 0.25f;
-//
-// 		Protocols::InteractionModel::Status status = Thermostat::Attributes::LocalTemperature::Set(1, static_cast<int16_t>(temp));
-// 		if (status != Protocols::InteractionModel::Status::Success)
-// 		{
-// 			ChipLogError(NotSpecified, "ERR: updating local temperature %x", static_cast<uint8_t>(status));
-// 		}
-//
-// 		int16_t coolingSP = 0, heatingSP = 0;
-// 		Thermostat::Attributes::OccupiedCoolingSetpoint::Get(1, &coolingSP);
-// 		Thermostat::Attributes::OccupiedHeatingSetpoint::Get(1, &heatingSP);
-//
-// 		ChipLogError(NotSpecified, "ERR: cooling %d, heating %d", coolingSP, heatingSP);
-//
-// 		PlatformMgr().UnlockChipStack();
-// 	}
-// }
+void AppTask::UpdateClusterState()
+{
+	float temp = 2000 + 500 * sinf(tempTime);
+	tempTime += 0.25f;
+	ThermostatMgr().SetCurrentTemp(tempTime);
+}
+
+void AppTask::ActionCompleted(ThermostatManager::Action_t aAction)
+{
+	if (aAction == ThermostatManager::CoolSet)
+	{
+		APP_DBG("Cooling setpoint completed");
+	}
+	else if (aAction == ThermostatManager::HeatSet)
+	{
+		APP_DBG("Heating setpoint completed");
+	}
+	else if (aAction == ThermostatManager::ModeSet)
+	{
+		APP_DBG("Mode set completed");
+	}
+	else if (aAction == ThermostatManager::LocalTemperature)
+	{
+		APP_DBG("Temperature set completed");
+	}
+
+	// UpdateTempGUI();
+}
 
 void AppTask::UpdateLEDs()
 {
@@ -298,11 +317,13 @@ void AppTask::UpdateLEDs()
 
 	if (sHaveBLEConnections)
 	{
+		ledCommissioning.SetColor(0, 0, 100);
 	}
 	else
 	{
 		ledCommissioning.SetColor(0, 0, 0);
 	}
+
 	if (sHaveFabric)
 	{
 		ledCommissioning.SetColor(0, 100, 0);

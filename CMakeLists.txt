@@ -45,6 +45,7 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
 		"Application/src/stm32_factorydata.c"
 		"Application/src/ZclCallbacks.cpp"
 		"Application/src/LED_Animation.cpp"
+		"Application/src/ThermostatManager.cpp"
 
 		"Application/codegen/zap-generated/app/callback-stub.cpp"
 		"Application/codegen/zap-generated/app/cluster-init-callback.cpp"

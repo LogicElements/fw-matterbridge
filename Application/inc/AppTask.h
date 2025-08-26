@@ -19,9 +19,9 @@
 #ifndef APP_TASK_H
 #define APP_TASK_H
 
-#include <cstdint>
 #include "AppEvent.h"
 #include <platform/CHIPDeviceLayer.h>
+#include "ThermostatManager.h"
 
 class AppTask
 {
@@ -38,6 +38,7 @@ protected:
 
 private:
 	friend AppTask& GetAppTask(void);
+	static void ActionCompleted(ThermostatManager::Action_t aAction);
 	void DispatchEvent(AppEvent* event);
 	static void MatterEventHandler(const chip::DeviceLayer::ChipDeviceEvent* event, intptr_t arg);
 	static void UpdateLEDs(void);

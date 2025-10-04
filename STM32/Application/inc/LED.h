@@ -9,6 +9,7 @@ extern "C" {
 #endif
 
 #include <stdint.h>
+#include <stm32wbxx_hal.h>
 
 typedef struct Color
 {

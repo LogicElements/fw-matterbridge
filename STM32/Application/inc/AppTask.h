@@ -40,6 +40,8 @@ private:
 	friend AppTask& GetAppTask(void);
 	static void ActionCompleted(ThermostatManager::Action_t aAction);
 	void DispatchEvent(AppEvent* event);
+	static void DelayNvmHandler(void);
+	static void UpdateNvmEventHandler(AppEvent * aEvent);
 	static void MatterEventHandler(const chip::DeviceLayer::ChipDeviceEvent* event, intptr_t arg);
 	static void UpdateLEDs(void);
 

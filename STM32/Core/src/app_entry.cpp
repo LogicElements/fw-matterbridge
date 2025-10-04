@@ -209,6 +209,8 @@ void APPE_Init(void)
 	/* FLASH init */
 	STM_EXT_FLASH_Init();
 
+	//STM_EXT_FLASH_Delete_Image(0x90000000U, 4096 * 6);
+
 	NM_Init();
 
 	APP_DBG("FW info :");
@@ -230,7 +232,7 @@ void APPE_Init(void)
 	 */
 	UTIL_LPM_SetOffMode(1 << CFG_LPM_APP, UTIL_LPM_DISABLE);
 
-	OsPushButtonProcessId = osThreadNew(LEDProcess, NULL, &PushButtonProcess_attr);
+	// OsPushButtonProcessId = osThreadNew(LEDProcess, NULL, &PushButtonProcess_attr);
 #if (ENABLE_IWDG_SUPPORT == 1)
 	OsIWDSBSFUId = osThreadNew(IWDSBSFUEvtProcess, NULL, &IWDSBSFU_attr);
 #endif /* (ENABLE_IWDG_SUPPORT == 1) */
@@ -632,15 +634,15 @@ static void LEDProcess(void* argument)
 
 	while (true)
 	{
-		ledPower.Update();
-		ledCommissioning.Update();
-		ledIdentifier.Update();
-
-		if (LED::dirty)
-		{
-			LED_Send();
-			LED::dirty = false;
-		}
+		// ledPower.Update();
+		// ledCommissioning.Update();
+		// ledIdentifier.Update();
+		//
+		// if (LED::dirty)
+		// {
+		// 	LED_Send();
+		// 	LED::dirty = false;
+		// }
 	}
 }
 

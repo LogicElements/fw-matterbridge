@@ -125,6 +125,7 @@ int main(void)
 	MX_TIM1_Init();
 
 	LED_Init();
+	LED_Send();
 
 	/* USER CODE END 2 */
 

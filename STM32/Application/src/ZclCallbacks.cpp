@@ -38,7 +38,7 @@ void MatterPostAttributeChangeCallback(const app::ConcreteAttributePath& attribu
 	{
 		ChipLogProgress(Zcl, "Cluster Identify: value set to %u", *value);
 
-		//		LightingMgr().StartIdentification(*value);
+		// LightingMgr().StartIdentification(*value);
 	}
 	else
 	{

@@ -66,7 +66,6 @@ using DeviceLayer::PersistedStorage::KeyValueStoreMgr;
 AppTask AppTask::sAppTask;
 FactoryDataProvider mFactoryDataProvider;
 
-// #define STM32ThreadDataSet "STM32DataSet"
 #define APP_EVENT_QUEUE_SIZE 10
 #define NVM_TIMEOUT 1000 // timer to handle PB to save data in nvm or do a factory reset
 
@@ -114,14 +113,13 @@ void UnlockOpenThreadTask() { ThreadStackMgr().UnlockThreadStack(); }
 CHIP_ERROR AppTask::Init()
 {
 	CHIP_ERROR err = CHIP_NO_ERROR;
-	ChipLogProgress(NotSpecified, "Current Software Version: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
 
 	ThreadStackMgr().InitThreadStack();
 
-#if (CHIP_DEVICE_CONFIG_ENABLE_SED == 1)
+#if ( CHIP_DEVICE_CONFIG_ENABLE_SED == 1)
 	ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SleepyEndDevice);
 #else
-	ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router);
+	ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_FullEndDevice);
 #endif
 
 	PlatformMgr().AddEventHandler(MatterEventHandler, 0);
@@ -158,19 +156,14 @@ CHIP_ERROR AppTask::Init()
 
 	ConfigurationMgr().LogDeviceConfig();
 
-	// Open commissioning after boot if no fabric was available
 	if (Server::GetInstance().GetFabricTable().FabricCount() == 0)
 	{
 		PrintOnboardingCodes(RendezvousInformationFlags(RendezvousInformationFlag::kBLE));
-		// Enable BLE advertisements
 		Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
 		APP_DBG("BLE advertising started. Waiting for Pairing.");
-
-		ledCommissioning.SetEffect(LED::Effect::Blinking);
 	}
 	else
 	{
-		// try to attach to the thread network
 		sHaveFabric = true;
 	}
 
@@ -179,7 +172,6 @@ CHIP_ERROR AppTask::Init()
 	{
 		APP_DBG("PlatformMgr().StartEventLoopTask() failed");
 	}
-
 
 	return err;
 }
@@ -335,6 +327,38 @@ void AppTask::UpdateLEDs()
 	}
 }
 
+void AppTask::DelayNvmHandler(void)
+{
+	AppEvent event;
+	event.Type = AppEvent::kEventType_Timer;
+	event.Handler = UpdateNvmEventHandler;
+	sAppTask.mFunction = kFunction_SaveNvm;
+	sAppTask.PostEvent(&event);
+}
+
+void AppTask::UpdateNvmEventHandler(AppEvent* aEvent)
+{
+	uint8_t err = 0;
+
+	if (sAppTask.mFunction == kFunction_SaveNvm)
+	{
+		err = NM_Dump();
+		if (err == 0)
+		{
+			APP_DBG("SAVE NVM");
+		}
+		else
+		{
+			APP_DBG("Failed to SAVE NVM");
+		}
+	}
+	else if (sAppTask.mFunction == kFunction_FactoryReset)
+	{
+		APP_DBG("FACTORY RESET");
+		NM_ResetFactory();
+	}
+}
+
 void AppTask::MatterEventHandler(const ChipDeviceEvent* event, intptr_t)
 {
 	switch (event->Type)
@@ -378,6 +402,7 @@ void AppTask::MatterEventHandler(const ChipDeviceEvent* event, intptr_t)
 				if (sFabricNeedSaved)
 				{
 					APP_DBG("Start timer to save nvm after commissioning finish");
+					DelayNvmHandler();
 					sFabricNeedSaved = false;
 				}
 				UpdateLEDs();
@@ -387,10 +412,12 @@ void AppTask::MatterEventHandler(const ChipDeviceEvent* event, intptr_t)
 			{
 				sFabricNeedSaved = true;
 				sHaveFabric = true;
+
 				// check if ble is on, since before save in nvm we need to stop m0, Better to write in nvm when m0 is less busy
 				if (sHaveBLEConnections == false)
 				{
 					APP_DBG("Start timer to save nvm after commissioning finish");
+					DelayNvmHandler();
 					sFabricNeedSaved = false; // put to false to avoid save in nvm 2 times
 				}
 				UpdateLEDs();

@@ -86,6 +86,7 @@ NVM_StatusTypeDef NM_Init(void)
 
 	memset(ram_nvm, DEFAULT_VALUE, sizeof(ram_nvm));
 	err = STM_EXT_FLASH_ReadChunk(NVM_MATTER_ADDR_INIT_SECURE, ram_nvm, sizeof(ram_nvm));
+
 	return err;
 }
 
@@ -118,16 +119,16 @@ NVM_StatusTypeDef NM_GetKeyExists(const char* KeyName, NVM_Sector sector)
 	NVM_Sector_Struct select_nvm = {0};
 	switch (sector)
 	{
-	case SECTOR_NO_SECURE:
-		select_nvm = sector_no_secure;
-		break;
+		case SECTOR_NO_SECURE:
+			select_nvm = sector_no_secure;
+			break;
 
-	case SECTOR_SECURE:
-		select_nvm = sector_secure;
-		break;
+		case SECTOR_SECURE:
+			select_nvm = sector_secure;
+			break;
 
-	default:
-		return NVM_WRITE_FAILED;
+		default:
+			return NVM_WRITE_FAILED;
 	}
 
 	uint8_t* key_search = SearchKey(select_nvm.ram_ptr, (uint8_t*)KeyName, select_nvm.sector_size);
@@ -147,16 +148,16 @@ NVM_StatusTypeDef NM_GetKeyValue(void* KeyValue, const char* KeyName, uint32_t K
 	NVM_Sector_Struct select_nvm = {0};
 	switch (sector)
 	{
-	case SECTOR_NO_SECURE:
-		select_nvm = sector_no_secure;
-		break;
+		case SECTOR_NO_SECURE:
+			select_nvm = sector_no_secure;
+			break;
 
-	case SECTOR_SECURE:
-		select_nvm = sector_secure;
-		break;
+		case SECTOR_SECURE:
+			select_nvm = sector_secure;
+			break;
 
-	default:
-		return NVM_WRITE_FAILED;
+		default:
+			return NVM_WRITE_FAILED;
 	}
 
 	uint8_t* key_search = SearchKey(select_nvm.ram_ptr, (uint8_t*)KeyName, select_nvm.sector_size);
@@ -189,16 +190,16 @@ NVM_StatusTypeDef NM_SetKeyValue(char* KeyValue, char* KeyName, uint32_t KeySize
 
 	switch (sector)
 	{
-	case SECTOR_NO_SECURE:
-		select_nvm = sector_no_secure;
-		break;
+		case SECTOR_NO_SECURE:
+			select_nvm = sector_no_secure;
+			break;
 
-	case SECTOR_SECURE:
-		select_nvm = sector_secure;
-		break;
+		case SECTOR_SECURE:
+			select_nvm = sector_secure;
+			break;
 
-	default:
-		return NVM_WRITE_FAILED;
+		default:
+			return NVM_WRITE_FAILED;
 	}
 
 	if (KeySize > NVM_BLOCK_SIZE)
@@ -231,16 +232,16 @@ NVM_StatusTypeDef NM_DeleteKey(const char* Keyname, NVM_Sector sector)
 	NVM_Sector_Struct select_nvm = {0};
 	switch (sector)
 	{
-	case SECTOR_NO_SECURE:
-		select_nvm = sector_no_secure;
-		break;
+		case SECTOR_NO_SECURE:
+			select_nvm = sector_no_secure;
+			break;
 
-	case SECTOR_SECURE:
-		select_nvm = sector_secure;
-		break;
+		case SECTOR_SECURE:
+			select_nvm = sector_secure;
+			break;
 
-	default:
-		return NVM_WRITE_FAILED;
+		default:
+			return NVM_WRITE_FAILED;
 	}
 	uint8_t* Ptkey = SearchKey(select_nvm.ram_ptr, (uint8_t*)Keyname, select_nvm.sector_size);
 	if (Ptkey != NULL)

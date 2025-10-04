@@ -122,29 +122,29 @@ typedef struct
 /* Definition for QSPI clock resources */
 #define QSPI_CLK_ENABLE()          __HAL_RCC_QSPI_CLK_ENABLE()
 #define QSPI_CLK_DISABLE()         __HAL_RCC_QSPI_CLK_DISABLE()
-#define QSPI_CS_GPIO_CLK_ENABLE()  __HAL_RCC_GPIOD_CLK_ENABLE()
-#define QSPI_CLK_GPIO_CLK_ENABLE() __HAL_RCC_GPIOA_CLK_ENABLE()
+#define QSPI_CS_GPIO_CLK_ENABLE()  __HAL_RCC_GPIOA_CLK_ENABLE()
+#define QSPI_CLK_GPIO_CLK_ENABLE() __HAL_RCC_GPIOB_CLK_ENABLE()
 #define QSPI_D0_GPIO_CLK_ENABLE()  __HAL_RCC_GPIOB_CLK_ENABLE()
-#define QSPI_D1_GPIO_CLK_ENABLE()  __HAL_RCC_GPIOD_CLK_ENABLE()
-#define QSPI_D2_GPIO_CLK_ENABLE()  __HAL_RCC_GPIOD_CLK_ENABLE()
-#define QSPI_D3_GPIO_CLK_ENABLE()  __HAL_RCC_GPIOD_CLK_ENABLE()
+#define QSPI_D1_GPIO_CLK_ENABLE()  __HAL_RCC_GPIOB_CLK_ENABLE()
+#define QSPI_D2_GPIO_CLK_ENABLE()  __HAL_RCC_GPIOA_CLK_ENABLE()
+#define QSPI_D3_GPIO_CLK_ENABLE()  __HAL_RCC_GPIOA_CLK_ENABLE()
 
 #define QSPI_FORCE_RESET()         __HAL_RCC_QSPI_FORCE_RESET()
 #define QSPI_RELEASE_RESET()       __HAL_RCC_QSPI_RELEASE_RESET()
 
 /* Definition for QSPI Pins */
-#define QSPI_CS_PIN                GPIO_PIN_3
-#define QSPI_CS_GPIO_PORT          GPIOD
-#define QSPI_CLK_PIN               GPIO_PIN_3
-#define QSPI_CLK_GPIO_PORT         GPIOA
+#define QSPI_CS_PIN                GPIO_PIN_2
+#define QSPI_CS_GPIO_PORT          GPIOA
+#define QSPI_CLK_PIN               GPIO_PIN_10
+#define QSPI_CLK_GPIO_PORT         GPIOB
 #define QSPI_D0_PIN                GPIO_PIN_9
 #define QSPI_D0_GPIO_PORT          GPIOB
-#define QSPI_D1_PIN                GPIO_PIN_5
-#define QSPI_D1_GPIO_PORT          GPIOD
-#define QSPI_D2_PIN                GPIO_PIN_6
-#define QSPI_D2_GPIO_PORT          GPIOD
-#define QSPI_D3_PIN                GPIO_PIN_7
-#define QSPI_D3_GPIO_PORT          GPIOD
+#define QSPI_D1_PIN                GPIO_PIN_8
+#define QSPI_D1_GPIO_PORT          GPIOB
+#define QSPI_D2_PIN                GPIO_PIN_7
+#define QSPI_D2_GPIO_PORT          GPIOA
+#define QSPI_D3_PIN                GPIO_PIN_6
+#define QSPI_D3_GPIO_PORT          GPIOA
 
 /* S25FL128S memory */
 /* Size of the flash */
